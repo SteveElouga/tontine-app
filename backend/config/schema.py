@@ -106,6 +106,35 @@ def _recap_membre(member: Member, cycle: Cycle) -> RecapMembre:
 
 
 @strawberry.type
+class Pret:
+    id: strawberry.ID
+    membre_id: strawberry.ID
+    nom: str
+    montant: Decimal
+    mois_pret: int
+    mois_remboursement: Optional[int]
+    mois_de_dette: int
+    majoration: Decimal
+    total_a_rembourser: Decimal
+    rembourse: bool
+
+
+def _pret(loan) -> "Pret":
+    return Pret(
+        id=strawberry.ID(str(loan.id)),
+        membre_id=strawberry.ID(str(loan.member_id)),
+        nom=loan.member.nom,
+        montant=loan.montant,
+        mois_pret=loan.mois_pret,
+        mois_remboursement=loan.mois_remboursement,
+        mois_de_dette=loan.mois_de_dette,
+        majoration=loan.majoration,
+        total_a_rembourser=loan.total_a_rembourser,
+        rembourse=loan.mois_remboursement is not None,
+    )
+
+
+@strawberry.type
 class Query:
     @strawberry.field
     def sante(self) -> str:
@@ -208,6 +237,18 @@ class Query:
             position_nette=interest.position_nette(depots_domain, prets_domain, params),
         )
 
+    @strawberry.field
+    def prets_cycle(self, cycle_id: strawberry.ID) -> List[Pret]:
+        """Tous les prêts d'un cycle (montant, majoration, total, statut)."""
+        from apps.loans.models import Loan
+
+        loans = (
+            Loan.objects.filter(cycle_id=cycle_id)
+            .select_related("member", "cycle")
+            .order_by("member__nom", "mois_pret")
+        )
+        return [_pret(loan) for loan in loans]
+
 
 @strawberry.type
 class Mutation:
@@ -248,6 +289,32 @@ class Mutation:
         m.actif = False
         m.save(update_fields=["actif"])
         return True
+
+    @strawberry.mutation
+    def ajouter_pret(
+        self, cycle_id: strawberry.ID, member_id: strawberry.ID, montant: Decimal, mois_pret: int
+    ) -> Pret:
+        """Enregistre un prêt accordé à un membre par la caisse."""
+        from apps.loans.models import Loan
+
+        cycle = Cycle.objects.get(id=cycle_id)
+        member = Member.objects.get(id=member_id)
+        loan = Loan.objects.create(cycle=cycle, member=member, montant=montant, mois_pret=mois_pret)
+        loan.cycle = cycle
+        loan.member = member
+        return _pret(loan)
+
+    @strawberry.mutation
+    def rembourser_pret(
+        self, pret_id: strawberry.ID, mois_remboursement: Optional[int] = None
+    ) -> Pret:
+        """Marque un prêt remboursé (mois indiqué ; vide = au délai d'août)."""
+        from apps.loans.models import Loan
+
+        loan = Loan.objects.select_related("member", "cycle").get(id=pret_id)
+        loan.mois_remboursement = mois_remboursement
+        loan.save(update_fields=["mois_remboursement"])
+        return _pret(loan)
 
 
 schema = strawberry.Schema(query=Query, mutation=Mutation)

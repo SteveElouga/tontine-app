@@ -67,3 +67,17 @@ export interface FicheMembre {
   dettes: string;
   positionNette: string;
 }
+
+/** Une ligne de prêt du cycle (vue « Prêts »). */
+export interface Pret {
+  id: string;
+  membreId: string;
+  nom: string;
+  montant: string;
+  moisPret: number;
+  moisRemboursement: number | null;
+  moisDeDette: number;
+  majoration: string;
+  totalARembourser: string;
+  rembourse: boolean;
+}

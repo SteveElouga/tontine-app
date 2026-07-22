@@ -1,0 +1,192 @@
+:host {
+  display: block;
+}
+
+.entete {
+  margin-bottom: 20px;
+
+  h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .sub {
+    margin: 2px 0 0;
+    color: var(--c-text-2);
+    font-size: 14px;
+  }
+}
+
+.champ {
+  border: 1px solid var(--c-border-strong);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 15px;
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-family: inherit;
+
+  &:focus {
+    outline: none;
+    border-color: var(--c-accent);
+    box-shadow: 0 0 0 2px var(--c-accent-bg);
+  }
+}
+
+.ajout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 22px;
+  padding: 14px;
+  background: var(--c-surface-1);
+  border-radius: 12px;
+
+  .membre {
+    min-width: 200px;
+  }
+
+  .unite {
+    font-size: 12px;
+    color: var(--c-text-muted);
+  }
+}
+
+.prets {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+
+  th {
+    text-align: left;
+    font-size: 12px;
+    color: var(--c-text-muted);
+    font-weight: 500;
+    padding: 0 12px 10px;
+    border-bottom: 1px solid var(--c-border);
+  }
+
+  td {
+    padding: 12px;
+    border-bottom: 1px solid var(--c-border);
+  }
+
+  .g {
+    text-align: left;
+  }
+
+  .c {
+    text-align: center;
+  }
+
+  .d {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .a {
+    text-align: right;
+  }
+
+  .fort {
+    font-weight: 600;
+  }
+
+  .rouge {
+    color: #b23b3b;
+  }
+
+  tfoot td {
+    border-top: 2px solid var(--c-border-strong);
+    border-bottom: none;
+    padding-top: 14px;
+  }
+}
+
+.centre {
+  text-align: center;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+
+  &.ok {
+    color: var(--c-success);
+  }
+}
+
+.lien {
+  border: 1px solid var(--c-border-strong);
+  background: var(--c-surface);
+  color: var(--c-accent);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-family: inherit;
+
+  &:hover {
+    background: var(--c-accent-bg);
+    border-color: var(--c-accent);
+  }
+}
+
+.remb {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: flex-end;
+
+  .mini {
+    padding: 6px 8px;
+    font-size: 14px;
+  }
+}
+
+.mini-btn {
+  border: 1px solid var(--c-border-strong);
+  background: var(--c-surface);
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 6px 9px;
+  color: var(--c-text-2);
+
+  i {
+    font-size: 14px;
+  }
+
+  &:hover {
+    border-color: var(--c-accent);
+    color: var(--c-accent);
+  }
+
+  &.ok:hover {
+    border-color: var(--c-success);
+    color: var(--c-success);
+  }
+}
+
+.astuce {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  background: var(--c-surface-1);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--c-text-2);
+
+  i {
+    color: var(--c-accent);
+  }
+}
+
+.muted {
+  color: var(--c-text-muted);
+}
