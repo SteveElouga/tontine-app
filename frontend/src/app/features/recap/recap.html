@@ -6,49 +6,68 @@
 @if (chargement()) {
   <p class="muted">Chargement…</p>
 } @else {
-  <table class="recap">
-    <thead>
-      <tr>
-        <th class="g">Membre</th>
-        <th class="d">Épargne + intérêts</th>
-        <th class="d">Dette</th>
-        <th class="d">À recevoir</th>
-        <th class="chev"></th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (m of membres(); track m.id) {
-        <tr class="clic" [routerLink]="['/membre', m.id]">
-          <td class="g">{{ m.nom }}</td>
-          <td class="d muted2">{{ format(m.epargnePlusInterets) }}</td>
+  <div class="barre">
+    <span class="recherche">
+      <i class="pi pi-search"></i>
+      <input
+        pInputText
+        type="search"
+        [ngModel]="recherche()"
+        (ngModelChange)="recherche.set($event)"
+        placeholder="Rechercher un membre…"
+      />
+    </span>
+  </div>
+
+  <div class="tableau-wrap">
+    <table class="recap">
+      <thead>
+        <tr>
+          <th class="g">Membre</th>
+          <th class="d">Épargne + intérêts</th>
+          <th class="d">Dette</th>
+          <th class="d">À recevoir</th>
+          <th class="chev"></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (m of membresFiltres(); track m.id) {
+          <tr class="clic" [routerLink]="['/membre', m.id]">
+            <td class="g">{{ m.nom }}</td>
+            <td class="d muted2">{{ format(m.epargnePlusInterets) }}</td>
+            <td class="d">
+              @if (n(m.dettes) > 0) {
+                <span class="dette">−{{ format(m.dettes) }}</span>
+              } @else {
+                <span class="tiret">—</span>
+              }
+            </td>
+            <td class="d fort">{{ format(m.positionNette) }}</td>
+            <td class="chev"><i class="pi pi-angle-right"></i></td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="muted centre">Aucun membre trouvé.</td>
+          </tr>
+        }
+      </tbody>
+      <tfoot>
+        <tr>
+          <td class="g fort">Total</td>
+          <td class="d muted2">{{ format(totalEpargne()) }}</td>
           <td class="d">
-            @if (n(m.dettes) > 0) {
-              <span class="dette">−{{ format(m.dettes) }}</span>
+            @if (totalDettes() > 0) {
+              <span class="dette">−{{ format(totalDettes()) }}</span>
             } @else {
               <span class="tiret">—</span>
             }
           </td>
-          <td class="d fort">{{ format(m.positionNette) }}</td>
-          <td class="chev"><i class="pi pi-angle-right"></i></td>
+          <td class="d fort">{{ format(totalRecevoir()) }}</td>
+          <td class="chev"></td>
         </tr>
-      }
-    </tbody>
-    <tfoot>
-      <tr>
-        <td class="g fort">Total</td>
-        <td class="d muted2">{{ format(totalEpargne()) }}</td>
-        <td class="d">
-          @if (totalDettes() > 0) {
-            <span class="dette">−{{ format(totalDettes()) }}</span>
-          } @else {
-            <span class="tiret">—</span>
-          }
-        </td>
-        <td class="d fort">{{ format(totalRecevoir()) }}</td>
-        <td class="chev"></td>
-      </tr>
-    </tfoot>
-  </table>
+      </tfoot>
+    </table>
+  </div>
 
   <div class="pied">
     <p-button label="Imprimer" icon="pi pi-print" (onClick)="imprimer()" />
