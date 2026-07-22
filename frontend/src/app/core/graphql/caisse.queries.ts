@@ -92,3 +92,32 @@ export const RETIRER_MEMBRE = gql`
     retirerMembre(memberId: $memberId)
   }
 `;
+
+/** Détail complet d'un membre (transparence : d'où vient son montant). */
+export const FICHE_MEMBRE = gql`
+  query FicheMembre($cycleId: ID!, $memberId: ID!) {
+    ficheMembre(cycleId: $cycleId, memberId: $memberId) {
+      id
+      nom
+      depots {
+        moisIndex
+        montant
+        taux
+        interet
+      }
+      prets {
+        montant
+        moisPret
+        moisRemboursement
+        moisDeDette
+        majoration
+        totalARembourser
+      }
+      totalDepose
+      interets
+      epargnePlusInterets
+      dettes
+      positionNette
+    }
+  }
+`;
