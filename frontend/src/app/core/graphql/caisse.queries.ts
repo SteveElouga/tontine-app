@@ -121,3 +121,57 @@ export const FICHE_MEMBRE = gql`
     }
   }
 `;
+
+/** Tous les prêts d'un cycle (avec majoration, total, statut). */
+export const PRETS_CYCLE = gql`
+  query PretsCycle($cycleId: ID!) {
+    pretsCycle(cycleId: $cycleId) {
+      id
+      membreId
+      nom
+      montant
+      moisPret
+      moisRemboursement
+      moisDeDette
+      majoration
+      totalARembourser
+      rembourse
+    }
+  }
+`;
+
+/** Enregistre un prêt accordé à un membre. */
+export const AJOUTER_PRET = gql`
+  mutation AjouterPret($cycleId: ID!, $memberId: ID!, $montant: Decimal!, $moisPret: Int!) {
+    ajouterPret(cycleId: $cycleId, memberId: $memberId, montant: $montant, moisPret: $moisPret) {
+      id
+      membreId
+      nom
+      montant
+      moisPret
+      moisRemboursement
+      moisDeDette
+      majoration
+      totalARembourser
+      rembourse
+    }
+  }
+`;
+
+/** Marque un prêt remboursé (mois indiqué ; vide = au délai d'août). */
+export const REMBOURSER_PRET = gql`
+  mutation RembourserPret($pretId: ID!, $moisRemboursement: Int) {
+    rembourserPret(pretId: $pretId, moisRemboursement: $moisRemboursement) {
+      id
+      membreId
+      nom
+      montant
+      moisPret
+      moisRemboursement
+      moisDeDette
+      majoration
+      totalARembourser
+      rembourse
+    }
+  }
+`;

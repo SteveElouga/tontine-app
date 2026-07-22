@@ -65,10 +65,10 @@ gitGraph
 > Mis à jour à la FIN de chaque session (E7). Doit répondre en 30 s à « où en est-on ? ».
 - **Phase** : développement
 - **Dernier jalon atteint** : TON-9 mergé (#8) — **fiche membre détaillée** (transparence, la douleur n°1 du sondage : la méfiance) : écran qui montre pour un membre **d'où vient chaque franc** (dépôt × taux → intérêt ; prêt → majoration ; `épargne + intérêts − dette = à recevoir`), accessible en touchant une ligne du Récapitulatif. Protection `develop` **ajustée pour le solo** (revue approuvée = 0) : les PR passent au vert sur la seule CI, sans bypass.
-- **En cours** : story **pleine largeur** sur `refactor/pleine-largeur` — retrait des plafonds `:host { max-width }` (Membres 760, Fiche 680) et de `.raccourcis` (900, tableau de bord), pour que chaque section occupe toute la largeur disponible. Contrôles gardés volontairement étroits car ce sont des widgets et non des sections : le sélecteur de mois (stepper) et l'astuce de saisie.
-- **Prochaine étape** : module **Prêts** (backend + écran de saisie des prêts, pour qu'ils se saisissent au-delà du seed et apparaissent dans fiches + récap) ; puis brancher la règle d'ajustement des intérêts (après réponse trésorière).
+- **En cours** : story **TON-10 Prêts** sur `feat/TON-10-prets`. Backend : type GraphQL `Pret`, query `pretsCycle`, mutations `ajouterPret`/`rembourserPret`. Frontend : écran `features/prets/` — liste des prêts du cycle (montant, mois de dette, majoration, total, statut), formulaire « nouveau prêt » (membre + montant + mois) et remboursement en ligne (choix du mois). Nav « Prêts » activée (route `/prets`). **Vérifié** : `ngc` AOT + templates = exit 0.
+- **Prochaine étape** : brancher la **règle d'ajustement des intérêts** dès la précision de Thérèse (voir points d'attention) ; puis **sélecteur de cycle/caisse** (retirer le `CYCLE_ID` codé en dur).
 - **Points d'attention / dette** :
-  - **Règle d'ajustement des intérêts** (quand tout n'est pas prêté) en attente de réponse de la trésorière pilote — le moteur est prêt à l'accueillir (`apps/core/domain/interest.py`, classes `RepartitionInterets`).
+  - **Règle d'ajustement des intérêts** (quand tout n'est pas prêté) : Thérèse a tranché **Règle 2** (on ne rémunère que l'argent réellement prêté) en **réduisant le nombre de mois**, montant **calculé automatiquement** (total intérêts = majorations encaissées). Reste **1 précision** demandée : **plafonner** les mois (les déposants tôt baissent, les tardifs ne bougent pas) ou **retrancher** le même nombre de mois à tous (les tardifs peuvent tomber à 0). Moteur prêt à l'accueillir (`apps/core/domain/interest.py`, `RepartitionInterets`).
   - Frontend : **Angular 22 + PrimeNG 21 (MIT, gratuit)** — ne pas passer à PrimeNG 22 (licence). Preset PrimeNG personnalisé (bleu) dans `app.config.ts`. Sélecteur GraphQL/cycle codé en dur pour l'instant (dev).
   - Montants renvoyés en **chaînes** par l'API (Decimal Strawberry) ; contrat aligné dans `caisse.models.ts`.
   - gitleaks et Task (go-task) à installer en local (`brew install gitleaks go-task`).
@@ -78,6 +78,7 @@ gitGraph
 
 | Date | Auteur | Résumé de ce qui a été fait | Branches / PR |
 |------|--------|-----------------------------|---------------|
+| 2026-07-22 | Steve + agent | Story **TON-10 Prêts** : backend (type `Pret`, query `pretsCycle`, mutations `ajouterPret`/`rembourserPret`) + écran Prêts (liste, ajout d'un prêt, remboursement en ligne) + nav/route `/prets`. Vérifié `ngc` (AOT + templates, exit 0) ; schéma testé côté Mac (curl `pretsCycle`). Réponse trésorière notée pour la règle d'intérêts (Règle 2 + réduire les mois). | feat/TON-10-prets → PR #10 |
 | 2026-07-22 | Steve + agent | TON-9 mergé (#8). Protection `develop` réglée pour le solo (revue approuvée → 0 ; CI/PR/historique linéaire/pas de push direct conservés — cf. §7). Story UI : **tous les écrans en pleine largeur** — retrait des plafonds `max-width` sur Membres, Fiche membre et la grille de raccourcis du tableau de bord. | refactor/pleine-largeur → PR #9 |
 | 2026-07-22 | Steve + agent | TON-8 mergé (#7). Story TON-9 : **fiche membre détaillée** (transparence) — query GraphQL `ficheMembre` (détail dépôts/taux/intérêts + prêt/majoration/total) et écran fidèle à la maquette ; lignes du Récapitulatif rendues cliquables (route `membre/:id`, chevron + indice). Vérifié par `ngc` (AOT + type-check des templates, exit 0). | feat/TON-9-fiche-membre → PR #8 |
 | 2026-07-22 | Steve + agent | TON-6 mergé (#6). TON-7 (récap colonnes redimensionnables) essayé puis **abandonné** (pas intuitif). Story TON-8 : écran Membres (liste + ajouter/renommer/désactiver) + nav cliquable + correctif barre latérale fixe. | feat/TON-8-membres → PR #7 |
@@ -116,8 +117,9 @@ gitGraph
 | 8 | Écran Membres — liste + ajouter/renommer/désactiver (TON-8) | fait | PR #7 |
 | 9 | Fiche membre détaillée (transparence, sur `ficheMembre`) (TON-9) | fait | PR #8 |
 | 10 | Tous les écrans en pleine largeur (retrait des plafonds `max-width`) | en cours | refactor/pleine-largeur |
-| 11 | Module Prêts — backend + écran de saisie des prêts | à faire | — |
-| 12 | Brancher la règle d'ajustement des intérêts (après réponse trésorière) | bloqué | — |
+| 11 | Module Prêts — saisie + remboursement (TON-10) | en cours | feat/TON-10-prets |
+| 12 | Brancher la règle d'ajustement des intérêts (Règle 2 + réduire les mois, montant auto) | en attente | 1 précision Thérèse |
+| 13 | Sélecteur de cycle/caisse (retirer le `CYCLE_ID` codé en dur) | à faire | — |
 
 ## 9. Stack & conventions du projet
 - **Frontend** : Angular (PWA), TypeScript, Apollo GraphQL. Web d'abord ; mobile plus tard.

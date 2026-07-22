@@ -2,15 +2,25 @@ import { Injectable, inject } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { map, Observable } from 'rxjs';
 
-import { FicheMembre, Membre, MembreMontant, MontantMois, RecapMembre } from '../domain/caisse.models';
+import {
+  FicheMembre,
+  Membre,
+  MembreMontant,
+  MontantMois,
+  Pret,
+  RecapMembre,
+} from '../domain/caisse.models';
 import {
   AJOUTER_DEPOT,
   AJOUTER_MEMBRE,
+  AJOUTER_PRET,
   DEPOTS_MEMBRE,
   DEPOTS_MOIS,
   FICHE_MEMBRE,
   MEMBRES,
+  PRETS_CYCLE,
   RECAP_CYCLE,
+  REMBOURSER_PRET,
   RENOMMER_MEMBRE,
   RETIRER_MEMBRE,
 } from './caisse.queries';
@@ -117,5 +127,41 @@ export class CaisseService {
         fetchPolicy: 'network-only',
       })
       .pipe(map((r) => r.data!.ficheMembre as FicheMembre));
+  }
+
+  /** Tous les prêts d'un cycle (montant, majoration, total, statut). */
+  pretsCycle(cycleId: string): Observable<Pret[]> {
+    return this.apollo
+      .query<{ pretsCycle: Pret[] }>({
+        query: PRETS_CYCLE,
+        variables: { cycleId },
+        fetchPolicy: 'network-only',
+      })
+      .pipe(map((r) => (r.data?.pretsCycle ?? []) as Pret[]));
+  }
+
+  /** Enregistre un prêt accordé à un membre. */
+  ajouterPret(
+    cycleId: string,
+    memberId: string,
+    montant: number,
+    moisPret: number,
+  ): Observable<Pret> {
+    return this.apollo
+      .mutate<{ ajouterPret: Pret }>({
+        mutation: AJOUTER_PRET,
+        variables: { cycleId, memberId, montant, moisPret },
+      })
+      .pipe(map((r) => r.data!.ajouterPret as Pret));
+  }
+
+  /** Marque un prêt remboursé (mois indiqué ; null = au délai d'août). */
+  rembourserPret(pretId: string, moisRemboursement: number | null): Observable<Pret> {
+    return this.apollo
+      .mutate<{ rembourserPret: Pret }>({
+        mutation: REMBOURSER_PRET,
+        variables: { pretId, moisRemboursement },
+      })
+      .pipe(map((r) => r.data!.rembourserPret as Pret));
   }
 }
