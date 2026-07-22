@@ -63,20 +63,20 @@ gitGraph
 
 ## 5. État courant du projet
 > Mis à jour à la FIN de chaque session (E7). Doit répondre en 30 s à « où en est-on ? ».
-- **Phase** : développement (bootstrap gouvernance)
-- **Dernier jalon atteint** : scaffold complet (backend Django modulaire + structure frontend Angular) ; moteur de calcul de la caisse mutuelle codé et **testé** (8/8) ; docs fonctionnelle & architecture rédigées.
-- **En cours** : mise en place de la gouvernance Git (ce fichier + artefacts §5) avant tout commit.
-- **Prochaine étape** : amorcer le dépôt (`git init` → hooks → 1er commit sur `main` → créer `develop`), puis première story (au choix : seed des 17 membres du pilote, ou 1er écran Angular de saisie des dépôts).
+- **Phase** : développement
+- **Dernier jalon atteint** : gouvernance Git **complète et active** (hooks locaux + protection serveur `main`/`develop` + CI) ; dépôt public en ligne (github.com/SteveElouga/tontine-app) ; scaffold + moteur de calcul testé (8/8).
+- **En cours** : story **TON-1** — migrations initiales + seed de la caisse pilote — sur `feat/TON-1-seed-caisse-pilote`.
+- **Prochaine étape** : ouvrir la PR TON-1 → CI verte → merge (rebase) dans `develop` ; puis 1er écran Angular (saisie des dépôts).
 - **Points d'attention / dette** :
   - **Règle d'ajustement des intérêts** (quand tout n'est pas prêté) en attente de réponse de la trésorière pilote — le moteur est prêt à l'accueillir (`apps/core/domain/interest.py`, classes `RepartitionInterets`).
-  - Dépôt GitHub à créer ; lancer `scripts/setup-github.sh` pour la protection serveur.
-  - gitleaks et Task (go-task) à installer en local (`brew install gitleaks go-task`).
+  - gitleaks et Task (go-task) à installer en local (`brew install gitleaks go-task`) pour le scan de secrets et les tâches.
 
 ## 6. Journal des sessions
 > Une entrée par session (humaine ou agent). Le plus récent en haut. On ajoute, on ne réécrit pas.
 
 | Date | Auteur | Résumé de ce qui a été fait | Branches / PR |
 |------|--------|-----------------------------|---------------|
+| 2026-07-22 | Steve + agent | Dépôt GitHub public créé + branches `main`/`develop` protégées (défense en profondeur active). Story TON-1 : migrations initiales + commande `seed_pilote` (caisse, cycle 2025-2026, 17 membres). MEMORY.md mis à jour. | feat/TON-1-seed-caisse-pilote → PR #1 |
 | 2026-07-22 | Steve + agent | Modélisation de la caisse mutuelle (règles + classeur de calcul vérifié). Spéc. fonctionnelle & doc d'architecture. Scaffold backend Django (monolithe modulaire) + frontend Angular. Moteur de calcul testé (8/8). Mise en place de la gouvernance Git. | — (pré-dépôt) |
 
 ## 7. Registre de décisions & d'exceptions (ADR léger)
@@ -93,9 +93,9 @@ gitGraph
 
 | # | Tâche | État | Branche / PR |
 |---|-------|------|--------------|
-| 1 | Amorcer le dépôt Git + protection serveur | à faire | — |
-| 2 | Seed : caisse pilote + 17 membres + cycle | à faire | — |
-| 3 | Migrations initiales (members, cycles, savings, loans) | à faire | — |
+| 1 | Amorcer le dépôt Git + protection serveur | fait | — |
+| 2 | Seed : caisse pilote + 17 membres + cycle | en cours | feat/TON-1 |
+| 3 | Migrations initiales (members, cycles, savings, loans) | en cours | feat/TON-1 |
 | 4 | Écran Angular : saisie des dépôts (grille membres × mois) | à faire | — |
 | 5 | Écran récapitulatif de clôture + export | à faire | — |
 | 6 | Brancher la règle d'ajustement des intérêts (après réponse trésorière) | bloqué | — |
