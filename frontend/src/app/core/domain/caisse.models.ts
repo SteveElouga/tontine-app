@@ -32,3 +32,10 @@ export interface MontantMois {
   moisIndex: number;
   montant: string;
 }
+
+export interface Membre {
+  id: string;
+  nom: string;
+  telephone: string;
+  actif: boolean;
+}

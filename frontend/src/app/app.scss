@@ -1,6 +1,7 @@
 .shell {
   display: flex;
-  min-height: 100dvh;
+  height: 100dvh;
+  overflow: hidden;
 }
 
 .sidebar {
@@ -11,6 +12,7 @@
   padding: 14px 10px;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .brand {
@@ -83,4 +85,5 @@ nav {
   flex: 1;
   min-width: 0;
   padding: 22px 26px;
+  overflow-y: auto;
 }
