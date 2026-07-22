@@ -1,5 +1,5 @@
 # Backend — caisse mutuelle
-Django>=5.0,<5.2
+Django>=5.2,<5.3        # 5.2 = version LTS
 djangorestframework>=3.15
 djangorestframework-simplejwt>=5.3
 strawberry-graphql>=0.235
