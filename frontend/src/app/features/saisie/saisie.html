@@ -4,10 +4,10 @@
 </header>
 
 <div class="bascule">
-  <button type="button" class="seg" [class.actif]="vue() === 'mois'" (click)="vue.set('mois')">
+  <button type="button" class="seg" [class.actif]="vue() === 'mois'" (click)="changerVue('mois')">
     <i class="pi pi-calendar"></i> Par mois
   </button>
-  <button type="button" class="seg" [class.actif]="vue() === 'membre'" (click)="vue.set('membre')">
+  <button type="button" class="seg" [class.actif]="vue() === 'membre'" (click)="changerVue('membre')">
     <i class="pi pi-user"></i> Par membre
   </button>
 </div>
@@ -25,52 +25,61 @@
       <i class="pi pi-chevron-right"></i>
     </button>
   </div>
-
   <p class="consigne">Enregistre le versement de chaque membre.</p>
-
-  @if (chargement()) {
-    <p class="muted">Chargement des membres…</p>
-  } @else {
-    <div class="grille-membres">
-      @for (ligne of lignes(); track ligne.id) {
-        <div class="ligne">
-          <span class="nom">{{ ligne.nom }}</span>
-          <p-inputnumber
-            [ngModel]="ligne.montant"
-            (ngModelChange)="setMontant(ligne, $event)"
-            (onBlur)="enregistrer(ligne)"
-            [maxFractionDigits]="0"
-            [useGrouping]="true"
-            locale="fr-FR"
-            placeholder="0"
-            [inputStyle]="{ width: '108px', 'text-align': 'right' }"
-          />
-          <span class="unite">FCFA</span>
-          @if (ligne.enregistre) {
-            <i class="pi pi-check-circle etat ok" aria-label="enregistré"></i>
-          } @else {
-            <i class="pi pi-clock etat attente" aria-label="en attente"></i>
-          }
-        </div>
-      }
+} @else {
+  <div class="stepper">
+    <button class="step-btn" (click)="membrePrecedent()" aria-label="Membre précédent">
+      <i class="pi pi-chevron-left"></i>
+    </button>
+    <div class="step-mois">
+      <span class="mois">{{ membreCourant()?.nom }}</span>
+      <span class="sous">membre {{ membreIndex() + 1 }} sur {{ membres().length }}</span>
     </div>
+    <button class="step-btn" (click)="membreSuivant()" aria-label="Membre suivant">
+      <i class="pi pi-chevron-right"></i>
+    </button>
+  </div>
+  <p class="consigne">Enregistre les versements de ce membre, mois par mois.</p>
+}
 
-    <div class="pied">
-      <span class="total">
-        Total {{ moisNom() }} : <strong>{{ format(total()) }} FCFA</strong>
-        · {{ nbEnregistres() }} / {{ lignes().length }}
-      </span>
-      <p-button label="Terminer" (onClick)="terminer()" />
-    </div>
+@if (chargement()) {
+  <p class="muted">Chargement…</p>
+} @else {
+  <div class="grille-membres">
+    @for (ligne of lignes(); track ligne.memberId + '_' + ligne.moisIndex) {
+      <div class="ligne">
+        <span class="nom">{{ ligne.label }}</span>
+        <p-inputnumber
+          [ngModel]="ligne.montant"
+          (ngModelChange)="setMontant(ligne, $event)"
+          (onBlur)="enregistrer(ligne)"
+          [maxFractionDigits]="0"
+          [useGrouping]="true"
+          locale="fr-FR"
+          placeholder="0"
+          [inputStyle]="{ width: '108px', 'text-align': 'right' }"
+        />
+        <span class="unite">FCFA</span>
+        @if (ligne.enregistre) {
+          <i class="pi pi-check-circle etat ok" aria-label="enregistré"></i>
+        } @else {
+          <i class="pi pi-clock etat attente" aria-label="en attente"></i>
+        }
+      </div>
+    }
+  </div>
 
+  <div class="pied">
+    <span class="total">
+      Total : <strong>{{ format(total()) }} FCFA</strong> · {{ nbEnregistres() }} / {{ lignes().length }}
+    </span>
+    <p-button label="Terminer" (onClick)="terminer()" />
+  </div>
+
+  @if (vue() === 'mois') {
     <div class="astuce">
       <i class="pi pi-info-circle"></i>
       <span>Un dépôt de {{ moisNom() }} rapporte {{ taux() }} % à la clôture. Le calcul est automatique.</span>
     </div>
   }
-} @else {
-  <div class="apercu-bientot">
-    <i class="pi pi-user"></i>
-    <p>La vue « Par membre » arrive juste après — elle a besoin d'une petite évolution de l'API (TON-4).</p>
-  </div>
 }

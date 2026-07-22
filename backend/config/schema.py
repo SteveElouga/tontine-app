@@ -27,6 +27,19 @@ class RecapMembre:
     position_nette: Decimal
 
 
+@strawberry.type
+class MembreMontant:
+    id: strawberry.ID
+    nom: str
+    montant: Decimal
+
+
+@strawberry.type
+class MontantMois:
+    mois_index: int
+    montant: Decimal
+
+
 def _recap_membre(member: Member, cycle: Cycle) -> RecapMembre:
     params = cycle.to_params()
     depots = [
@@ -62,6 +75,37 @@ class Query:
         cycle = Cycle.objects.select_related("caisse").get(id=cycle_id)
         membres = Member.objects.filter(caisse=cycle.caisse, actif=True)
         return [_recap_membre(m, cycle) for m in membres]
+
+    @strawberry.field
+    def depots_mois(self, cycle_id: strawberry.ID, mois_index: int) -> List[MembreMontant]:
+        """Pour un mois donné, le montant déposé par chaque membre (0 si aucun)."""
+        from apps.savings.models import Deposit
+
+        cycle = Cycle.objects.select_related("caisse").get(id=cycle_id)
+        depots = {
+            d.member_id: d.montant
+            for d in Deposit.objects.filter(cycle=cycle, mois_index=mois_index)
+        }
+        membres = Member.objects.filter(caisse=cycle.caisse, actif=True)
+        return [
+            MembreMontant(id=strawberry.ID(str(m.id)), nom=m.nom, montant=depots.get(m.id, Decimal(0)))
+            for m in membres
+        ]
+
+    @strawberry.field
+    def depots_membre(self, cycle_id: strawberry.ID, member_id: strawberry.ID) -> List[MontantMois]:
+        """Pour un membre donné, le montant déposé à chaque mois du cycle (0 si aucun)."""
+        from apps.savings.models import Deposit
+
+        cycle = Cycle.objects.get(id=cycle_id)
+        depots = {
+            d.mois_index: d.montant
+            for d in Deposit.objects.filter(cycle=cycle, member_id=member_id)
+        }
+        return [
+            MontantMois(mois_index=m, montant=depots.get(m, Decimal(0)))
+            for m in range(1, cycle.duree_depot + 1)
+        ]
 
 
 @strawberry.type
