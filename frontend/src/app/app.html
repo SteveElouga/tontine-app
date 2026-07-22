@@ -3,16 +3,22 @@
     <div class="brand"><i class="pi pi-users"></i><span>Tontine</span></div>
     <nav>
       @for (item of nav; track item.label) {
-        <a class="nav-item" [class.active]="item.active">
-          <i [class]="item.icon"></i>{{ item.label }}
-        </a>
+        @if (item.route) {
+          <a class="nav-item" [routerLink]="item.route" routerLinkActive="active">
+            <i [class]="item.icon"></i>{{ item.label }}
+          </a>
+        } @else {
+          <span class="nav-item todo">
+            <i [class]="item.icon"></i>{{ item.label }}
+          </span>
+        }
       }
     </nav>
     <div class="sidebar-bottom">
       @for (item of navBas; track item.label) {
-        <a class="nav-item soon">
+        <span class="nav-item todo">
           <i [class]="item.icon"></i>{{ item.label }}<span class="soon-tag">bientôt</span>
-        </a>
+        </span>
       }
     </div>
   </aside>

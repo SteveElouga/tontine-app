@@ -1,26 +1,26 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Toast } from 'primeng/toast';
 
 interface NavItem {
   label: string;
   icon: string;
-  active?: boolean;
+  route?: string;
   soon?: boolean;
 }
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Toast],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Toast],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
 export class App {
   protected readonly nav: NavItem[] = [
     { label: 'Tableau de bord', icon: 'pi pi-home' },
-    { label: 'Saisie des dépôts', icon: 'pi pi-pencil', active: true },
+    { label: 'Saisie des dépôts', icon: 'pi pi-pencil', route: '/saisie' },
     { label: 'Prêts', icon: 'pi pi-money-bill' },
-    { label: 'Récapitulatif', icon: 'pi pi-list' },
+    { label: 'Récapitulatif', icon: 'pi pi-list', route: '/recapitulatif' },
     { label: 'Membres', icon: 'pi pi-users' },
     { label: 'Simulation', icon: 'pi pi-calculator' },
     { label: 'Historique', icon: 'pi pi-history' },

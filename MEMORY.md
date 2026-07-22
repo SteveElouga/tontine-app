@@ -64,9 +64,9 @@ gitGraph
 ## 5. État courant du projet
 > Mis à jour à la FIN de chaque session (E7). Doit répondre en 30 s à « où en est-on ? ».
 - **Phase** : développement
-- **Dernier jalon atteint** : TON-3 mergé (#3) — écran saisie « Par mois ». **TON-4 : pré-remplissage + vue « Par membre »** fonctionnels — requêtes `depotsMois`/`depotsMembre`, montants existants affichés, pivot mois/membre, liste unifiée pleine largeur.
-- **En cours** : story **TON-4** sur `feat/TON-4-prefill-par-membre` (prête à merger).
-- **Prochaine étape** : merger TON-4 ; puis un nouvel écran — **Récapitulatif** (clôture, sur `recapCycle`) ou **Tableau de bord** (accueil + totaux).
+- **Dernier jalon atteint** : TON-4 mergé (#4). **TON-5 : écran Récapitulatif** fonctionnel — tableau membre/épargne+intérêts/dette/à recevoir + totaux + impression (sur `recapCycle`). **Navigation réelle** : barre latérale cliquable (routing Saisie ↔ Récapitulatif).
+- **En cours** : story **TON-5** sur `feat/TON-5-recapitulatif` (prête à merger).
+- **Prochaine étape** : merger TON-5 ; puis **Tableau de bord** (accueil + totaux), ou les modules **Prêts** / **Membres**.
 - **Points d'attention / dette** :
   - **Règle d'ajustement des intérêts** (quand tout n'est pas prêté) en attente de réponse de la trésorière pilote — le moteur est prêt à l'accueillir (`apps/core/domain/interest.py`, classes `RepartitionInterets`).
   - Frontend : **Angular 22 + PrimeNG 21 (MIT, gratuit)** — ne pas passer à PrimeNG 22 (licence). Preset PrimeNG personnalisé (bleu) dans `app.config.ts`. Sélecteur GraphQL/cycle codé en dur pour l'instant (dev).
@@ -78,6 +78,7 @@ gitGraph
 
 | Date | Auteur | Résumé de ce qui a été fait | Branches / PR |
 |------|--------|-----------------------------|---------------|
+| 2026-07-22 | Steve + agent | TON-4 mergé (#4). Story TON-5 : écran Récapitulatif (tableau + totaux + impression, sur `recapCycle`) + navigation réelle (routing, barre latérale cliquable). | feat/TON-5-recapitulatif → PR #5 |
 | 2026-07-22 | Steve + agent | TON-3 mergé (#3). Story TON-4 : requêtes `depotsMois`/`depotsMembre` ; frontend pré-remplissage des montants existants + vue « Par membre » (liste unifiée, pleine largeur). | feat/TON-4-prefill-par-membre → PR #4 |
 | 2026-07-22 | Steve + agent | TON-2 mergé (#2). Story TON-3 : premier écran Angular (saisie « Par mois ») branché sur l'API, PrimeNG 21 (MIT) sur Angular 22, thème aligné sur notre bleu, mode sombre neutralisé. | feat/TON-3-ecran-saisie → PR #3 |
 | 2026-07-22 | Steve + agent | TON-1 mergé (#1). Story TON-2 : API GraphQL vérifiée de bout en bout (lecture `recapCycle` + écriture `ajouterDepot`), endpoint exempté de CSRF, contrat Decimal aligné côté frontend. | feat/TON-2-api-graphql-caisse → PR #2 |
@@ -103,8 +104,8 @@ gitGraph
 | 2 | Seed + migrations initiales (TON-1) | fait | PR #1 |
 | 3 | API GraphQL vérifiée lecture + écriture, CSRF exempté (TON-2) | fait | PR #2 |
 | 4 | Écran saisie « Par mois » — Angular + PrimeNG 21, pleine largeur (TON-3) | fait | PR #3 |
-| 5 | Vue « Par membre » + pré-remplissage des montants (TON-4) | en cours | feat/TON-4 |
-| 6 | Écran récapitulatif de clôture + export | à faire | — |
+| 5 | Vue « Par membre » + pré-remplissage des montants (TON-4) | fait | PR #4 |
+| 6 | Écran Récapitulatif + navigation réelle (TON-5) | en cours | feat/TON-5 |
 | 7 | Brancher la règle d'ajustement des intérêts (après réponse trésorière) | bloqué | — |
 
 ## 9. Stack & conventions du projet
