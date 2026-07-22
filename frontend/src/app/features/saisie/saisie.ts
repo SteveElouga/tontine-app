@@ -12,10 +12,17 @@ const CYCLE_ID = '8e7323b1-1277-47dd-b358-ee0354d52b3d';
 const NB_MOIS = 9;
 
 interface Ligne {
-  id: string;
-  nom: string;
+  label: string;
+  memberId: string;
+  moisIndex: number;
   montant: number | null;
   enregistre: boolean;
+}
+
+/** Un montant en chaîne (API) → valeur d'affichage (null si 0) + état « déjà enregistré ». */
+function versLigne(valeur: string): { montant: number | null; enregistre: boolean } {
+  const n = Number(valeur);
+  return { montant: n > 0 ? n : null, enregistre: n > 0 };
 }
 
 @Component({
@@ -29,12 +36,14 @@ export class Saisie implements OnInit {
   private readonly toast = inject(MessageService);
 
   protected readonly vue = signal<'mois' | 'membre'>('mois');
-
   protected readonly moisIndex = signal(2); // Octobre
+  protected readonly membres = signal<{ id: string; nom: string }[]>([]);
+  protected readonly membreIndex = signal(0);
   protected readonly lignes = signal<Ligne[]>([]);
   protected readonly chargement = signal(true);
 
   protected readonly moisNom = computed(() => MOIS[this.moisIndex()]);
+  protected readonly membreCourant = computed(() => this.membres()[this.membreIndex()]);
   protected readonly taux = computed(() => 5 * (NB_MOIS - this.moisIndex() + 1));
   protected readonly total = computed(() =>
     this.lignes().reduce((s, l) => s + (l.montant ?? 0), 0),
@@ -44,78 +53,148 @@ export class Saisie implements OnInit {
   );
 
   ngOnInit(): void {
-    this.caisse.recapCycle(CYCLE_ID).subscribe({
-      next: (membres) => {
-        this.lignes.set(
-          membres.map((m) => ({ id: m.id, nom: m.nom, montant: null, enregistre: false })),
-        );
-        this.chargement.set(false);
-      },
-      error: () => {
-        this.chargement.set(false);
-        this.toast.add({
-          severity: 'error',
-          summary: 'Chargement impossible',
-          detail: 'Vérifie que le serveur Django est démarré.',
-        });
-      },
-    });
+    this.chargerMois();
+  }
+
+  changerVue(v: 'mois' | 'membre'): void {
+    if (this.vue() === v) return;
+    this.vue.set(v);
+    if (v === 'mois') this.chargerMois();
+    else this.chargerMembre();
   }
 
   moisPrecedent(): void {
     if (this.moisIndex() > 1) {
       this.moisIndex.update((m) => m - 1);
-      this.reinitialiser();
+      this.chargerMois();
     }
   }
-
   moisSuivant(): void {
     if (this.moisIndex() < NB_MOIS) {
       this.moisIndex.update((m) => m + 1);
-      this.reinitialiser();
+      this.chargerMois();
+    }
+  }
+
+  membrePrecedent(): void {
+    if (this.membreIndex() > 0) {
+      this.membreIndex.update((i) => i - 1);
+      this.chargerMembre();
+    }
+  }
+  membreSuivant(): void {
+    if (this.membreIndex() < this.membres().length - 1) {
+      this.membreIndex.update((i) => i + 1);
+      this.chargerMembre();
     }
   }
 
   setMontant(ligne: Ligne, valeur: number | null): void {
     this.lignes.update((ls) =>
-      ls.map((l) => (l.id === ligne.id ? { ...l, montant: valeur } : l)),
+      ls.map((l) =>
+        l.memberId === ligne.memberId && l.moisIndex === ligne.moisIndex
+          ? { ...l, montant: valeur }
+          : l,
+      ),
     );
   }
 
   enregistrer(ligne: Ligne): void {
-    const courant = this.lignes().find((l) => l.id === ligne.id);
+    const courant = this.lignes().find(
+      (l) => l.memberId === ligne.memberId && l.moisIndex === ligne.moisIndex,
+    );
     if (!courant || courant.montant == null) return;
-    this.caisse.ajouterDepot(CYCLE_ID, courant.id, this.moisIndex(), courant.montant).subscribe({
-      next: () => {
-        this.lignes.update((ls) =>
-          ls.map((l) => (l.id === courant.id ? { ...l, enregistre: true } : l)),
-        );
-        this.toast.add({
-          severity: 'success',
-          summary: 'Dépôt enregistré',
-          detail: `${courant.nom} — ${this.moisNom()}`,
-          life: 2500,
-        });
-      },
-      error: () =>
-        this.toast.add({
-          severity: 'error',
-          summary: 'Enregistrement impossible',
-          detail: 'Réessaie.',
-        }),
-    });
+    this.caisse
+      .ajouterDepot(CYCLE_ID, courant.memberId, courant.moisIndex, courant.montant)
+      .subscribe({
+        next: () => {
+          this.lignes.update((ls) =>
+            ls.map((l) =>
+              l.memberId === courant.memberId && l.moisIndex === courant.moisIndex
+                ? { ...l, enregistre: true }
+                : l,
+            ),
+          );
+          this.toast.add({
+            severity: 'success',
+            summary: 'Dépôt enregistré',
+            detail:
+              this.vue() === 'mois'
+                ? `${courant.label} — ${this.moisNom()}`
+                : `${MOIS[courant.moisIndex]} — ${this.membreCourant()?.nom}`,
+            life: 2500,
+          });
+        },
+        error: () =>
+          this.toast.add({
+            severity: 'error',
+            summary: 'Enregistrement impossible',
+            detail: 'Réessaie.',
+          }),
+      });
   }
 
   terminer(): void {
     this.toast.add({
       severity: 'info',
-      summary: `Saisie de ${this.moisNom()} terminée`,
-      detail: `${this.nbEnregistres()} membre(s) · total ${this.format(this.total())} FCFA`,
+      summary: 'Saisie terminée',
+      detail: `${this.nbEnregistres()} enregistrement(s) · total ${this.format(this.total())} FCFA`,
     });
   }
 
-  private reinitialiser(): void {
-    this.lignes.update((ls) => ls.map((l) => ({ ...l, montant: null, enregistre: false })));
+  private chargerMois(): void {
+    this.chargement.set(true);
+    const mois = this.moisIndex();
+    this.caisse.depotsMois(CYCLE_ID, mois).subscribe({
+      next: (rows) => {
+        this.membres.set(rows.map((r) => ({ id: r.id, nom: r.nom })));
+        this.lignes.set(
+          rows.map((r) => {
+            const { montant, enregistre } = versLigne(r.montant);
+            return { label: r.nom, memberId: r.id, moisIndex: mois, montant, enregistre };
+          }),
+        );
+        this.chargement.set(false);
+      },
+      error: () => this.erreurChargement(),
+    });
+  }
+
+  private chargerMembre(): void {
+    const membre = this.membreCourant();
+    if (!membre) {
+      this.lignes.set([]);
+      this.chargement.set(false);
+      return;
+    }
+    this.chargement.set(true);
+    this.caisse.depotsMembre(CYCLE_ID, membre.id).subscribe({
+      next: (rows) => {
+        this.lignes.set(
+          rows.map((r) => {
+            const { montant, enregistre } = versLigne(r.montant);
+            return {
+              label: MOIS[r.moisIndex],
+              memberId: membre.id,
+              moisIndex: r.moisIndex,
+              montant,
+              enregistre,
+            };
+          }),
+        );
+        this.chargement.set(false);
+      },
+      error: () => this.erreurChargement(),
+    });
+  }
+
+  private erreurChargement(): void {
+    this.chargement.set(false);
+    this.toast.add({
+      severity: 'error',
+      summary: 'Chargement impossible',
+      detail: 'Vérifie que le serveur est démarré.',
+    });
   }
 
   protected readonly format = (n: number): string => n.toLocaleString('fr-FR');

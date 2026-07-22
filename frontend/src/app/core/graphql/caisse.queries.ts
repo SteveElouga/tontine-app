@@ -33,3 +33,24 @@ export const AJOUTER_DEPOT = gql`
     }
   }
 `;
+
+/** Montant déposé par chaque membre pour un mois donné (pré-remplissage « Par mois »). */
+export const DEPOTS_MOIS = gql`
+  query DepotsMois($cycleId: ID!, $moisIndex: Int!) {
+    depotsMois(cycleId: $cycleId, moisIndex: $moisIndex) {
+      id
+      nom
+      montant
+    }
+  }
+`;
+
+/** Montant déposé par un membre à chaque mois (vue « Par membre »). */
+export const DEPOTS_MEMBRE = gql`
+  query DepotsMembre($cycleId: ID!, $memberId: ID!) {
+    depotsMembre(cycleId: $cycleId, memberId: $memberId) {
+      moisIndex
+      montant
+    }
+  }
+`;
