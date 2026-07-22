@@ -1,0 +1,188 @@
+:host {
+  display: block;
+}
+
+.entete {
+  margin-bottom: 18px;
+
+  h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .sub {
+    margin: 2px 0 0;
+    color: var(--c-text-2);
+    font-size: 14px;
+  }
+}
+
+/* Bascule — pilule de la maquette */
+.bascule {
+  display: inline-flex;
+  gap: 4px;
+  background: var(--c-surface-1);
+  border-radius: 999px;
+  padding: 4px;
+  margin-bottom: 16px;
+
+  .seg {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 9px 20px;
+    border-radius: 999px;
+    font-size: 14px;
+    color: var(--c-text-2);
+
+    i {
+      font-size: 16px;
+    }
+
+    &.actif {
+      background: var(--c-accent-bg);
+      color: var(--c-accent);
+      font-weight: 500;
+    }
+  }
+}
+
+/* Sélecteur de mois */
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  padding: 10px 16px;
+  max-width: 440px;
+}
+
+.step-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 6px;
+  color: var(--c-text-2);
+
+  i {
+    font-size: 22px;
+  }
+
+  &:hover {
+    color: var(--c-accent);
+  }
+}
+
+.step-mois {
+  text-align: center;
+
+  .mois {
+    display: block;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .sous {
+    display: block;
+    font-size: 12px;
+    color: var(--c-text-muted);
+  }
+}
+
+.consigne {
+  margin: 8px 0 12px;
+  color: var(--c-text-2);
+  font-size: 14px;
+}
+
+/* Grille des membres — occupe la largeur disponible */
+.grille-membres {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  column-gap: 40px;
+}
+
+.ligne {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 4px;
+  border-bottom: 1px solid var(--c-border);
+
+  .nom {
+    flex: 1;
+    font-size: 16px;
+    min-width: 0;
+  }
+
+  .unite {
+    font-size: 12px;
+    color: var(--c-text-muted);
+  }
+}
+
+.etat {
+  font-size: 20px;
+
+  &.ok {
+    color: var(--c-success);
+  }
+
+  &.attente {
+    color: var(--c-text-muted);
+  }
+}
+
+.pied {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--c-border);
+
+  .total {
+    font-size: 14px;
+    color: var(--c-text-2);
+  }
+}
+
+.astuce {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  background: var(--c-surface-1);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--c-text-2);
+  max-width: 680px;
+
+  i {
+    color: var(--c-accent);
+  }
+}
+
+.muted {
+  color: var(--c-text-muted);
+}
+
+.apercu-bientot {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--c-text-muted);
+
+  i {
+    font-size: 32px;
+    display: block;
+    margin-bottom: 10px;
+  }
+}

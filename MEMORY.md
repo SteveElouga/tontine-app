@@ -64,19 +64,21 @@ gitGraph
 ## 5. État courant du projet
 > Mis à jour à la FIN de chaque session (E7). Doit répondre en 30 s à « où en est-on ? ».
 - **Phase** : développement
-- **Dernier jalon atteint** : TON-1 mergé (#1) — seed pilote + migrations sur `develop`. API GraphQL prouvée de bout en bout : lecture (`recapCycle`) **et** écriture (`ajouterDepot`), endpoint exempté de CSRF.
-- **En cours** : story **TON-2** — vérification/solidification de l'API GraphQL — sur `feat/TON-2-api-graphql-caisse`.
-- **Prochaine étape** : merger TON-2, puis **TON-3** = premier écran Angular (grille de saisie des dépôts) sur une API prouvée.
+- **Dernier jalon atteint** : TON-2 mergé (#2) — API GraphQL vérifiée. **TON-3 : premier écran Angular fonctionnel** — saisie « Par mois », 17 membres chargés via `recapCycle`, enregistrement via `ajouterDepot`, PrimeNG 21 sur Angular 22, thème aligné sur notre bleu.
+- **En cours** : story **TON-3** sur `feat/TON-3-ecran-saisie` (prête à merger).
+- **Prochaine étape** : merger TON-3 ; puis **TON-4** = vue « Par membre » + pré-remplissage des montants déjà saisis (nécessite une requête backend « dépôts d'un mois »).
 - **Points d'attention / dette** :
   - **Règle d'ajustement des intérêts** (quand tout n'est pas prêté) en attente de réponse de la trésorière pilote — le moteur est prêt à l'accueillir (`apps/core/domain/interest.py`, classes `RepartitionInterets`).
-  - Montants renvoyés en **chaînes** par l'API (Decimal Strawberry) ; contrat aligné dans `caisse.models.ts` (faire `Number()` seulement pour l'affichage).
-  - gitleaks et Task (go-task) à installer en local (`brew install gitleaks go-task`) pour le scan de secrets et les tâches.
+  - Frontend : **Angular 22 + PrimeNG 21 (MIT, gratuit)** — ne pas passer à PrimeNG 22 (licence). Preset PrimeNG personnalisé (bleu) dans `app.config.ts`. Sélecteur GraphQL/cycle codé en dur pour l'instant (dev).
+  - Montants renvoyés en **chaînes** par l'API (Decimal Strawberry) ; contrat aligné dans `caisse.models.ts`.
+  - gitleaks et Task (go-task) à installer en local (`brew install gitleaks go-task`).
 
 ## 6. Journal des sessions
 > Une entrée par session (humaine ou agent). Le plus récent en haut. On ajoute, on ne réécrit pas.
 
 | Date | Auteur | Résumé de ce qui a été fait | Branches / PR |
 |------|--------|-----------------------------|---------------|
+| 2026-07-22 | Steve + agent | TON-2 mergé (#2). Story TON-3 : premier écran Angular (saisie « Par mois ») branché sur l'API, PrimeNG 21 (MIT) sur Angular 22, thème aligné sur notre bleu, mode sombre neutralisé. | feat/TON-3-ecran-saisie → PR #3 |
 | 2026-07-22 | Steve + agent | TON-1 mergé (#1). Story TON-2 : API GraphQL vérifiée de bout en bout (lecture `recapCycle` + écriture `ajouterDepot`), endpoint exempté de CSRF, contrat Decimal aligné côté frontend. | feat/TON-2-api-graphql-caisse → PR #2 |
 | 2026-07-22 | Steve + agent | Dépôt GitHub public créé + branches `main`/`develop` protégées (défense en profondeur active). Story TON-1 : migrations initiales + commande `seed_pilote` (caisse, cycle 2025-2026, 17 membres). MEMORY.md mis à jour. | feat/TON-1-seed-caisse-pilote → PR #1 |
 | 2026-07-22 | Steve + agent | Modélisation de la caisse mutuelle (règles + classeur de calcul vérifié). Spéc. fonctionnelle & doc d'architecture. Scaffold backend Django (monolithe modulaire) + frontend Angular. Moteur de calcul testé (8/8). Mise en place de la gouvernance Git. | — (pré-dépôt) |
@@ -89,6 +91,7 @@ gitGraph
 | 2026-07-22 | décision | Périmètre v1 = module **Caisse mutuelle** d'abord | Cas d'usage validé et concret (caisse de la mère du porteur), le plus rapide à mettre en vrai | La tontine rotative devient un module ultérieur | Steve |
 | 2026-07-22 | décision | **Monolithe modulaire** (apps Django), pas de microservices | Projet solo, petit budget : frontières nettes sans coût opérationnel des microservices | Structure `apps/` = modules métier | Steve |
 | 2026-07-22 | décision | Stack : Angular (PWA) · Django + DRF · GraphQL (Strawberry) · PostgreSQL | Choix du porteur ; web d'abord, mobile plus tard | GraphQL = métier, DRF = auth/technique | Steve |
+| 2026-07-22 | décision | UI = **PrimeNG 21 (MIT, gratuit)** sur Angular 22, pas PrimeNG 22 (licence). Preset Aura personnalisé (bleu sobre) ; bascule maison pour coller à la maquette ; pas de sélecteur de thème en v1. | Budget lean ; Prime gratuit en v21 | Option clair/sombre possible dans Paramètres plus tard | Steve |
 
 ## 8. Backlog
 > Vue courte de ce qui reste. Détail fin dans l'outil de suivi (stories `TON-…`).
@@ -97,10 +100,11 @@ gitGraph
 |---|-------|------|--------------|
 | 1 | Amorcer le dépôt Git + protection serveur | fait | — |
 | 2 | Seed + migrations initiales (TON-1) | fait | PR #1 |
-| 3 | API GraphQL vérifiée lecture + écriture, CSRF exempté (TON-2) | en cours | feat/TON-2 |
-| 4 | Écran Angular : saisie des dépôts (grille membres × mois) | à faire | — |
-| 5 | Écran récapitulatif de clôture + export | à faire | — |
-| 6 | Brancher la règle d'ajustement des intérêts (après réponse trésorière) | bloqué | — |
+| 3 | API GraphQL vérifiée lecture + écriture, CSRF exempté (TON-2) | fait | PR #2 |
+| 4 | Écran saisie « Par mois » — Angular + PrimeNG 21, pleine largeur (TON-3) | en cours | feat/TON-3 |
+| 5 | Vue « Par membre » + pré-remplissage des montants (requête backend « dépôts d'un mois ») (TON-4) | à faire | — |
+| 6 | Écran récapitulatif de clôture + export | à faire | — |
+| 7 | Brancher la règle d'ajustement des intérêts (après réponse trésorière) | bloqué | — |
 
 ## 9. Stack & conventions du projet
 - **Frontend** : Angular (PWA), TypeScript, Apollo GraphQL. Web d'abord ; mobile plus tard.
