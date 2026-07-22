@@ -1,0 +1,25 @@
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><i class="pi pi-users"></i><span>Tontine</span></div>
+    <nav>
+      @for (item of nav; track item.label) {
+        <a class="nav-item" [class.active]="item.active">
+          <i [class]="item.icon"></i>{{ item.label }}
+        </a>
+      }
+    </nav>
+    <div class="sidebar-bottom">
+      @for (item of navBas; track item.label) {
+        <a class="nav-item soon">
+          <i [class]="item.icon"></i>{{ item.label }}<span class="soon-tag">bientôt</span>
+        </a>
+      }
+    </div>
+  </aside>
+
+  <main class="content">
+    <router-outlet />
+  </main>
+</div>
+
+<p-toast position="top-right" />

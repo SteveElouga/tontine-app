@@ -1,69 +1,59 @@
-# Frontend — Caisse mutuelle (Angular PWA)
+# Frontend
 
-Le frontend est une **PWA Angular** qui consomme l'API GraphQL du backend. Toute la logique de
-calcul (intérêts, majorations) vit **côté serveur** : le client ne fait qu'afficher et saisir.
-On évite ainsi de dupliquer — et de désynchroniser — les règles métier.
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.0.7.
 
-> Angular se génère avec sa CLI (`ng new`). Ce dossier fournit **les commandes de mise en place**
-> et **les fichiers métier à ajouter** (modèles TypeScript, requêtes GraphQL, service). Génère la
-> coquille avec la CLI, puis dépose les fichiers de `src/app/core/` fournis ici.
+## Development server
 
-## 1. Générer le projet
+To start a local development server, run:
 
 ```bash
-# depuis tontine-app/
-npm install -g @angular/cli
-ng new frontend --routing --style=scss --ssr=false
-cd frontend
-
-# PWA (service worker, manifest, installation hors ligne)
-ng add @angular/pwa
-
-# Client GraphQL
-ng add apollo-angular
+ng serve
 ```
 
-Lors de `ng add apollo-angular`, renseigner l'URL de l'API : `http://localhost:8000/graphql/`.
+Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
-## 2. Déposer les fichiers métier
+## Code scaffolding
 
-Copier les fichiers déjà écrits :
-
-```
-src/app/core/domain/caisse.models.ts     # types TypeScript (miroir des types GraphQL)
-src/app/core/graphql/caisse.queries.ts   # requêtes & mutations GraphQL
-src/app/core/graphql/caisse.service.ts   # service Angular (injectable) sur Apollo
-```
-
-## 3. Lancer
+Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
 
 ```bash
-ng serve            # http://localhost:4200
+ng generate component component-name
 ```
 
-Le backend doit tourner en parallèle (voir `../backend/README.md`) et autoriser l'origine
-`http://localhost:4200` (déjà configuré via `CORS_ALLOWED_ORIGINS`).
+For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
 
-## 4. Structure cible
-
-```
-src/app/
-├── core/
-│   ├── domain/        # types du domaine (data shapes, pas de logique de calcul)
-│   └── graphql/       # requêtes GraphQL + service d'accès aux données
-├── features/
-│   ├── dashboard/     # tableau de bord du cycle
-│   ├── members/       # liste & fiche membre
-│   ├── deposits/      # saisie des dépôts (grille membres × mois)
-│   ├── loans/         # prêts & majoration
-│   └── closing/       # récapitulatif de clôture + export
-└── shared/            # composants UI réutilisables (boutons, tableaux…)
+```bash
+ng generate --help
 ```
 
-## 5. Principes UX (rappel de la spec)
+## Building
 
-- **Plus simple que WhatsApp.** Gros boutons, peu d'étapes, libellés en langage courant.
-- **Installable & hors ligne** (PWA). Phase 1 : consultation hors ligne. Phase 2 : saisie hors
-  ligne mise en file dans IndexedDB puis synchronisée.
-- **Léger** : cible Android d'entrée de gamme **et** Safari iOS. Tester sur les deux.
-- **Français d'abord**, prévoir l'i18n (`@angular/localize`) pour l'anglais (njangi) plus tard.
+To build the project run:
+
+```bash
+ng build
+```
+
+This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+
+## Running unit tests
+
+To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+
+```bash
+ng test
+```
+
+## Running end-to-end tests
+
+For end-to-end (e2e) testing, run:
+
+```bash
+ng e2e
+```
+
+Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+
+## Additional Resources
+
+For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

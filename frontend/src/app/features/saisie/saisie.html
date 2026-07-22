@@ -1,0 +1,76 @@
+<header class="entete">
+  <h1>Saisie des dépôts</h1>
+  <p class="sub">Caisse mutuelle (pilote) · 2025–2026</p>
+</header>
+
+<div class="bascule">
+  <button type="button" class="seg" [class.actif]="vue() === 'mois'" (click)="vue.set('mois')">
+    <i class="pi pi-calendar"></i> Par mois
+  </button>
+  <button type="button" class="seg" [class.actif]="vue() === 'membre'" (click)="vue.set('membre')">
+    <i class="pi pi-user"></i> Par membre
+  </button>
+</div>
+
+@if (vue() === 'mois') {
+  <div class="stepper">
+    <button class="step-btn" (click)="moisPrecedent()" aria-label="Mois précédent">
+      <i class="pi pi-chevron-left"></i>
+    </button>
+    <div class="step-mois">
+      <span class="mois">{{ moisNom() }}</span>
+      <span class="sous">mois {{ moisIndex() }} sur 9</span>
+    </div>
+    <button class="step-btn" (click)="moisSuivant()" aria-label="Mois suivant">
+      <i class="pi pi-chevron-right"></i>
+    </button>
+  </div>
+
+  <p class="consigne">Enregistre le versement de chaque membre.</p>
+
+  @if (chargement()) {
+    <p class="muted">Chargement des membres…</p>
+  } @else {
+    <div class="grille-membres">
+      @for (ligne of lignes(); track ligne.id) {
+        <div class="ligne">
+          <span class="nom">{{ ligne.nom }}</span>
+          <p-inputnumber
+            [ngModel]="ligne.montant"
+            (ngModelChange)="setMontant(ligne, $event)"
+            (onBlur)="enregistrer(ligne)"
+            [maxFractionDigits]="0"
+            [useGrouping]="true"
+            locale="fr-FR"
+            placeholder="0"
+            [inputStyle]="{ width: '108px', 'text-align': 'right' }"
+          />
+          <span class="unite">FCFA</span>
+          @if (ligne.enregistre) {
+            <i class="pi pi-check-circle etat ok" aria-label="enregistré"></i>
+          } @else {
+            <i class="pi pi-clock etat attente" aria-label="en attente"></i>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="pied">
+      <span class="total">
+        Total {{ moisNom() }} : <strong>{{ format(total()) }} FCFA</strong>
+        · {{ nbEnregistres() }} / {{ lignes().length }}
+      </span>
+      <p-button label="Terminer" (onClick)="terminer()" />
+    </div>
+
+    <div class="astuce">
+      <i class="pi pi-info-circle"></i>
+      <span>Un dépôt de {{ moisNom() }} rapporte {{ taux() }} % à la clôture. Le calcul est automatique.</span>
+    </div>
+  }
+} @else {
+  <div class="apercu-bientot">
+    <i class="pi pi-user"></i>
+    <p>La vue « Par membre » arrive juste après — elle a besoin d'une petite évolution de l'API (TON-4).</p>
+  </div>
+}

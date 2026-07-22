@@ -1,5 +1,4 @@
-/** Service d'accès aux données de la caisse (sur Apollo GraphQL). */
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { map, Observable } from 'rxjs';
 
@@ -8,7 +7,7 @@ import { AJOUTER_DEPOT, RECAP_CYCLE } from './caisse.queries';
 
 @Injectable({ providedIn: 'root' })
 export class CaisseService {
-  constructor(private readonly apollo: Apollo) {}
+  private readonly apollo = inject(Apollo);
 
   /** Récapitulatif de tous les membres d'un cycle (épargne, intérêts, dettes, net). */
   recapCycle(cycleId: string): Observable<RecapMembre[]> {
@@ -17,7 +16,7 @@ export class CaisseService {
         query: RECAP_CYCLE,
         variables: { cycleId },
       })
-      .valueChanges.pipe(map((res) => res.data.recapCycle));
+      .valueChanges.pipe(map((res) => (res.data?.recapCycle ?? []) as RecapMembre[]));
   }
 
   /** Saisit un dépôt et renvoie le récap à jour du membre. */
@@ -31,9 +30,8 @@ export class CaisseService {
       .mutate<{ ajouterDepot: RecapMembre }>({
         mutation: AJOUTER_DEPOT,
         variables: { cycleId, memberId, moisIndex, montant },
-        // rafraîchit le récap du cycle après écriture
         refetchQueries: [{ query: RECAP_CYCLE, variables: { cycleId } }],
       })
-      .pipe(map((res) => res.data!.ajouterDepot));
+      .pipe(map((res) => res.data!.ajouterDepot as RecapMembre));
   }
 }

@@ -1,4 +1,3 @@
-/** Requêtes et mutations GraphQL de la caisse mutuelle. */
 import { gql } from 'apollo-angular';
 
 /** Récapitulatif de tous les membres d'un cycle. */
@@ -32,12 +31,5 @@ export const AJOUTER_DEPOT = gql`
       epargnePlusInterets
       positionNette
     }
-  }
-`;
-
-/** Sonde de santé de l'API. */
-export const SANTE = gql`
-  query Sante {
-    sante
   }
 `;
