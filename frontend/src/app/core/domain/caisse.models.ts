@@ -21,3 +21,14 @@ export interface RecapMembre {
   dettes: string;
   positionNette: string;
 }
+
+export interface MembreMontant {
+  id: string;
+  nom: string;
+  montant: string;
+}
+
+export interface MontantMois {
+  moisIndex: number;
+  montant: string;
+}
