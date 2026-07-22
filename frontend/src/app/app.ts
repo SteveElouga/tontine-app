@@ -17,7 +17,7 @@ interface NavItem {
 })
 export class App {
   protected readonly nav: NavItem[] = [
-    { label: 'Tableau de bord', icon: 'pi pi-home' },
+    { label: 'Tableau de bord', icon: 'pi pi-home', route: '/tableau-de-bord' },
     { label: 'Saisie des dépôts', icon: 'pi pi-pencil', route: '/saisie' },
     { label: 'Prêts', icon: 'pi pi-money-bill' },
     { label: 'Récapitulatif', icon: 'pi pi-list', route: '/recapitulatif' },
