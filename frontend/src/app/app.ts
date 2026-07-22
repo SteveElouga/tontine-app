@@ -21,7 +21,7 @@ export class App {
     { label: 'Saisie des dépôts', icon: 'pi pi-pencil', route: '/saisie' },
     { label: 'Prêts', icon: 'pi pi-money-bill' },
     { label: 'Récapitulatif', icon: 'pi pi-list', route: '/recapitulatif' },
-    { label: 'Membres', icon: 'pi pi-users' },
+    { label: 'Membres', icon: 'pi pi-users', route: '/membres' },
     { label: 'Simulation', icon: 'pi pi-calculator' },
     { label: 'Historique', icon: 'pi pi-history' },
   ];

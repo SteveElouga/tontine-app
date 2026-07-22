@@ -54,3 +54,41 @@ export const DEPOTS_MEMBRE = gql`
     }
   }
 `;
+
+/** Liste des membres actifs de la caisse. */
+export const MEMBRES = gql`
+  query Membres($cycleId: ID!) {
+    membres(cycleId: $cycleId) {
+      id
+      nom
+      telephone
+      actif
+    }
+  }
+`;
+
+export const AJOUTER_MEMBRE = gql`
+  mutation AjouterMembre($cycleId: ID!, $nom: String!, $telephone: String) {
+    ajouterMembre(cycleId: $cycleId, nom: $nom, telephone: $telephone) {
+      id
+      nom
+      telephone
+      actif
+    }
+  }
+`;
+
+export const RENOMMER_MEMBRE = gql`
+  mutation RenommerMembre($memberId: ID!, $nom: String!) {
+    renommerMembre(memberId: $memberId, nom: $nom) {
+      id
+      nom
+    }
+  }
+`;
+
+export const RETIRER_MEMBRE = gql`
+  mutation RetirerMembre($memberId: ID!) {
+    retirerMembre(memberId: $memberId)
+  }
+`;

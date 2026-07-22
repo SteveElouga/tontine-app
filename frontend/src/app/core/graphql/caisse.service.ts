@@ -2,8 +2,17 @@ import { Injectable, inject } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { map, Observable } from 'rxjs';
 
-import { MembreMontant, MontantMois, RecapMembre } from '../domain/caisse.models';
-import { AJOUTER_DEPOT, DEPOTS_MEMBRE, DEPOTS_MOIS, RECAP_CYCLE } from './caisse.queries';
+import { Membre, MembreMontant, MontantMois, RecapMembre } from '../domain/caisse.models';
+import {
+  AJOUTER_DEPOT,
+  AJOUTER_MEMBRE,
+  DEPOTS_MEMBRE,
+  DEPOTS_MOIS,
+  MEMBRES,
+  RECAP_CYCLE,
+  RENOMMER_MEMBRE,
+  RETIRER_MEMBRE,
+} from './caisse.queries';
 
 @Injectable({ providedIn: 'root' })
 export class CaisseService {
@@ -55,5 +64,46 @@ export class CaisseService {
         fetchPolicy: 'network-only',
       })
       .pipe(map((r) => (r.data?.depotsMembre ?? []) as MontantMois[]));
+  }
+
+  /** Liste des membres actifs. */
+  membres(cycleId: string): Observable<Membre[]> {
+    return this.apollo
+      .query<{ membres: Membre[] }>({
+        query: MEMBRES,
+        variables: { cycleId },
+        fetchPolicy: 'network-only',
+      })
+      .pipe(map((r) => (r.data?.membres ?? []) as Membre[]));
+  }
+
+  /** Ajoute un membre. */
+  ajouterMembre(cycleId: string, nom: string, telephone: string): Observable<Membre> {
+    return this.apollo
+      .mutate<{ ajouterMembre: Membre }>({
+        mutation: AJOUTER_MEMBRE,
+        variables: { cycleId, nom, telephone },
+      })
+      .pipe(map((r) => r.data!.ajouterMembre as Membre));
+  }
+
+  /** Renomme un membre. */
+  renommerMembre(memberId: string, nom: string): Observable<Membre> {
+    return this.apollo
+      .mutate<{ renommerMembre: Membre }>({
+        mutation: RENOMMER_MEMBRE,
+        variables: { memberId, nom },
+      })
+      .pipe(map((r) => r.data!.renommerMembre as Membre));
+  }
+
+  /** Désactive un membre (l'historique est conservé). */
+  retirerMembre(memberId: string): Observable<boolean> {
+    return this.apollo
+      .mutate<{ retirerMembre: boolean }>({
+        mutation: RETIRER_MEMBRE,
+        variables: { memberId },
+      })
+      .pipe(map((r) => Boolean(r.data?.retirerMembre)));
   }
 }

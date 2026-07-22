@@ -64,9 +64,9 @@ gitGraph
 ## 5. État courant du projet
 > Mis à jour à la FIN de chaque session (E7). Doit répondre en 30 s à « où en est-on ? ».
 - **Phase** : développement
-- **Dernier jalon atteint** : TON-5 mergé (#5). **TON-6 : Tableau de bord** fonctionnel — accueil (route par défaut), 4 cartes de totaux (épargne, intérêts, à reverser, prêts en cours) + raccourcis. **Ossature complète et navigable** : Accueil → Saisie → Récapitulatif.
-- **En cours** : story **TON-6** sur `feat/TON-6-tableau-de-bord` (prête à merger).
-- **Prochaine étape** : merger TON-6 ; puis module **Membres** (vrais noms de la caisse) ou **Prêts** (backend + écran).
+- **Dernier jalon atteint** : TON-6 mergé (#6) — Tableau de bord. **TON-8 : écran Membres** fonctionnel — lister/ajouter/renommer/désactiver, nav « Membres » cliquable, + correctif barre latérale fixe. Permet enfin de mettre les vrais noms de la caisse.
+- **En cours** : story **TON-8** sur `feat/TON-8-membres` (prête à merger). *(TON-7 = récap à colonnes redimensionnables : essayé puis abandonné — pas intuitif pour nos utilisateurs ; revert propre, aucune trace.)*
+- **Prochaine étape** : merger TON-8 ; puis **fiche membre détaillée** (transparence : d'où vient le montant, sur `depotsMembre`) ou module **Prêts** (backend + écran).
 - **Points d'attention / dette** :
   - **Règle d'ajustement des intérêts** (quand tout n'est pas prêté) en attente de réponse de la trésorière pilote — le moteur est prêt à l'accueillir (`apps/core/domain/interest.py`, classes `RepartitionInterets`).
   - Frontend : **Angular 22 + PrimeNG 21 (MIT, gratuit)** — ne pas passer à PrimeNG 22 (licence). Preset PrimeNG personnalisé (bleu) dans `app.config.ts`. Sélecteur GraphQL/cycle codé en dur pour l'instant (dev).
@@ -78,6 +78,7 @@ gitGraph
 
 | Date | Auteur | Résumé de ce qui a été fait | Branches / PR |
 |------|--------|-----------------------------|---------------|
+| 2026-07-22 | Steve + agent | TON-6 mergé (#6). TON-7 (récap colonnes redimensionnables) essayé puis **abandonné** (pas intuitif). Story TON-8 : écran Membres (liste + ajouter/renommer/désactiver) + nav cliquable + correctif barre latérale fixe. | feat/TON-8-membres → PR #7 |
 | 2026-07-22 | Steve + agent | TON-5 mergé (#5). Story TON-6 : Tableau de bord (accueil par défaut) — cartes de totaux via `recapCycle` + raccourcis vers saisie/récap. | feat/TON-6-tableau-de-bord → PR #6 |
 | 2026-07-22 | Steve + agent | TON-4 mergé (#4). Story TON-5 : écran Récapitulatif (tableau + totaux + impression, sur `recapCycle`) + navigation réelle (routing, barre latérale cliquable). | feat/TON-5-recapitulatif → PR #5 |
 | 2026-07-22 | Steve + agent | TON-3 mergé (#3). Story TON-4 : requêtes `depotsMois`/`depotsMembre` ; frontend pré-remplissage des montants existants + vue « Par membre » (liste unifiée, pleine largeur). | feat/TON-4-prefill-par-membre → PR #4 |
@@ -107,8 +108,10 @@ gitGraph
 | 4 | Écran saisie « Par mois » — Angular + PrimeNG 21, pleine largeur (TON-3) | fait | PR #3 |
 | 5 | Vue « Par membre » + pré-remplissage des montants (TON-4) | fait | PR #4 |
 | 6 | Écran Récapitulatif + navigation réelle (TON-5) | fait | PR #5 |
-| 7 | Tableau de bord (accueil + totaux) (TON-6) | en cours | feat/TON-6 |
-| 8 | Brancher la règle d'ajustement des intérêts (après réponse trésorière) | bloqué | — |
+| 7 | Tableau de bord (accueil + totaux) (TON-6) | fait | PR #6 |
+| 8 | Écran Membres — liste + ajouter/renommer/désactiver (TON-8) | en cours | feat/TON-8 |
+| 9 | Fiche membre détaillée (transparence, sur `depotsMembre`) | à faire | — |
+| 10 | Brancher la règle d'ajustement des intérêts (après réponse trésorière) | bloqué | — |
 
 ## 9. Stack & conventions du projet
 - **Frontend** : Angular (PWA), TypeScript, Apollo GraphQL. Web d'abord ; mobile plus tard.
