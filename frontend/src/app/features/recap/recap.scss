@@ -37,12 +37,35 @@
     border-bottom: 1px solid var(--c-border);
   }
 
+  tbody tr.clic {
+    cursor: pointer;
+
+    &:hover {
+      background: var(--c-surface-1);
+    }
+
+    &:hover .chev i {
+      color: var(--c-accent);
+    }
+  }
+
   .g {
     text-align: left;
   }
 
   .d {
     text-align: right;
+  }
+
+  .chev {
+    width: 28px;
+    text-align: right;
+    padding-left: 0;
+
+    i {
+      font-size: 15px;
+      color: var(--c-text-muted);
+    }
   }
 
   .muted2 {

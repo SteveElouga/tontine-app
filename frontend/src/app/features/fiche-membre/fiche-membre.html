@@ -1,0 +1,85 @@
+@if (chargement()) {
+  <p class="muted">Chargement…</p>
+} @else if (fiche(); as f) {
+  <a class="retour" routerLink="/recapitulatif">
+    <i class="pi pi-arrow-left"></i> Récapitulatif
+  </a>
+
+  <header class="membre">
+    <span class="avatar">{{ initiales() }}</span>
+    <span class="ident">
+      <span class="nom">{{ f.nom }}</span>
+      <span class="cycle">Cycle 2025–2026</span>
+    </span>
+  </header>
+
+  <section class="resultat">
+    <span class="lbl">À recevoir à la clôture</span>
+    <span class="val">{{ fmt(f.positionNette) }} FCFA</span>
+  </section>
+
+  <h2 class="titre">Épargne et intérêts</h2>
+  <table class="detail">
+    <thead>
+      <tr>
+        <th>Mois du dépôt</th>
+        <th class="num">Déposé</th>
+        <th class="num">Taux</th>
+        <th class="num">Intérêt</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (d of f.depots; track d.moisIndex) {
+        <tr>
+          <td>{{ MOIS[d.moisIndex] }}</td>
+          <td class="num">{{ fmt(d.montant) }}</td>
+          <td class="num sub">{{ pct(d.taux) }}</td>
+          <td class="num vert">+{{ fmt(d.interet) }}</td>
+        </tr>
+      } @empty {
+        <tr><td colspan="4" class="muted">Aucun dépôt enregistré.</td></tr>
+      }
+    </tbody>
+    @if (f.depots.length) {
+      <tfoot>
+        <tr>
+          <td class="sub">Sous-total</td>
+          <td class="num fort">{{ fmt(f.totalDepose) }}</td>
+          <td></td>
+          <td class="num fort vert">+{{ fmt(f.interets) }}</td>
+        </tr>
+      </tfoot>
+    }
+  </table>
+  <p class="ligne-cle">
+    <span class="sub">Épargne + intérêts</span>
+    <strong>{{ fmt(f.epargnePlusInterets) }} FCFA</strong>
+  </p>
+
+  @if (f.prets.length) {
+    <h2 class="titre">Prêt</h2>
+    @for (p of f.prets; track $index) {
+      <div class="pret">
+        <div class="pl">
+          <span>Pris en {{ MOIS[p.moisPret] }}</span>
+          <span>{{ fmt(p.montant) }}</span>
+        </div>
+        <div class="pl">
+          <span class="sub">Majoration (5 % × {{ p.moisDeDette }} mois)</span>
+          <span class="rouge">+{{ fmt(p.majoration) }}</span>
+        </div>
+        <div class="pl fort">
+          <span>À rembourser</span>
+          <span class="rouge">{{ fmt(p.totalARembourser) }}</span>
+        </div>
+      </div>
+    }
+  }
+
+  <section class="final">
+    <span class="calc">{{ fmt(f.epargnePlusInterets) }} − {{ fmt(f.dettes) }}</span>
+    <span class="net">= {{ fmt(f.positionNette) }} FCFA</span>
+  </section>
+} @else {
+  <p class="muted">Membre introuvable.</p>
+}

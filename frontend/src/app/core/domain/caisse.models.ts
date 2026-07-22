@@ -39,3 +39,31 @@ export interface Membre {
   telephone: string;
   actif: boolean;
 }
+
+export interface DepotDetail {
+  moisIndex: number;
+  montant: string;
+  taux: string;
+  interet: string;
+}
+
+export interface PretDetail {
+  montant: string;
+  moisPret: number;
+  moisRemboursement: number | null;
+  moisDeDette: number;
+  majoration: string;
+  totalARembourser: string;
+}
+
+export interface FicheMembre {
+  id: string;
+  nom: string;
+  depots: DepotDetail[];
+  prets: PretDetail[];
+  totalDepose: string;
+  interets: string;
+  epargnePlusInterets: string;
+  dettes: string;
+  positionNette: string;
+}

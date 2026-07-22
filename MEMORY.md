@@ -64,9 +64,9 @@ gitGraph
 ## 5. État courant du projet
 > Mis à jour à la FIN de chaque session (E7). Doit répondre en 30 s à « où en est-on ? ».
 - **Phase** : développement
-- **Dernier jalon atteint** : TON-6 mergé (#6) — Tableau de bord. **TON-8 : écran Membres** fonctionnel — lister/ajouter/renommer/désactiver, nav « Membres » cliquable, + correctif barre latérale fixe. Permet enfin de mettre les vrais noms de la caisse.
-- **En cours** : story **TON-8** sur `feat/TON-8-membres` (prête à merger). *(TON-7 = récap à colonnes redimensionnables : essayé puis abandonné — pas intuitif pour nos utilisateurs ; revert propre, aucune trace.)*
-- **Prochaine étape** : merger TON-8 ; puis **fiche membre détaillée** (transparence : d'où vient le montant, sur `depotsMembre`) ou module **Prêts** (backend + écran).
+- **Dernier jalon atteint** : TON-8 mergé (#7) — écran Membres (lister/ajouter/renommer/désactiver) + barre latérale fixe. **TON-9 : fiche membre détaillée** (transparence, la douleur n°1 du sondage : la méfiance) — écran qui montre pour un membre **d'où vient chaque franc** : chaque dépôt × son taux → intérêt, le prêt → majoration, puis `épargne + intérêts − dette = à recevoir`. On y accède en **touchant une ligne du Récapitulatif** (route `membre/:id`, bouton retour).
+- **En cours** : story **TON-9** sur `feat/TON-9-fiche-membre` (prête à merger). Backend : query GraphQL `ficheMembre` (détail dépôts/taux/intérêts + prêt/majoration/total). Frontend : écran `features/fiche-membre/` fidèle à la maquette + lignes du récap cliquables (chevron + indice « touchez un nom »). **Vérifié** : `ngc` AOT + type-check des templates = exit 0 (le contrôleur qui avait attrapé nos erreurs PrimeNG). *(TON-7 = récap à colonnes redimensionnables : essayé puis abandonné — pas intuitif ; revert propre.)*
+- **Prochaine étape** : merger TON-9 ; puis module **Prêts** (backend + écran de saisie des prêts, pour qu'ils se saisissent au-delà du seed et apparaissent dans fiches + récap) ; puis brancher la règle d'ajustement des intérêts (après réponse trésorière).
 - **Points d'attention / dette** :
   - **Règle d'ajustement des intérêts** (quand tout n'est pas prêté) en attente de réponse de la trésorière pilote — le moteur est prêt à l'accueillir (`apps/core/domain/interest.py`, classes `RepartitionInterets`).
   - Frontend : **Angular 22 + PrimeNG 21 (MIT, gratuit)** — ne pas passer à PrimeNG 22 (licence). Preset PrimeNG personnalisé (bleu) dans `app.config.ts`. Sélecteur GraphQL/cycle codé en dur pour l'instant (dev).
@@ -78,6 +78,7 @@ gitGraph
 
 | Date | Auteur | Résumé de ce qui a été fait | Branches / PR |
 |------|--------|-----------------------------|---------------|
+| 2026-07-22 | Steve + agent | TON-8 mergé (#7). Story TON-9 : **fiche membre détaillée** (transparence) — query GraphQL `ficheMembre` (détail dépôts/taux/intérêts + prêt/majoration/total) et écran fidèle à la maquette ; lignes du Récapitulatif rendues cliquables (route `membre/:id`, chevron + indice). Vérifié par `ngc` (AOT + type-check des templates, exit 0). | feat/TON-9-fiche-membre → PR #8 |
 | 2026-07-22 | Steve + agent | TON-6 mergé (#6). TON-7 (récap colonnes redimensionnables) essayé puis **abandonné** (pas intuitif). Story TON-8 : écran Membres (liste + ajouter/renommer/désactiver) + nav cliquable + correctif barre latérale fixe. | feat/TON-8-membres → PR #7 |
 | 2026-07-22 | Steve + agent | TON-5 mergé (#5). Story TON-6 : Tableau de bord (accueil par défaut) — cartes de totaux via `recapCycle` + raccourcis vers saisie/récap. | feat/TON-6-tableau-de-bord → PR #6 |
 | 2026-07-22 | Steve + agent | TON-4 mergé (#4). Story TON-5 : écran Récapitulatif (tableau + totaux + impression, sur `recapCycle`) + navigation réelle (routing, barre latérale cliquable). | feat/TON-5-recapitulatif → PR #5 |
@@ -109,9 +110,10 @@ gitGraph
 | 5 | Vue « Par membre » + pré-remplissage des montants (TON-4) | fait | PR #4 |
 | 6 | Écran Récapitulatif + navigation réelle (TON-5) | fait | PR #5 |
 | 7 | Tableau de bord (accueil + totaux) (TON-6) | fait | PR #6 |
-| 8 | Écran Membres — liste + ajouter/renommer/désactiver (TON-8) | en cours | feat/TON-8 |
-| 9 | Fiche membre détaillée (transparence, sur `depotsMembre`) | à faire | — |
-| 10 | Brancher la règle d'ajustement des intérêts (après réponse trésorière) | bloqué | — |
+| 8 | Écran Membres — liste + ajouter/renommer/désactiver (TON-8) | fait | PR #7 |
+| 9 | Fiche membre détaillée (transparence, sur `ficheMembre`) (TON-9) | en cours | feat/TON-9 |
+| 10 | Module Prêts — backend + écran de saisie des prêts | à faire | — |
+| 11 | Brancher la règle d'ajustement des intérêts (après réponse trésorière) | bloqué | — |
 
 ## 9. Stack & conventions du projet
 - **Frontend** : Angular (PWA), TypeScript, Apollo GraphQL. Web d'abord ; mobile plus tard.
