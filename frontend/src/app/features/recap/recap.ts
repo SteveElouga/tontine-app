@@ -1,4 +1,5 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
@@ -9,7 +10,7 @@ const CYCLE_ID = '8e7323b1-1277-47dd-b358-ee0354d52b3d';
 
 @Component({
   selector: 'app-recap',
-  imports: [Button],
+  imports: [Button, RouterLink],
   templateUrl: './recap.html',
   styleUrl: './recap.scss',
 })

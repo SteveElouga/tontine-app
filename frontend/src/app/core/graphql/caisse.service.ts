@@ -2,12 +2,13 @@ import { Injectable, inject } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { map, Observable } from 'rxjs';
 
-import { Membre, MembreMontant, MontantMois, RecapMembre } from '../domain/caisse.models';
+import { FicheMembre, Membre, MembreMontant, MontantMois, RecapMembre } from '../domain/caisse.models';
 import {
   AJOUTER_DEPOT,
   AJOUTER_MEMBRE,
   DEPOTS_MEMBRE,
   DEPOTS_MOIS,
+  FICHE_MEMBRE,
   MEMBRES,
   RECAP_CYCLE,
   RENOMMER_MEMBRE,
@@ -105,5 +106,16 @@ export class CaisseService {
         variables: { memberId },
       })
       .pipe(map((r) => Boolean(r.data?.retirerMembre)));
+  }
+
+  /** Détail complet d'un membre : d'où vient chaque franc de son montant à la clôture. */
+  ficheMembre(cycleId: string, memberId: string): Observable<FicheMembre> {
+    return this.apollo
+      .query<{ ficheMembre: FicheMembre }>({
+        query: FICHE_MEMBRE,
+        variables: { cycleId, memberId },
+        fetchPolicy: 'network-only',
+      })
+      .pipe(map((r) => r.data!.ficheMembre as FicheMembre));
   }
 }
