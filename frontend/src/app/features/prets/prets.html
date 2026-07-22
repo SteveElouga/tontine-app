@@ -4,17 +4,17 @@
 </header>
 
 <div class="ajout">
-  <select
-    class="champ membre"
+  <p-select
+    [options]="optMembres()"
     [ngModel]="nMembre()"
     (ngModelChange)="nMembre.set($event)"
-    aria-label="Membre"
-  >
-    <option [ngValue]="''" disabled>Choisir un membre…</option>
-    @for (m of membres(); track m.id) {
-      <option [ngValue]="m.id">{{ m.nom }}</option>
-    }
-  </select>
+    optionLabel="label"
+    optionValue="value"
+    placeholder="Choisir un membre…"
+    [filter]="true"
+    filterBy="label"
+    [style]="{ 'min-width': '220px' }"
+  />
 
   <p-inputnumber
     [ngModel]="nMontant()"
@@ -27,16 +27,15 @@
   />
   <span class="unite">FCFA</span>
 
-  <select
-    class="champ"
+  <p-select
+    [options]="optMoisPret"
     [ngModel]="nMois()"
     (ngModelChange)="nMois.set($event)"
-    aria-label="Mois du prêt"
-  >
-    @for (mi of moisPretOptions; track mi) {
-      <option [ngValue]="mi">{{ MOIS[mi] }}</option>
-    }
-  </select>
+    optionLabel="label"
+    optionValue="value"
+    placeholder="Choisir le mois…"
+    [style]="{ 'min-width': '160px' }"
+  />
 
   <p-button label="Ajouter le prêt" icon="pi pi-plus" (onClick)="ajouter()" />
 </div>
@@ -72,18 +71,14 @@
               </span>
             } @else if (remboursementDe() === p.id) {
               <span class="remb">
-                <select
-                  class="champ mini"
+                <p-select
+                  [options]="optMoisRemb(p.moisPret)"
                   [ngModel]="moisRemb()"
                   (ngModelChange)="moisRemb.set($event)"
-                  aria-label="Mois de remboursement"
-                >
-                  @for (mi of moisRembOptions; track mi) {
-                    @if (mi >= p.moisPret) {
-                      <option [ngValue]="mi">{{ MOIS[mi] }}</option>
-                    }
-                  }
-                </select>
+                  optionLabel="label"
+                  optionValue="value"
+                  [style]="{ 'min-width': '150px' }"
+                />
                 <button type="button" class="mini-btn ok" (click)="valider(p)" aria-label="Valider">
                   <i class="pi pi-check"></i>
                 </button>

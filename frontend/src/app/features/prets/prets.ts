@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { InputNumber } from 'primeng/inputnumber';
 import { Button } from 'primeng/button';
+import { Select } from 'primeng/select';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { MOIS, Membre, Pret } from '../../core/domain/caisse.models';
@@ -12,7 +13,7 @@ const CYCLE_ID = '8e7323b1-1277-47dd-b358-ee0354d52b3d';
 
 @Component({
   selector: 'app-prets',
-  imports: [FormsModule, InputNumber, Button],
+  imports: [FormsModule, InputNumber, Button, Select],
   templateUrl: './prets.html',
   styleUrl: './prets.scss',
 })
@@ -21,17 +22,23 @@ export class Prets implements OnInit {
   private readonly toast = inject(MessageService);
 
   protected readonly MOIS = MOIS;
-  protected readonly moisPretOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-  protected readonly moisRembOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  private readonly moisRembTous = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  protected readonly optMoisPret = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((mi) => ({
+    label: MOIS[mi],
+    value: mi,
+  }));
 
   protected readonly prets = signal<Pret[]>([]);
   protected readonly membres = signal<Membre[]>([]);
+  protected readonly optMembres = computed(() =>
+    this.membres().map((m) => ({ label: m.nom, value: m.id })),
+  );
   protected readonly chargement = signal(true);
 
   // Formulaire « nouveau prêt »
   protected readonly nMembre = signal('');
   protected readonly nMontant = signal<number | null>(null);
-  protected readonly nMois = signal(2); // Octobre par défaut
+  protected readonly nMois = signal<number | null>(null); // choisi consciemment ; conservé d'un prêt au suivant
 
   // Remboursement en ligne (id du prêt en cours d'édition)
   protected readonly remboursementDe = signal<string | null>(null);
@@ -67,11 +74,12 @@ export class Prets implements OnInit {
   ajouter(): void {
     const membreId = this.nMembre();
     const montant = this.nMontant();
-    if (!membreId || !montant || montant <= 0) {
-      this.erreur('Choisis un membre et un montant.');
+    const mois = this.nMois();
+    if (!membreId || !montant || montant <= 0 || mois == null) {
+      this.erreur('Choisis un membre, un montant et un mois.');
       return;
     }
-    this.caisse.ajouterPret(CYCLE_ID, membreId, montant, this.nMois()).subscribe({
+    this.caisse.ajouterPret(CYCLE_ID, membreId, montant, mois).subscribe({
       next: (p) => {
         this.prets.update((l) => [...l, p].sort((a, b) => a.nom.localeCompare(b.nom, 'fr')));
         this.nMembre.set('');
@@ -94,6 +102,13 @@ export class Prets implements OnInit {
 
   annuler(): void {
     this.remboursementDe.set(null);
+  }
+
+  /** Mois de remboursement possibles pour un prêt (≥ son mois du prêt). */
+  optMoisRemb(moisPret: number): { label: string; value: number }[] {
+    return this.moisRembTous
+      .filter((mi) => mi >= moisPret)
+      .map((mi) => ({ label: MOIS[mi], value: mi }));
   }
 
   valider(p: Pret): void {
