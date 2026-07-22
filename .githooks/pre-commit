@@ -1,0 +1,67 @@
+#!/bin/sh
+# Tontine — hook pre-commit (garde-fous locaux ; voir MEMORY.md §1-§3).
+# Portable POSIX sh (macOS/Linux). Ne pas contourner (MEMORY.md §4).
+set -eu
+
+branch="$(git symbolic-ref --short HEAD 2>/dev/null || echo '')"
+
+# R2/E2 — jamais de commit direct sur main/develop
+case "$branch" in
+  main|develop)
+    echo "✖ [pre-commit] Commit direct interdit sur '$branch' (branche inviolable — MEMORY.md R2)."
+    echo "  → git switch -c feat/TON-<id>-<slug>   (branche dédiée, basée sur develop)"
+    exit 1
+    ;;
+esac
+
+staged="$(git diff --cached --name-only --diff-filter=ACM)"
+
+# S1/S2 — aucun fichier .env (hors .env.example) dans le commit
+secrets="$(printf '%s\n' "$staged" | grep -E '(^|/)\.env($|\.)' | grep -vE '(^|/)\.env\.example$' || true)"
+if [ -n "$secrets" ]; then
+  echo "✖ [pre-commit] Fichier de secret interdit dans le commit (MEMORY.md S1/S2) :"
+  printf '   - %s\n' $secrets
+  echo "  Seul .env.example (sans valeurs sensibles) est versionné."
+  exit 1
+fi
+
+# S4 — scan de secrets par CONTENU (gitleaks) sur les changements stagés.
+# Le nom .env ne suffit pas : une clé/token en dur dans le code doit AUSSI être bloqué.
+if command -v gitleaks >/dev/null 2>&1; then
+  if ! gitleaks protect --staged --redact --no-banner >/dev/null 2>&1; then
+    echo "✖ [pre-commit] gitleaks a détecté un secret potentiel dans les fichiers stagés (MEMORY.md S4)."
+    echo "  → Détail  : gitleaks protect --staged --redact --verbose"
+    echo "    Faux positif ? Ajoute une allowlist dans .gitleaks.toml."
+    exit 1
+  fi
+else
+  echo "⚠ [pre-commit] gitleaks non installé : scan de contenu ignoré EN LOCAL."
+  echo "  Le job CI 'Scan de secrets' reste bloquant. Installer : brew install gitleaks"
+fi
+
+# Marqueurs de conflit de merge non résolus (boucle portable, sans xargs -r)
+if [ -n "$staged" ]; then
+  conflicts=""
+  oldifs="$IFS"; IFS='
+'
+  for f in $staged; do
+    [ -f "$f" ] || continue
+    if grep -Eq '^(<<<<<<< |>>>>>>> |={7}$)' "$f" 2>/dev/null; then
+      conflicts="$conflicts $f"
+    fi
+  done
+  IFS="$oldifs"
+  if [ -n "$conflicts" ]; then
+    echo "✖ [pre-commit] Marqueurs de conflit non résolus :"
+    printf '   -%s\n' "$conflicts"
+    exit 1
+  fi
+fi
+
+# Lint ciblé optionnel (non bloquant si l'outillage n'est pas encore installé)
+if command -v task >/dev/null 2>&1 && task --list 2>/dev/null | grep -q 'lint:staged'; then
+  task lint:staged
+fi
+
+echo "✓ [pre-commit] Garde-fous OK (branche '$branch')."
+exit 0

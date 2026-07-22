@@ -1,0 +1,81 @@
+name: CI
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [develop]
+permissions:
+  contents: read
+
+jobs:
+  garde-fous:
+    name: Garde-fous PR
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cible de PR conforme (main <- develop OU hotfix/*)
+        run: |
+          base="${{ github.base_ref }}"; head="${{ github.head_ref }}"
+          if [ "$base" = "main" ]; then
+            case "$head" in
+              develop|hotfix/*) : ;;
+              *) echo "✖ Une PR vers 'main' ne peut venir que de 'develop' (release) ou 'hotfix/*' : $head -> $base"; exit 1 ;;
+            esac
+          fi
+          echo "✓ Cible de PR conforme."
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Messages de commit (Conventional Commits)
+        run: |
+          git fetch --no-tags --depth=100 origin "${{ github.base_ref }}"
+          pattern='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?: .+'
+          bad="$(git log --format='%s' "origin/${{ github.base_ref }}..HEAD" | grep -vE '^(Merge |Revert )' | grep -vE "$pattern" || true)"
+          if [ -n "$bad" ]; then
+            echo "✖ Commit(s) non conforme(s) :"; echo "$bad"; exit 1
+          fi
+          echo "✓ Messages de commit conformes."
+
+  secrets:
+    name: Scan de secrets
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: gitleaks (dépôt complet + historique)
+        run: |
+          docker run --rm -v "$PWD:/repo" -w /repo \
+            ghcr.io/gitleaks/gitleaks:v8.30.1 \
+            detect --redact --no-banner --config=/repo/.gitleaks.toml
+
+  tests-backend:
+    name: Tests backend
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Moteur de calcul (domaine pur, sans dépendances)
+        run: python backend/apps/core/domain/tests_interest.py
+      # TODO: quand les dépendances seront figées → pip install -r backend/requirements.txt && python backend/manage.py test
+
+  ci-ok:
+    name: CI OK
+    needs: [garde-fous, secrets, tests-backend]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Aucun job requis en échec (skipped toléré)
+        run: |
+          results="${{ needs['garde-fous'].result }} ${{ needs.secrets.result }} ${{ needs['tests-backend'].result }}"
+          echo "Résultats : $results"
+          for r in $results; do
+            case "$r" in
+              failure|cancelled) echo "✖ Un job requis a échoué ($r)."; exit 1 ;;
+            esac
+          done
+          echo "✓ CI verte (jobs non concernés = skipped, tolérés)."

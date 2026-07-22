@@ -1,0 +1,37 @@
+version: '3'
+silent: true
+
+tasks:
+  default:
+    cmds:
+      - task --list
+
+  install:hooks:
+    desc: Active les hooks Git versionnés (.githooks) + auto-test — OBLIGATOIRE
+    cmds:
+      - sh scripts/install-hooks.sh
+
+  verify:hooks:
+    desc: Rejoue l'auto-test des hooks (doit refuser un commit sur main)
+    cmds:
+      - sh scripts/install-hooks.sh
+
+  secrets:scan:
+    desc: Scan de secrets local (nécessite gitleaks installé)
+    cmds:
+      - gitleaks detect --redact --no-banner --config=.gitleaks.toml
+
+  test:domain:
+    desc: Teste le moteur de calcul (domaine pur, sans dépendances)
+    cmds:
+      - python backend/apps/core/domain/tests_interest.py
+
+  lint:
+    desc: Lint du projet (à compléter — ruff/black côté backend, eslint côté frontend)
+    cmds:
+      - echo "TODO: brancher ruff (backend) et eslint (frontend)"
+
+  test:
+    desc: Tests du projet (à compléter — pytest backend, jasmine/karma frontend)
+    cmds:
+      - task test:domain

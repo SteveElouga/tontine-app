@@ -1,0 +1,18 @@
+# Tontine — configuration du scan de secrets (gitleaks >= 8).
+# Étend les règles par défaut de gitleaks avec une allowlist des faux positifs connus.
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Faux positifs connus : valeurs d'exemple non sensibles, fixtures de test."
+paths = [
+  '''(^|/)\.env\.example$''',
+  '''(^|/)tests?/''',
+  '''(^|/)fixtures?/''',
+]
+regexes = [
+  # Les valeurs d'exemple de .env.example ne doivent pas déclencher d'alerte.
+  '''dev-insecure-change-me''',
+  '''change-moi-en-prod''',
+]

@@ -1,0 +1,30 @@
+# Tontine — normalisation Git. Évite les diffs parasites CRLF/LF entre OS
+# (important : les hooks sont en sh et DOIVENT rester en LF).
+
+# Par défaut : Git décide (texte normalisé en LF dans le dépôt).
+* text=auto eol=lf
+
+# Scripts shell & hooks : toujours LF, sinon ils cassent sous Unix.
+*.sh        text eol=lf
+.githooks/* text eol=lf
+
+# Fichiers spécifiques Windows : CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binaires : aucune conversion, aucun diff textuel.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.pdf  binary
+*.xlsx binary
+*.zip  binary
+*.gz   binary
+*.woff  binary
+*.woff2 binary
+
+# Lockfiles générés : exclus des stats de langage et des diffs de revue bruyants.
+*.lock            linguist-generated=true
+package-lock.json linguist-generated=true

@@ -1,0 +1,39 @@
+# ─── Secrets & environnement (MEMORY.md S1/S2) ─────────────
+.env
+.env.*
+!.env.example
+*.local
+secrets/
+*.pem
+*.key
+*.p12
+
+# ─── Python / Django ───────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+db.sqlite3
+staticfiles/
+.pytest_cache/
+.mypy_cache/
+
+# ─── Node / Angular ────────────────────────────────────────
+node_modules/
+dist/
+.angular/
+*.tsbuildinfo
+coverage/
+
+# ─── IDE / OS ──────────────────────────────────────────────
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# ─── Divers ────────────────────────────────────────────────
+_to_delete/
+*.log

@@ -1,0 +1,46 @@
+#!/bin/sh
+# Tontine — hook pre-push : protège main/develop et impose le rebase (MEMORY.md R2/R5/R7).
+set -eu
+
+protected="main develop"
+zero="0000000000000000000000000000000000000000"
+
+# git fournit sur stdin : <local_ref> <local_sha> <remote_ref> <remote_sha>
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ -z "${remote_ref:-}" ] && continue
+  target="${remote_ref#refs/heads/}"
+
+  # R2 — jamais de push direct sur main/develop (les fusions passent par une PR),
+  #      SAUF la création initiale de la branche sur le remote (bootstrap : remote_sha == zéro).
+  for p in $protected; do
+    if [ "$target" = "$p" ]; then
+      if [ "$remote_sha" = "$zero" ]; then
+        echo "ℹ [pre-push] Création initiale de '$p' sur le remote (bootstrap) — autorisée."
+      else
+        echo "✖ [pre-push] Push direct interdit sur '$p' (MEMORY.md R2)."
+        echo "  → Les intégrations vers main/develop passent EXCLUSIVEMENT par une PR."
+        exit 1
+      fi
+    fi
+  done
+
+  # Suppression de branche distante : rien à vérifier
+  [ "$local_sha" = "$zero" ] && continue
+
+  # R5/R7 — la branche poussée doit être rebasée sur sa base d'intégration à jour :
+  #   - hotfix/* se rebase sur origin/main (elle corrige la prod) ;
+  #   - toutes les autres se rebasent sur origin/develop.
+  case "$target" in
+    hotfix/*) base="origin/main" ;;
+    *)        base="origin/develop" ;;
+  esac
+  if git rev-parse --verify -q "$base" >/dev/null 2>&1; then
+    if ! git merge-base --is-ancestor "$base" "$local_sha" 2>/dev/null; then
+      echo "✖ [pre-push] '$target' n'est pas rebasée sur '$base' à jour (MEMORY.md R5/R7)."
+      echo "  → git fetch origin && git rebase $base"
+      exit 1
+    fi
+  fi
+done
+
+exit 0

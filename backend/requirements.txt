@@ -1,0 +1,9 @@
+# Backend — caisse mutuelle
+Django>=5.0,<5.2
+djangorestframework>=3.15
+djangorestframework-simplejwt>=5.3
+strawberry-graphql>=0.235
+django-cors-headers>=4.4
+psycopg2-binary>=2.9        # PostgreSQL (prod)
+gunicorn>=22.0             # serveur WSGI (prod)
+python-dotenv>=1.0
