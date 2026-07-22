@@ -1,9 +1,13 @@
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
 }
 
 .entete {
-  margin-bottom: 18px;
+  flex: 0 0 auto;
+  margin-bottom: 14px;
 
   h1 {
     font-size: 22px;
@@ -18,6 +22,41 @@
   }
 }
 
+.barre {
+  flex: 0 0 auto;
+  margin-bottom: 12px;
+}
+
+.recherche {
+  position: relative;
+  display: inline-block;
+
+  i {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--c-text-muted);
+    font-size: 14px;
+    pointer-events: none;
+  }
+
+  input {
+    padding-left: 32px;
+    min-width: 280px;
+  }
+}
+
+/* Zone défilante : le tableau scrolle ici, pas la page. */
+.tableau-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+}
+
 .recap {
   width: 100%;
   border-collapse: collapse;
@@ -28,8 +67,16 @@
     font-size: 12px;
     color: var(--c-text-muted);
     font-weight: 500;
-    padding: 0 12px 10px;
-    border-bottom: 1px solid var(--c-border);
+    padding: 12px;
+    background: var(--c-surface);
+  }
+
+  /* En-tête figé pendant le défilement. */
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    box-shadow: inset 0 -1px 0 var(--c-border);
   }
 
   td {
@@ -84,17 +131,27 @@
     color: var(--c-text-muted);
   }
 
+  .centre {
+    text-align: center;
+  }
+
+  /* Ligne Total figée en bas pendant le défilement. */
   tfoot td {
-    border-top: 2px solid var(--c-border-strong);
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    background: var(--c-surface);
     border-bottom: none;
+    box-shadow: inset 0 2px 0 var(--c-border-strong);
     padding-top: 14px;
   }
 }
 
 .pied {
+  flex: 0 0 auto;
   display: flex;
   justify-content: flex-end;
-  margin-top: 18px;
+  margin-top: 16px;
 }
 
 .muted {
