@@ -40,6 +40,18 @@ class MontantMois:
     montant: Decimal
 
 
+@strawberry.type
+class Membre:
+    id: strawberry.ID
+    nom: str
+    telephone: str
+    actif: bool
+
+
+def _membre(m: Member) -> "Membre":
+    return Membre(id=strawberry.ID(str(m.id)), nom=m.nom, telephone=m.telephone, actif=m.actif)
+
+
 def _recap_membre(member: Member, cycle: Cycle) -> RecapMembre:
     params = cycle.to_params()
     depots = [
@@ -107,6 +119,12 @@ class Query:
             for m in range(1, cycle.duree_depot + 1)
         ]
 
+    @strawberry.field
+    def membres(self, cycle_id: strawberry.ID) -> List[Membre]:
+        """Liste des membres actifs de la caisse du cycle."""
+        cycle = Cycle.objects.select_related("caisse").get(id=cycle_id)
+        return [_membre(m) for m in Member.objects.filter(caisse=cycle.caisse, actif=True)]
+
 
 @strawberry.type
 class Mutation:
@@ -124,6 +142,29 @@ class Mutation:
             defaults={"montant": montant},
         )
         return _recap_membre(member, cycle)
+
+    @strawberry.mutation
+    def ajouter_membre(self, cycle_id: strawberry.ID, nom: str, telephone: str = "") -> Membre:
+        """Ajoute un membre à la caisse du cycle."""
+        cycle = Cycle.objects.select_related("caisse").get(id=cycle_id)
+        m = Member.objects.create(caisse=cycle.caisse, nom=nom, telephone=telephone)
+        return _membre(m)
+
+    @strawberry.mutation
+    def renommer_membre(self, member_id: strawberry.ID, nom: str) -> Membre:
+        """Renomme un membre."""
+        m = Member.objects.get(id=member_id)
+        m.nom = nom
+        m.save(update_fields=["nom"])
+        return _membre(m)
+
+    @strawberry.mutation
+    def retirer_membre(self, member_id: strawberry.ID) -> bool:
+        """Désactive un membre (on ne supprime pas, pour garder l'historique des dépôts)."""
+        m = Member.objects.get(id=member_id)
+        m.actif = False
+        m.save(update_fields=["actif"])
+        return True
 
 
 schema = strawberry.Schema(query=Query, mutation=Mutation)

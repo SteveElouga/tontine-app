@@ -1,0 +1,30 @@
+<header class="entete">
+  <h1>Membres</h1>
+  <p class="sub">Caisse mutuelle (pilote) · {{ membres().length }} membres · clique un nom pour le corriger</p>
+</header>
+
+<div class="ajout">
+  <input #nomInp class="champ" placeholder="Nom du nouveau membre" (keyup.enter)="ajouter(nomInp.value, telInp.value); nomInp.value=''; telInp.value=''; nomInp.focus()" />
+  <input #telInp class="champ tel" placeholder="Téléphone (optionnel)" />
+  <p-button
+    label="Ajouter"
+    icon="pi pi-plus"
+    (onClick)="ajouter(nomInp.value, telInp.value); nomInp.value=''; telInp.value=''; nomInp.focus()"
+  />
+</div>
+
+@if (chargement()) {
+  <p class="muted">Chargement…</p>
+} @else {
+  <div class="liste">
+    @for (m of membres(); track m.id) {
+      <div class="ligne">
+        <input #nomEdit class="champ nom" [value]="m.nom" (blur)="renommer(m, nomEdit.value)" />
+        <span class="tel-aff">{{ m.telephone || '—' }}</span>
+        <button class="retirer" (click)="retirer(m)" [attr.aria-label]="'Retirer ' + m.nom">
+          <i class="pi pi-trash"></i>
+        </button>
+      </div>
+    }
+  </div>
+}
