@@ -1,6 +1,8 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
+import { InputText } from 'primeng/inputtext';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { RecapMembre } from '../../core/domain/caisse.models';
@@ -10,7 +12,7 @@ const CYCLE_ID = '8e7323b1-1277-47dd-b358-ee0354d52b3d';
 
 @Component({
   selector: 'app-recap',
-  imports: [Button, RouterLink],
+  imports: [Button, RouterLink, FormsModule, InputText],
   templateUrl: './recap.html',
   styleUrl: './recap.scss',
 })
@@ -19,15 +21,23 @@ export class Recap implements OnInit {
 
   protected readonly membres = signal<RecapMembre[]>([]);
   protected readonly chargement = signal(true);
+  protected readonly recherche = signal('');
+
+  /** Lignes filtrées par la recherche (par nom). */
+  protected readonly membresFiltres = computed(() => {
+    const q = this.recherche().trim().toLowerCase();
+    const rows = this.membres();
+    return q ? rows.filter((m) => m.nom.toLowerCase().includes(q)) : rows;
+  });
 
   protected readonly totalEpargne = computed(() =>
-    this.membres().reduce((s, m) => s + Number(m.epargnePlusInterets), 0),
+    this.membresFiltres().reduce((s, m) => s + Number(m.epargnePlusInterets), 0),
   );
   protected readonly totalDettes = computed(() =>
-    this.membres().reduce((s, m) => s + Number(m.dettes), 0),
+    this.membresFiltres().reduce((s, m) => s + Number(m.dettes), 0),
   );
   protected readonly totalRecevoir = computed(() =>
-    this.membres().reduce((s, m) => s + Number(m.positionNette), 0),
+    this.membresFiltres().reduce((s, m) => s + Number(m.positionNette), 0),
   );
 
   ngOnInit(): void {

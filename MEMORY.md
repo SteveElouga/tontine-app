@@ -78,6 +78,7 @@ gitGraph
 
 | Date | Auteur | Résumé de ce qui a été fait | Branches / PR |
 |------|--------|-----------------------------|---------------|
+| 2026-07-22 | Steve + agent | Story **TON-11 Récap** : recherche par nom (`pInputText`, totaux recalculés sur les lignes affichées) + tableau à **défilement interne** (en-tête et ligne Total figés en `sticky`, la barre de scroll de la page ne se déclenche plus). Menus de l'écran Prêts passés en `p-select` (cohérence PrimeNG, recherche membre). Vérifié `ngc` (exit 0). | feat/TON-11-recap-recherche-scroll → PR #11 |
 | 2026-07-22 | Steve + agent | Story **TON-10 Prêts** : backend (type `Pret`, query `pretsCycle`, mutations `ajouterPret`/`rembourserPret`) + écran Prêts (liste, ajout d'un prêt, remboursement en ligne) + nav/route `/prets`. Vérifié `ngc` (AOT + templates, exit 0) ; schéma testé côté Mac (curl `pretsCycle`). Réponse trésorière notée pour la règle d'intérêts (Règle 2 + réduire les mois). | feat/TON-10-prets → PR #10 |
 | 2026-07-22 | Steve + agent | TON-9 mergé (#8). Protection `develop` réglée pour le solo (revue approuvée → 0 ; CI/PR/historique linéaire/pas de push direct conservés — cf. §7). Story UI : **tous les écrans en pleine largeur** — retrait des plafonds `max-width` sur Membres, Fiche membre et la grille de raccourcis du tableau de bord. | refactor/pleine-largeur → PR #9 |
 | 2026-07-22 | Steve + agent | TON-8 mergé (#7). Story TON-9 : **fiche membre détaillée** (transparence) — query GraphQL `ficheMembre` (détail dépôts/taux/intérêts + prêt/majoration/total) et écran fidèle à la maquette ; lignes du Récapitulatif rendues cliquables (route `membre/:id`, chevron + indice). Vérifié par `ngc` (AOT + type-check des templates, exit 0). | feat/TON-9-fiche-membre → PR #8 |
@@ -120,6 +121,7 @@ gitGraph
 | 11 | Module Prêts — saisie + remboursement (TON-10) | en cours | feat/TON-10-prets |
 | 12 | Brancher la règle d'ajustement des intérêts (Règle 2 + réduire les mois, montant auto) | en attente | 1 précision Thérèse |
 | 13 | Sélecteur de cycle/caisse (retirer le `CYCLE_ID` codé en dur) | à faire | — |
+| 14 | Récap : recherche par nom + tableau à défilement interne (TON-11) | en cours | feat/TON-11-recap-recherche-scroll |
 
 ## 9. Stack & conventions du projet
 - **Frontend** : Angular (PWA), TypeScript, Apollo GraphQL. Web d'abord ; mobile plus tard.
