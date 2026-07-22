@@ -64,11 +64,12 @@ gitGraph
 ## 5. État courant du projet
 > Mis à jour à la FIN de chaque session (E7). Doit répondre en 30 s à « où en est-on ? ».
 - **Phase** : développement
-- **Dernier jalon atteint** : gouvernance Git **complète et active** (hooks locaux + protection serveur `main`/`develop` + CI) ; dépôt public en ligne (github.com/SteveElouga/tontine-app) ; scaffold + moteur de calcul testé (8/8).
-- **En cours** : story **TON-1** — migrations initiales + seed de la caisse pilote — sur `feat/TON-1-seed-caisse-pilote`.
-- **Prochaine étape** : ouvrir la PR TON-1 → CI verte → merge (rebase) dans `develop` ; puis 1er écran Angular (saisie des dépôts).
+- **Dernier jalon atteint** : TON-1 mergé (#1) — seed pilote + migrations sur `develop`. API GraphQL prouvée de bout en bout : lecture (`recapCycle`) **et** écriture (`ajouterDepot`), endpoint exempté de CSRF.
+- **En cours** : story **TON-2** — vérification/solidification de l'API GraphQL — sur `feat/TON-2-api-graphql-caisse`.
+- **Prochaine étape** : merger TON-2, puis **TON-3** = premier écran Angular (grille de saisie des dépôts) sur une API prouvée.
 - **Points d'attention / dette** :
   - **Règle d'ajustement des intérêts** (quand tout n'est pas prêté) en attente de réponse de la trésorière pilote — le moteur est prêt à l'accueillir (`apps/core/domain/interest.py`, classes `RepartitionInterets`).
+  - Montants renvoyés en **chaînes** par l'API (Decimal Strawberry) ; contrat aligné dans `caisse.models.ts` (faire `Number()` seulement pour l'affichage).
   - gitleaks et Task (go-task) à installer en local (`brew install gitleaks go-task`) pour le scan de secrets et les tâches.
 
 ## 6. Journal des sessions
@@ -76,6 +77,7 @@ gitGraph
 
 | Date | Auteur | Résumé de ce qui a été fait | Branches / PR |
 |------|--------|-----------------------------|---------------|
+| 2026-07-22 | Steve + agent | TON-1 mergé (#1). Story TON-2 : API GraphQL vérifiée de bout en bout (lecture `recapCycle` + écriture `ajouterDepot`), endpoint exempté de CSRF, contrat Decimal aligné côté frontend. | feat/TON-2-api-graphql-caisse → PR #2 |
 | 2026-07-22 | Steve + agent | Dépôt GitHub public créé + branches `main`/`develop` protégées (défense en profondeur active). Story TON-1 : migrations initiales + commande `seed_pilote` (caisse, cycle 2025-2026, 17 membres). MEMORY.md mis à jour. | feat/TON-1-seed-caisse-pilote → PR #1 |
 | 2026-07-22 | Steve + agent | Modélisation de la caisse mutuelle (règles + classeur de calcul vérifié). Spéc. fonctionnelle & doc d'architecture. Scaffold backend Django (monolithe modulaire) + frontend Angular. Moteur de calcul testé (8/8). Mise en place de la gouvernance Git. | — (pré-dépôt) |
 
@@ -94,8 +96,8 @@ gitGraph
 | # | Tâche | État | Branche / PR |
 |---|-------|------|--------------|
 | 1 | Amorcer le dépôt Git + protection serveur | fait | — |
-| 2 | Seed : caisse pilote + 17 membres + cycle | en cours | feat/TON-1 |
-| 3 | Migrations initiales (members, cycles, savings, loans) | en cours | feat/TON-1 |
+| 2 | Seed + migrations initiales (TON-1) | fait | PR #1 |
+| 3 | API GraphQL vérifiée lecture + écriture, CSRF exempté (TON-2) | en cours | feat/TON-2 |
 | 4 | Écran Angular : saisie des dépôts (grille membres × mois) | à faire | — |
 | 5 | Écran récapitulatif de clôture + export | à faire | — |
 | 6 | Brancher la règle d'ajustement des intérêts (après réponse trésorière) | bloqué | — |

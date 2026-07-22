@@ -46,13 +46,17 @@ export interface Loan {
   moisRemboursement?: MoisIndex | null;
 }
 
-/** Récapitulatif d'un membre calculé côté serveur (type GraphQL `RecapMembre`). */
+/**
+ * Récapitulatif d'un membre calculé côté serveur (type GraphQL `RecapMembre`).
+ * NB : les montants arrivent en chaînes — Strawberry sérialise les `Decimal` en texte
+ * (précision garantie sur l'argent). Utiliser `Number(x)` seulement pour l'affichage/formatage.
+ */
 export interface RecapMembre {
   id: string;
   nom: string;
-  totalDepose: number;
-  interets: number;
-  epargnePlusInterets: number;
-  dettes: number;
-  positionNette: number;
+  totalDepose: string;
+  interets: string;
+  epargnePlusInterets: string;
+  dettes: string;
+  positionNette: string;
 }
