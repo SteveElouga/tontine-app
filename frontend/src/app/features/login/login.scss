@@ -1,0 +1,62 @@
+:host {
+  display: block;
+}
+
+.login-wrap {
+  min-height: calc(100dvh - 44px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carte {
+  width: 100%;
+  max-width: 360px;
+  background: var(--c-surface, #fff);
+  border: 1px solid var(--c-border, #e2e6ea);
+  border-radius: 14px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #1d5fa5;
+
+  i {
+    font-size: 20px;
+  }
+}
+
+h1 {
+  font-size: 20px;
+  margin: 6px 0 0;
+}
+
+.sous {
+  margin: 0 0 6px;
+  color: var(--c-text-2, #5a6672);
+  font-size: 14px;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+
+  input {
+    width: 100%;
+  }
+}
+
+.erreur {
+  color: #b23b3b;
+  font-size: 14px;
+  margin: 0;
+}
