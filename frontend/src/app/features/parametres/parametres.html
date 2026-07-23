@@ -128,6 +128,17 @@
           [allowEmpty]="false"
         />
       </label>
+      <label>
+        <span>Langue</span>
+        <p-selectbutton
+          [options]="optLangue"
+          [ngModel]="lang.langue()"
+          (ngModelChange)="lang.changer($event)"
+          optionLabel="label"
+          optionValue="value"
+          [allowEmpty]="false"
+        />
+      </label>
     </div>
     <p class="aide-txt">Le choix est retenu pour vos prochaines visites.</p>
   </section>
