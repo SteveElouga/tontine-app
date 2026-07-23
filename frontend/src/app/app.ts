@@ -45,18 +45,18 @@ export class App {
   }
 
   protected readonly nav: NavItem[] = [
-    { label: 'nav.tableau', icon: 'pi pi-home', route: '/tableau-de-bord' },
+    { label: 'nav.tableau', icon: 'pi pi-home', route: '/tableau-de-bord', tour: 'tableau' },
     { label: 'nav.saisie', icon: 'pi pi-pencil', route: '/saisie', tour: 'saisie' },
-    { label: 'nav.prets', icon: 'pi pi-money-bill', route: '/prets' },
+    { label: 'nav.prets', icon: 'pi pi-money-bill', route: '/prets', tour: 'prets' },
     { label: 'nav.recap', icon: 'pi pi-list', route: '/recapitulatif', tour: 'recap' },
-    { label: 'nav.membres', icon: 'pi pi-users', route: '/membres' },
-    { label: 'nav.simulation', icon: 'pi pi-calculator', route: '/simulation' },
-    { label: 'nav.historique', icon: 'pi pi-history', route: '/historique' },
+    { label: 'nav.membres', icon: 'pi pi-users', route: '/membres', tour: 'membres' },
+    { label: 'nav.simulation', icon: 'pi pi-calculator', route: '/simulation', tour: 'simulation' },
+    { label: 'nav.historique', icon: 'pi pi-history', route: '/historique', tour: 'historique' },
   ];
 
   protected readonly navBas: NavItem[] = [
     { label: 'nav.aide', icon: 'pi pi-question-circle', route: '/aide', tour: 'aide' },
-    { label: 'nav.parametres', icon: 'pi pi-cog', route: '/parametres' },
-    { label: 'nav.profil', icon: 'pi pi-user', route: '/profil' },
+    { label: 'nav.parametres', icon: 'pi pi-cog', route: '/parametres', tour: 'parametres' },
+    { label: 'nav.profil', icon: 'pi pi-user', route: '/profil', tour: 'profil' },
   ];
 }
