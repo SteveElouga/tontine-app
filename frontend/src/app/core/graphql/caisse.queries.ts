@@ -202,3 +202,30 @@ export const HISTORIQUE = gql`
     }
   }
 `;
+
+/** Simulation d'un dépôt hypothétique. */
+export const SIMULER_EPARGNE = gql`
+  query SimulerEpargne($cycleId: ID!, $montant: Decimal!, $moisIndex: Int!) {
+    simulerEpargne(cycleId: $cycleId, montant: $montant, moisIndex: $moisIndex) {
+      taux
+      interet
+      total
+    }
+  }
+`;
+
+/** Simulation d'un prêt hypothétique. */
+export const SIMULER_PRET = gql`
+  query SimulerPret($cycleId: ID!, $montant: Decimal!, $moisPret: Int!, $moisRemboursement: Int) {
+    simulerPret(
+      cycleId: $cycleId
+      montant: $montant
+      moisPret: $moisPret
+      moisRemboursement: $moisRemboursement
+    ) {
+      moisDeDette
+      majoration
+      total
+    }
+  }
+`;

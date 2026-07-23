@@ -10,6 +10,8 @@ import {
   Operation,
   Pret,
   RecapMembre,
+  SimEpargne,
+  SimPret,
 } from '../domain/caisse.models';
 import {
   AJOUTER_DEPOT,
@@ -25,6 +27,8 @@ import {
   REMBOURSER_PRET,
   RENOMMER_MEMBRE,
   RETIRER_MEMBRE,
+  SIMULER_EPARGNE,
+  SIMULER_PRET,
 } from './caisse.queries';
 
 @Injectable({ providedIn: 'root' })
@@ -176,5 +180,32 @@ export class CaisseService {
         fetchPolicy: 'network-only',
       })
       .pipe(map((r) => (r.data?.historique ?? []) as Operation[]));
+  }
+
+  /** Simule un dépôt hypothétique (taux, intérêt, total à la clôture). */
+  simulerEpargne(cycleId: string, montant: number, moisIndex: number): Observable<SimEpargne> {
+    return this.apollo
+      .query<{ simulerEpargne: SimEpargne }>({
+        query: SIMULER_EPARGNE,
+        variables: { cycleId, montant, moisIndex },
+        fetchPolicy: 'network-only',
+      })
+      .pipe(map((r) => r.data!.simulerEpargne as SimEpargne));
+  }
+
+  /** Simule un prêt hypothétique (mois de dette, majoration, total à rembourser). */
+  simulerPret(
+    cycleId: string,
+    montant: number,
+    moisPret: number,
+    moisRemboursement: number | null,
+  ): Observable<SimPret> {
+    return this.apollo
+      .query<{ simulerPret: SimPret }>({
+        query: SIMULER_PRET,
+        variables: { cycleId, montant, moisPret, moisRemboursement },
+        fetchPolicy: 'network-only',
+      })
+      .pipe(map((r) => r.data!.simulerPret as SimPret));
   }
 }

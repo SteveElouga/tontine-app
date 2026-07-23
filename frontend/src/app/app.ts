@@ -37,7 +37,7 @@ export class App implements OnInit {
     { label: 'Prêts', icon: 'pi pi-money-bill', route: '/prets' },
     { label: 'Récapitulatif', icon: 'pi pi-list', route: '/recapitulatif' },
     { label: 'Membres', icon: 'pi pi-users', route: '/membres' },
-    { label: 'Simulation', icon: 'pi pi-calculator' },
+    { label: 'Simulation', icon: 'pi pi-calculator', route: '/simulation' },
     { label: 'Historique', icon: 'pi pi-history', route: '/historique' },
   ];
 

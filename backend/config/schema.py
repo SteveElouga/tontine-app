@@ -72,6 +72,20 @@ class Operation:
 
 
 @strawberry.type
+class SimEpargne:
+    taux: Decimal
+    interet: Decimal
+    total: Decimal
+
+
+@strawberry.type
+class SimPret:
+    mois_de_dette: int
+    majoration: Decimal
+    total: Decimal
+
+
+@strawberry.type
 class DepotDetail:
     mois_index: int
     montant: Decimal
@@ -251,6 +265,33 @@ class Query:
             )
         ops.sort(key=lambda o: o.date, reverse=True)
         return ops
+
+    @strawberry.field
+    def simuler_epargne(
+        self, cycle_id: strawberry.ID, montant: Decimal, mois_index: int
+    ) -> SimEpargne:
+        """Projection d'un dépôt hypothétique à la clôture (moteur = source de vérité)."""
+        params = Cycle.objects.get(id=cycle_id).to_params()
+        taux = interest.taux_a_la_cloture(mois_index, params)
+        interet = interest.interet_depot(montant, mois_index, params)
+        return SimEpargne(taux=taux, interet=interet, total=montant + interet)
+
+    @strawberry.field
+    def simuler_pret(
+        self,
+        cycle_id: strawberry.ID,
+        montant: Decimal,
+        mois_pret: int,
+        mois_remboursement: Optional[int] = None,
+    ) -> SimPret:
+        """Projection d'un prêt hypothétique (majoration, total à rembourser)."""
+        params = Cycle.objects.get(id=cycle_id).to_params()
+        pret = interest.Pret(montant, mois_pret, mois_remboursement)
+        return SimPret(
+            mois_de_dette=interest.mois_de_dette(pret, params),
+            majoration=interest.majoration_pret(pret, params),
+            total=interest.total_a_rembourser(pret, params),
+        )
 
     @strawberry.field
     def fiche_membre(self, cycle_id: strawberry.ID, member_id: strawberry.ID) -> FicheMembre:

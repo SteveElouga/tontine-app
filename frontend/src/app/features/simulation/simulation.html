@@ -1,0 +1,97 @@
+<header class="entete">
+  <h1>Simulation</h1>
+  <p class="sub">Projette un dépôt ou un prêt — même calcul que la vraie caisse</p>
+</header>
+
+<div class="cartes">
+  <section class="carte">
+    <h2><i class="pi pi-wallet"></i> Épargne</h2>
+    <div class="champs">
+      <label>
+        <span>Montant</span>
+        <p-inputnumber
+          [ngModel]="epMontant()"
+          (ngModelChange)="epMontant.set($event); calculerEpargne()"
+          [maxFractionDigits]="0"
+          [useGrouping]="true"
+          locale="fr-FR"
+          placeholder="0"
+          [style]="{ width: '100%' }"
+          [inputStyle]="{ width: '100%', 'text-align': 'right' }"
+        />
+      </label>
+      <label>
+        <span>Mois du dépôt</span>
+        <p-select
+          [options]="optMoisDepot"
+          [ngModel]="epMois()"
+          (ngModelChange)="epMois.set($event); calculerEpargne()"
+          optionLabel="label"
+          optionValue="value"
+          [style]="{ width: '100%' }"
+        />
+      </label>
+    </div>
+    @if (epResultat(); as r) {
+      <div class="res">
+        <div class="ligne"><span>Taux à la clôture</span><span>{{ pct(r.taux) }}</span></div>
+        <div class="ligne"><span>Intérêt</span><span class="vert">+{{ fmt(r.interet) }}</span></div>
+        <div class="ligne fort"><span>Total à la clôture</span><span>{{ fmt(r.total) }} FCFA</span></div>
+      </div>
+    } @else {
+      <p class="hint">Entre un montant pour voir la projection.</p>
+    }
+  </section>
+
+  <section class="carte">
+    <h2><i class="pi pi-money-bill"></i> Prêt</h2>
+    <div class="champs">
+      <label>
+        <span>Montant</span>
+        <p-inputnumber
+          [ngModel]="prMontant()"
+          (ngModelChange)="prMontant.set($event); calculerPret()"
+          [maxFractionDigits]="0"
+          [useGrouping]="true"
+          locale="fr-FR"
+          placeholder="0"
+          [style]="{ width: '100%' }"
+          [inputStyle]="{ width: '100%', 'text-align': 'right' }"
+        />
+      </label>
+      <label>
+        <span>Mois du prêt</span>
+        <p-select
+          [options]="optMoisDepot"
+          [ngModel]="prMois()"
+          (ngModelChange)="prMois.set($event); calculerPret()"
+          optionLabel="label"
+          optionValue="value"
+          [style]="{ width: '100%' }"
+        />
+      </label>
+      <label>
+        <span>Remboursement</span>
+        <p-select
+          [options]="optMoisRemb()"
+          [ngModel]="prRemb()"
+          (ngModelChange)="prRemb.set($event); calculerPret()"
+          optionLabel="label"
+          optionValue="value"
+          [style]="{ width: '100%' }"
+        />
+      </label>
+    </div>
+    @if (prResultat(); as r) {
+      <div class="res">
+        <div class="ligne"><span>Mois de dette</span><span>{{ r.moisDeDette }}</span></div>
+        <div class="ligne">
+          <span>Majoration (5 % × mois)</span><span class="rouge">+{{ fmt(r.majoration) }}</span>
+        </div>
+        <div class="ligne fort"><span>Total à rembourser</span><span>{{ fmt(r.total) }} FCFA</span></div>
+      </div>
+    } @else {
+      <p class="hint">Entre un montant pour voir la projection.</p>
+    }
+  </section>
+</div>
