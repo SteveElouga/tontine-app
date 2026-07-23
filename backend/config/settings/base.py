@@ -1,5 +1,6 @@
 """Réglages de base — communs à tous les environnements."""
 import os
+from datetime import timedelta
 from pathlib import Path
 
 # backend/  (config/settings/base.py -> remonter de 3)
@@ -91,6 +92,12 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+}
+
+# Durée de vie des jetons JWT (sessions longues pour limiter les reconnexions de la trésorière).
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=8),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
 }
 
 LANGUAGE_CODE = "fr-fr"

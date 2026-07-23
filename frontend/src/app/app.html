@@ -1,4 +1,5 @@
 <div class="shell">
+  @if (auth.connecte()) {
   <aside class="sidebar">
     <div class="brand"><i class="pi pi-users"></i><span>Tontine</span></div>
 
@@ -41,8 +42,12 @@
           </span>
         }
       }
+      <button type="button" class="nav-item deconnexion" (click)="deconnecter()">
+        <i class="pi pi-sign-out"></i>{{ 'nav.deconnexion' | translate }}
+      </button>
     </div>
   </aside>
+  }
 
   <main class="content">
     <router-outlet />
