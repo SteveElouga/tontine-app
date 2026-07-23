@@ -100,6 +100,37 @@
       </div>
     }
   </section>
+
+  <section class="carte">
+    <h2>La caisse</h2>
+    <div class="champs">
+      <label>
+        <span>Nom de la caisse</span>
+        <input class="champ" [ngModel]="caisseNom()" (ngModelChange)="caisseNom.set($event)" />
+      </label>
+    </div>
+    <div class="actions">
+      <p-button label="Enregistrer" icon="pi pi-check" (onClick)="enregistrerCaisse()" />
+    </div>
+  </section>
+
+  <section class="carte">
+    <h2>Affichage</h2>
+    <div class="champs">
+      <label>
+        <span>Thème</span>
+        <p-selectbutton
+          [options]="optTheme"
+          [ngModel]="theme.sombre()"
+          (ngModelChange)="theme.basculer($event)"
+          optionLabel="label"
+          optionValue="value"
+          [allowEmpty]="false"
+        />
+      </label>
+    </div>
+    <p class="aide-txt">Le choix est retenu pour vos prochaines visites.</p>
+  </section>
   </div>
 } @else {
   <p class="muted">Cycle introuvable.</p>

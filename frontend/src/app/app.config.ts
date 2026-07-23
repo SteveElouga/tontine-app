@@ -1,12 +1,14 @@
 import {
   ApplicationConfig,
   provideBrowserGlobalErrorListeners,
+  provideAppInitializer,
   isDevMode,
   inject,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
+import { ThemeStore } from './core/state/theme-store';
 import { provideServiceWorker } from '@angular/service-worker';
 import { provideHttpClient } from '@angular/common/http';
 import { provideApollo } from 'apollo-angular';
@@ -44,6 +46,9 @@ const GRAPHQL_URI = 'http://localhost:8000/graphql/';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
+    provideAppInitializer(() => {
+      inject(ThemeStore);
+    }),
     provideAnimationsAsync(),
     providePrimeNG({ theme: { preset: TontinePreset, options: { darkModeSelector: '.app-dark' } } }),
     MessageService,

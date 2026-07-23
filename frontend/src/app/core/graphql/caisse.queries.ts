@@ -76,6 +76,15 @@ export const CLOTURER_CYCLE = gql`
   }
 `;
 
+export const RENOMMER_CAISSE = gql`
+  mutation RenommerCaisse($cycleId: ID!, $nom: String!) {
+    renommerCaisse(cycleId: $cycleId, nom: $nom) {
+      id
+      caisseNom
+    }
+  }
+`;
+
 /** Récapitulatif des membres d'un cycle, selon le mode de répartition des intérêts. */
 export const RECAP_CYCLE = gql`
   query RecapCycle($cycleId: ID!, $mode: String, $nMois: Int) {

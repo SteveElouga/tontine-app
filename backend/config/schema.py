@@ -563,5 +563,13 @@ class Mutation:
         c.save(update_fields=["statut"])
         return _params_cycle(c)
 
+    @strawberry.mutation
+    def renommer_caisse(self, cycle_id: strawberry.ID, nom: str) -> ParametresCycle:
+        """Renomme la caisse à laquelle appartient le cycle."""
+        c = Cycle.objects.select_related("caisse").get(id=cycle_id)
+        c.caisse.nom = nom
+        c.caisse.save(update_fields=["nom"])
+        return _params_cycle(c)
+
 
 schema = strawberry.Schema(query=Query, mutation=Mutation)
