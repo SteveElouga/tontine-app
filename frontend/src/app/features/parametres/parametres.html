@@ -20,7 +20,10 @@
         />
       </label>
       <label>
-        <span>{{ 'param.moisOuverture' | translate }}</span>
+        <span>
+          {{ 'param.moisOuverture' | translate }}
+          <i class="pi pi-info-circle tip" [pTooltip]="'param.tipMoisOuverture' | translate" tooltipPosition="top"></i>
+        </span>
         <p-select
           [options]="optMoisDebut()"
           [ngModel]="moisDebut()"
@@ -31,7 +34,10 @@
         />
       </label>
       <label>
-        <span>{{ 'param.tauxEpargne' | translate }}</span>
+        <span>
+          {{ 'param.tauxEpargne' | translate }}
+          <i class="pi pi-info-circle tip" [pTooltip]="'param.tipTauxEpargne' | translate" tooltipPosition="top"></i>
+        </span>
         <p-inputnumber
           [ngModel]="tauxEpargnePct()"
           (ngModelChange)="tauxEpargnePct.set($event)"
@@ -41,7 +47,10 @@
         />
       </label>
       <label>
-        <span>{{ 'param.tauxMajo' | translate }}</span>
+        <span>
+          {{ 'param.tauxMajo' | translate }}
+          <i class="pi pi-info-circle tip" [pTooltip]="'param.tipTauxMajo' | translate" tooltipPosition="top"></i>
+        </span>
         <p-inputnumber
           [ngModel]="tauxMajoPct()"
           (ngModelChange)="tauxMajoPct.set($event)"
@@ -59,7 +68,10 @@
         />
       </label>
       <label>
-        <span>{{ 'param.remboursementAvant' | translate }}</span>
+        <span>
+          {{ 'param.remboursementAvant' | translate }}
+          <i class="pi pi-info-circle tip" [pTooltip]="'param.tipRemboursement' | translate" tooltipPosition="top"></i>
+        </span>
         <p-select
           [options]="optDelai()"
           [ngModel]="moisDelai()"

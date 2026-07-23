@@ -4,6 +4,7 @@ import { MessageService } from 'primeng/api';
 import { InputNumber } from 'primeng/inputnumber';
 import { Button } from 'primeng/button';
 import { Select } from 'primeng/select';
+import { Tooltip } from 'primeng/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
@@ -14,7 +15,7 @@ import { Membre, Pret, moisCalendaire } from '../../core/domain/caisse.models';
 
 @Component({
   selector: 'app-prets',
-  imports: [FormsModule, InputNumber, Button, Select, TranslatePipe, MoisNomPipe],
+  imports: [FormsModule, InputNumber, Button, Select, TranslatePipe, MoisNomPipe, Tooltip],
   templateUrl: './prets.html',
   styleUrl: './prets.scss',
 })

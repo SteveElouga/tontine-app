@@ -55,10 +55,22 @@
       <thead>
         <tr>
           <th class="g">{{ 'recap.colMembre' | translate }}</th>
-          <th class="d">{{ 'recap.colEpargne' | translate }}</th>
-          <th class="d">{{ 'recap.colInterets' | translate }}</th>
-          <th class="d">{{ 'recap.colDette' | translate }}</th>
-          <th class="d">{{ 'recap.colRecevoir' | translate }}</th>
+          <th class="d">
+            {{ 'recap.colEpargne' | translate }}
+            <i class="pi pi-info-circle tip" [pTooltip]="'recap.tipEpargne' | translate" tooltipPosition="top"></i>
+          </th>
+          <th class="d">
+            {{ 'recap.colInterets' | translate }}
+            <i class="pi pi-info-circle tip" [pTooltip]="'recap.tipInterets' | translate" tooltipPosition="top"></i>
+          </th>
+          <th class="d">
+            {{ 'recap.colDette' | translate }}
+            <i class="pi pi-info-circle tip" [pTooltip]="'recap.tipDette' | translate" tooltipPosition="top"></i>
+          </th>
+          <th class="d">
+            {{ 'recap.colRecevoir' | translate }}
+            <i class="pi pi-info-circle tip" [pTooltip]="'recap.tipRecevoir' | translate" tooltipPosition="top"></i>
+          </th>
           <th class="chev"></th>
         </tr>
       </thead>
@@ -75,7 +87,13 @@
                 <span class="tiret">—</span>
               }
             </td>
-            <td class="d fort">{{ format(m.positionNette) }}</td>
+            <td
+              class="d fort"
+              [pTooltip]="'recap.tipRecevoirCalc' | translate: { e: format(m.totalDepose), i: format(m.interets), d: format(m.dettes) }"
+              tooltipPosition="left"
+            >
+              {{ format(m.positionNette) }}
+            </td>
             <td class="chev"><i class="pi pi-angle-right"></i></td>
           </tr>
         } @empty {
