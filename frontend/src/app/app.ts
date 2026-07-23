@@ -1,11 +1,12 @@
-import { Component, OnInit, computed, inject } from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Toast } from 'primeng/toast';
 import { Select } from 'primeng/select';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import { CycleStore } from './core/state/cycle-store';
+import { AuthStore } from './core/state/auth-store';
 
 interface NavItem {
   label: string;
@@ -20,16 +21,26 @@ interface NavItem {
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
-export class App implements OnInit {
+export class App {
   protected readonly cycles = inject(CycleStore);
+  protected readonly auth = inject(AuthStore);
+  private readonly router = inject(Router);
 
-  /** Options du menu : « Caisse · libellé ». */
+  /** Options du menu : « libellé du cycle ». */
   protected readonly cyclesOpt = computed(() =>
     this.cycles.cycles().map((c) => ({ label: c.libelle, value: c.id })),
   );
 
-  ngOnInit(): void {
-    this.cycles.charger();
+  constructor() {
+    // Charge (ou recharge) les cycles dès que la trésorière est connectée.
+    effect(() => {
+      if (this.auth.connecte()) this.cycles.charger();
+    });
+  }
+
+  deconnecter(): void {
+    this.auth.deconnecter();
+    this.router.navigate(['/login']);
   }
 
   protected readonly nav: NavItem[] = [

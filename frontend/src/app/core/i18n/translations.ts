@@ -19,6 +19,7 @@ export const FR = {
     parametres: 'Paramètres',
     profil: 'Profil',
     cycle: 'Cycle',
+    deconnexion: 'Déconnexion',
   },
   param: {
     langue: 'Langue',
@@ -68,6 +69,15 @@ export const FR = {
   },
   commun: {
     chargement: 'Chargement…',
+  },
+  login: {
+    titre: 'Connexion',
+    sous: 'Accès réservé à la trésorière.',
+    identifiant: 'Identifiant',
+    motDePasse: 'Mot de passe',
+    bouton: 'Se connecter',
+    enCours: 'Connexion…',
+    erreur: 'Identifiant ou mot de passe incorrect.',
   },
   tdb: {
     titre: 'Tableau de bord',
@@ -277,6 +287,7 @@ export const EN = {
     parametres: 'Settings',
     profil: 'Profile',
     cycle: 'Cycle',
+    deconnexion: 'Sign out',
   },
   param: {
     langue: 'Language',
@@ -326,6 +337,15 @@ export const EN = {
   },
   commun: {
     chargement: 'Loading…',
+  },
+  login: {
+    titre: 'Sign in',
+    sous: 'Treasurer access only.',
+    identifiant: 'Username',
+    motDePasse: 'Password',
+    bouton: 'Sign in',
+    enCours: 'Signing in…',
+    erreur: 'Wrong username or password.',
   },
   tdb: {
     titre: 'Dashboard',

@@ -9,17 +9,20 @@ import { Simulation } from './features/simulation/simulation';
 import { Aide } from './features/aide/aide';
 import { Parametres } from './features/parametres/parametres';
 import { FicheMembrePage } from './features/fiche-membre/fiche-membre';
+import { Login } from './features/login/login';
+import { authGuard } from './core/auth/auth-guard';
 
 export const routes: Routes = [
+  { path: 'login', component: Login },
   { path: '', redirectTo: 'tableau-de-bord', pathMatch: 'full' },
-  { path: 'tableau-de-bord', component: Dashboard },
-  { path: 'saisie', component: Saisie },
-  { path: 'prets', component: Prets },
-  { path: 'membres', component: Membres },
-  { path: 'recapitulatif', component: Recap },
-  { path: 'historique', component: Historique },
-  { path: 'simulation', component: Simulation },
-  { path: 'aide', component: Aide },
-  { path: 'parametres', component: Parametres },
-  { path: 'membre/:id', component: FicheMembrePage },
+  { path: 'tableau-de-bord', component: Dashboard, canActivate: [authGuard] },
+  { path: 'saisie', component: Saisie, canActivate: [authGuard] },
+  { path: 'prets', component: Prets, canActivate: [authGuard] },
+  { path: 'membres', component: Membres, canActivate: [authGuard] },
+  { path: 'recapitulatif', component: Recap, canActivate: [authGuard] },
+  { path: 'historique', component: Historique, canActivate: [authGuard] },
+  { path: 'simulation', component: Simulation, canActivate: [authGuard] },
+  { path: 'aide', component: Aide, canActivate: [authGuard] },
+  { path: 'parametres', component: Parametres, canActivate: [authGuard] },
+  { path: 'membre/:id', component: FicheMembrePage, canActivate: [authGuard] },
 ];

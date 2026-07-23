@@ -1,0 +1,43 @@
+<div class="login-wrap">
+  <form class="carte" (ngSubmit)="seConnecter()">
+    <div class="brand"><i class="pi pi-users"></i><span>Tontine</span></div>
+    <h1>{{ 'login.titre' | translate }}</h1>
+    <p class="sous">{{ 'login.sous' | translate }}</p>
+
+    <label>
+      <span>{{ 'login.identifiant' | translate }}</span>
+      <input
+        pInputText
+        name="identifiant"
+        autocomplete="username"
+        [ngModel]="identifiant()"
+        (ngModelChange)="identifiant.set($event)"
+      />
+    </label>
+
+    <label>
+      <span>{{ 'login.motDePasse' | translate }}</span>
+      <p-password
+        name="motDePasse"
+        autocomplete="current-password"
+        [feedback]="false"
+        [toggleMask]="true"
+        [ngModel]="motDePasse()"
+        (ngModelChange)="motDePasse.set($event)"
+        [style]="{ width: '100%' }"
+        [inputStyle]="{ width: '100%' }"
+      />
+    </label>
+
+    @if (erreur()) {
+      <p class="erreur">{{ 'login.erreur' | translate }}</p>
+    }
+
+    <p-button
+      type="submit"
+      [label]="(enCours() ? 'login.enCours' : 'login.bouton') | translate"
+      [disabled]="enCours()"
+      [style]="{ width: '100%' }"
+    />
+  </form>
+</div>

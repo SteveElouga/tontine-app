@@ -83,6 +83,14 @@ nav {
   }
 }
 
+button.nav-item {
+  width: 100%;
+  background: none;
+  border: 0;
+  font: inherit;
+  text-align: left;
+}
+
 .soon-tag {
   margin-left: auto;
   font-size: 11px;
