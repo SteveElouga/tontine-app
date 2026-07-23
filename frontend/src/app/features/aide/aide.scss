@@ -134,3 +134,18 @@
     color: var(--c-text);
   }
 }
+
+.revoir-tour {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border: 1px solid var(--c-accent);
+  background: var(--c-accent-bg);
+  color: var(--c-accent);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}

@@ -3,7 +3,7 @@
   <aside class="sidebar">
     <div class="brand"><i class="pi pi-users"></i><span>Tontine</span></div>
 
-    <div class="cycle">
+    <div class="cycle" data-tour="cycle">
       <label>{{ 'nav.cycle' | translate }}</label>
       <p-select
         [options]="cyclesOpt()"
@@ -20,7 +20,7 @@
     <nav>
       @for (item of nav; track item.label) {
         @if (item.route) {
-          <a class="nav-item" [routerLink]="item.route" routerLinkActive="active">
+          <a class="nav-item" [routerLink]="item.route" routerLinkActive="active" [attr.data-tour]="item.tour">
             <i [class]="item.icon"></i>{{ item.label | translate }}
           </a>
         } @else {
@@ -33,7 +33,7 @@
     <div class="sidebar-bottom">
       @for (item of navBas; track item.label) {
         @if (item.route) {
-          <a class="nav-item" [routerLink]="item.route" routerLinkActive="active">
+          <a class="nav-item" [routerLink]="item.route" routerLinkActive="active" [attr.data-tour]="item.tour">
             <i [class]="item.icon"></i>{{ item.label | translate }}
           </a>
         } @else {
