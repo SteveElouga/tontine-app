@@ -1,0 +1,143 @@
+:host {
+  display: block;
+}
+
+.entete {
+  margin-bottom: 22px;
+
+  h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .sub {
+    margin: 2px 0 0;
+    color: var(--c-text-2);
+    font-size: 14px;
+  }
+}
+
+.cartes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.carte {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  padding: 18px 20px;
+
+  h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 16px;
+  }
+}
+
+.champs {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 14px;
+    color: var(--c-text-2);
+  }
+}
+
+.champ {
+  border: 1px solid var(--c-border-strong);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 15px;
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-family: inherit;
+
+  &:focus {
+    outline: none;
+    border-color: var(--c-accent);
+    box-shadow: 0 0 0 2px var(--c-accent-bg);
+  }
+}
+
+.avert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 10px 12px;
+  background: #fdf3e7;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #8a5a1c;
+
+  i {
+    color: #c47f2a;
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.info {
+  font-size: 14px;
+  color: var(--c-text-2);
+  margin: 0 0 14px;
+}
+
+.bloc-annee {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+
+  label {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 13px;
+    color: var(--c-text-2);
+  }
+
+  .champ {
+    width: 100%;
+  }
+}
+
+.aide-txt {
+  font-size: 13px;
+  color: var(--c-text-muted);
+  margin: 8px 0 0;
+}
+
+.lien-danger {
+  border: 1px solid var(--c-border-strong);
+  background: var(--c-surface);
+  color: #b23b3b;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-family: inherit;
+
+  &:hover {
+    background: #fbeaea;
+    border-color: #b23b3b;
+  }
+}
+
+.muted {
+  color: var(--c-text-muted);
+}
