@@ -1,7 +1,7 @@
 # Documentation d'architecture
 
 **Projet :** Application de gestion de tontines — module Caisse mutuelle (v1)
-**Version :** 0.1
+**Version :** 0.2
 **Décision structurante :** monolithe **modulaire** (pas de microservices).
 
 ---
@@ -126,7 +126,7 @@ Fonctions principales :
 - `majoration_pret(montant, mois_pret, mois_remboursement, cycle)` → majoration d'un prêt (défaut : délai si non remboursé).
 - `position_nette_membre(...)` → épargne + intérêts − dettes.
 
-**C'est ici que vivra la règle d'ajustement des intérêts** (question ouverte de la spec, §5) : une stratégie enfichable (`RepartitionInterets`) permettra de basculer entre « intérêts complets », « au prorata du prêté », ou « partage des majorations », **sans toucher au reste de l'app**.
+**La règle d'ajustement des intérêts** (spec §5, désormais tranchée) vit ici, sous forme de stratégie enfichable (`RepartitionInterets`). Quatre modes sont implémentés et testés : `InteretsComplets`, `InteretsReductionMois(n)`, `InteretsEquitableProrata(...)` et `InteretsEquitableEgal(...)`, avec les aides `total_majorations(...)` et `suggerer_reduction_mois(...)`. Le mode est choisi à la clôture sur le Récapitulatif, **sans toucher au reste de l'app**.
 
 Ces fonctions reproduisent exactement les calculs déjà vérifiés dans le classeur `Caisse-Mutuelle-Calculatrice.xlsx`, et sont couvertes par des tests unitaires (`apps/core/domain/tests_interest.py`).
 
@@ -206,7 +206,7 @@ tontine-app/
 |---|---|
 | Monolithe modulaire (apps Django) plutôt que microservices | **Acté** — adapté au projet solo, faible coût opérationnel |
 | Angular PWA / Django-DRF / GraphQL / PostgreSQL | **Acté** (choix du porteur) |
-| GraphQL = métier, DRF = auth/technique | Proposé |
-| Bibliothèque GraphQL : Strawberry | Proposé (alternative : Graphene) |
-| Moteur de calcul en Python pur, isolé de Django | **Recommandé fortement** (testabilité, règle d'intérêts enfichable) |
+| GraphQL = métier, DRF = auth/technique | **Acté** pour GraphQL (implémenté) ; auth DRF/JWT pas encore branchée |
+| Bibliothèque GraphQL : Strawberry | **Acté** (implémenté) |
+| Moteur de calcul en Python pur, isolé de Django | **Acté** (implémenté et testé ; 4 modes d'intérêts enfichables) |
 | Offline-first en 2 phases | Proposé |
