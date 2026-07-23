@@ -3,7 +3,7 @@
     <div class="brand"><i class="pi pi-users"></i><span>Tontine</span></div>
 
     <div class="cycle">
-      <label>Cycle</label>
+      <label>{{ 'nav.cycle' | translate }}</label>
       <p-select
         [options]="cyclesOpt()"
         [ngModel]="cycles.cycleId()"
@@ -20,11 +20,11 @@
       @for (item of nav; track item.label) {
         @if (item.route) {
           <a class="nav-item" [routerLink]="item.route" routerLinkActive="active">
-            <i [class]="item.icon"></i>{{ item.label }}
+            <i [class]="item.icon"></i>{{ item.label | translate }}
           </a>
         } @else {
           <span class="nav-item todo">
-            <i [class]="item.icon"></i>{{ item.label }}
+            <i [class]="item.icon"></i>{{ item.label | translate }}
           </span>
         }
       }
@@ -33,11 +33,11 @@
       @for (item of navBas; track item.label) {
         @if (item.route) {
           <a class="nav-item" [routerLink]="item.route" routerLinkActive="active">
-            <i [class]="item.icon"></i>{{ item.label }}
+            <i [class]="item.icon"></i>{{ item.label | translate }}
           </a>
         } @else {
           <span class="nav-item todo">
-            <i [class]="item.icon"></i>{{ item.label }}<span class="soon-tag">bientôt</span>
+            <i [class]="item.icon"></i>{{ item.label | translate }}<span class="soon-tag">bientôt</span>
           </span>
         }
       }
