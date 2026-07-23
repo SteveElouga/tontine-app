@@ -10,13 +10,17 @@ try:
     from apps.core.domain.interest import (
         Cycle, Depot, Pret, taux_a_la_cloture, interet_depot, interets_membre,
         epargne_plus_interets, mois_de_dette, majoration_pret, total_a_rembourser,
-        position_nette, InteretsAuProrataDuPrete,
+        total_majorations, position_nette,
+        InteretsReductionMois, InteretsEquitableProrata, InteretsEquitableEgal,
+        suggerer_reduction_mois,
     )
 except ImportError:  # exécution directe depuis le dossier domain/
     from interest import (
         Cycle, Depot, Pret, taux_a_la_cloture, interet_depot, interets_membre,
         epargne_plus_interets, mois_de_dette, majoration_pret, total_a_rembourser,
-        position_nette, InteretsAuProrataDuPrete,
+        total_majorations, position_nette,
+        InteretsReductionMois, InteretsEquitableProrata, InteretsEquitableEgal,
+        suggerer_reduction_mois,
     )
 
 CYCLE = Cycle()  # cycle standard : 9 mois de dépôt, délai août, taux 5 %
@@ -67,11 +71,48 @@ def test_position_nette():
     assert position_nette(depots, prets, CYCLE) == Decimal("145000") - Decimal("62500")
 
 
-def test_repartition_prorata():
-    # Règle B : si seulement 50 % de l'argent a été prêté, intérêts réduits de moitié
-    depots = [Depot(1, Decimal("100000"))]
-    strat = InteretsAuProrataDuPrete(Decimal("0.5"))
-    assert strat.interets(depots, CYCLE) == Decimal("22500")
+def test_reduction_mois():
+    # Mode 2 (−3 mois). Awa : 100k sept (9 mois) ; Béa : 100k février (mois 6 → 4 mois).
+    awa = [Depot(1, Decimal("100000"))]
+    bea = [Depot(6, Decimal("100000"))]
+    strat = InteretsReductionMois(3)
+    assert strat.interets(awa, CYCLE) == Decimal("30000")  # 6 mois → 30 %
+    assert strat.interets(bea, CYCLE) == Decimal("5000")   # 1 mois → 5 %
+
+
+def test_reduction_mois_plancher_zero():
+    # Dépôt d'avril (mois 8 → 2 mois) avec −3 mois → 0 (pas d'intérêt négatif).
+    avril = [Depot(8, Decimal("100000"))]
+    assert InteretsReductionMois(3).interets(avril, CYCLE) == Decimal("0")
+
+
+def test_equitable_prorata():
+    # Mode 3a : gains 30 000, Awa a déposé 200k, Béa 100k (total 300k).
+    awa = [Depot(1, Decimal("200000"))]
+    bea = [Depot(6, Decimal("100000"))]
+    strat = InteretsEquitableProrata(Decimal("30000"), Decimal("300000"))
+    assert strat.interets(awa, CYCLE) == Decimal("20000")  # 30000 × 200/300
+    assert strat.interets(bea, CYCLE) == Decimal("10000")  # 30000 × 100/300
+
+
+def test_equitable_egal():
+    # Mode 3b : gains 30 000, 3 épargnants → 10 000 chacun ; un non-épargnant → 0.
+    strat = InteretsEquitableEgal(Decimal("30000"), 3)
+    assert strat.interets([Depot(1, Decimal("100000"))], CYCLE) == Decimal("10000")
+    assert strat.interets([], CYCLE) == Decimal("0")
+
+
+def test_total_majorations():
+    prets = [Pret(Decimal("100000"), 6, 12), Pret(Decimal("50000"), 1, 6)]
+    assert total_majorations(prets, CYCLE) == Decimal("42500")  # 30 000 + 12 500
+
+
+def test_suggerer_reduction_mois():
+    # Awa 100k sept (complet 45 000) ; gains encaissés 30 000 → il faut retrancher 3 mois.
+    tous = [Depot(1, Decimal("100000"))]
+    prets = [Pret(Decimal("100000"), 6, 12)]  # majoration 30 000
+    assert total_majorations(prets, CYCLE) == Decimal("30000")
+    assert suggerer_reduction_mois(tous, prets, CYCLE) == 3
 
 
 def _run():
