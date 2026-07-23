@@ -1,20 +1,22 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
-import { MOIS, Operation } from '../../core/domain/caisse.models';
+import { LangStore } from '../../core/state/lang-store';
+import { Operation } from '../../core/domain/caisse.models';
 
 @Component({
   selector: 'app-historique',
-  imports: [],
+  imports: [TranslatePipe],
   templateUrl: './historique.html',
   styleUrl: './historique.scss',
 })
 export class Historique implements OnInit {
   private readonly caisse = inject(CaisseService);
   private readonly cycleStore = inject(CycleStore);
+  private readonly lang = inject(LangStore);
 
-  protected readonly MOIS = MOIS;
   protected readonly operations = signal<Operation[]>([]);
   protected readonly chargement = signal(true);
 
@@ -34,7 +36,8 @@ export class Historique implements OnInit {
 
   /** ISO → « 12 févr. 2026 ». */
   protected date(iso: string): string {
-    return new Date(iso).toLocaleDateString('fr-FR', {
+    const locale = this.lang.langue() === 'en' ? 'en-GB' : 'fr-FR';
+    return new Date(iso).toLocaleDateString(locale, {
       day: '2-digit',
       month: 'short',
       year: 'numeric',

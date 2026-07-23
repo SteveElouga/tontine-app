@@ -1,26 +1,26 @@
 <header class="entete">
-  <h1>Paramètres</h1>
-  <p class="sub">Les règles du cycle et la gestion des années.</p>
+  <h1>{{ 'param.titre' | translate }}</h1>
+  <p class="sub">{{ 'param.sous' | translate }}</p>
 </header>
 
 @if (chargement()) {
-  <p class="muted">Chargement…</p>
+  <p class="muted">{{ 'commun.chargement' | translate }}</p>
 } @else if (params(); as p) {
   <div class="cartes">
   <section class="carte">
-    <h2>Règles du cycle</h2>
+    <h2>{{ 'param.reglesTitre' | translate }}</h2>
     <div class="champs">
       <label>
-        <span>Année</span>
+        <span>{{ 'param.annee' | translate }}</span>
         <input
           class="champ"
           [ngModel]="libelle()"
           (ngModelChange)="libelle.set($event)"
-          placeholder="ex. 2025-2026"
+          [placeholder]="'param.anneePlaceholder' | translate"
         />
       </label>
       <label>
-        <span>Taux d'épargne (par mois)</span>
+        <span>{{ 'param.tauxEpargne' | translate }}</span>
         <p-inputnumber
           [ngModel]="tauxEpargnePct()"
           (ngModelChange)="tauxEpargnePct.set($event)"
@@ -30,7 +30,7 @@
         />
       </label>
       <label>
-        <span>Taux de majoration des prêts (par mois)</span>
+        <span>{{ 'param.tauxMajo' | translate }}</span>
         <p-inputnumber
           [ngModel]="tauxMajoPct()"
           (ngModelChange)="tauxMajoPct.set($event)"
@@ -40,7 +40,7 @@
         />
       </label>
       <label>
-        <span>Nombre de mois de dépôt</span>
+        <span>{{ 'param.nbMoisDepot' | translate }}</span>
         <p-inputnumber
           [ngModel]="dureeDepot()"
           (ngModelChange)="dureeDepot.set($event)"
@@ -48,9 +48,9 @@
         />
       </label>
       <label>
-        <span>Remboursement au plus tard en</span>
+        <span>{{ 'param.remboursementAvant' | translate }}</span>
         <p-select
-          [options]="optDelai"
+          [options]="optDelai()"
           [ngModel]="moisDelai()"
           (ngModelChange)="moisDelai.set($event)"
           optionLabel="label"
@@ -61,66 +61,63 @@
     </div>
     <p class="avert">
       <i class="pi pi-exclamation-triangle"></i>
-      Modifier les taux recalcule les montants de tous les membres de ce cycle.
+      {{ 'param.avertTaux' | translate }}
     </p>
     <div class="actions">
-      <p-button label="Enregistrer" icon="pi pi-check" (onClick)="enregistrer()" />
+      <p-button [label]="'param.enregistrer' | translate" icon="pi pi-check" (onClick)="enregistrer()" />
     </div>
   </section>
 
   <section class="carte">
-    <h2>Les années</h2>
+    <h2>{{ 'param.anneesTitre' | translate }}</h2>
     <p class="info">
-      Année en cours : <strong>{{ p.libelle }}</strong>
-      ({{ p.statut === 'cloture' ? 'clôturée' : 'ouverte' }}).
+      {{ 'param.anneeEnCours' | translate }} <strong>{{ p.libelle }}</strong>
+      ({{ (p.statut === 'cloture' ? 'param.cloturee' : 'param.ouverte') | translate }}).
     </p>
 
     <div class="bloc-annee">
       <label>
-        <span>Créer une nouvelle année</span>
+        <span>{{ 'param.creerAnnee' | translate }}</span>
         <input
           class="champ"
           [ngModel]="nouveauLibelle()"
           (ngModelChange)="nouveauLibelle.set($event)"
-          placeholder="ex. 2026-2027"
+          [placeholder]="'param.nouvelleAnneePlaceholder' | translate"
         />
       </label>
-      <p-button label="Créer" icon="pi pi-plus" (onClick)="creer()" />
+      <p-button [label]="'param.creer' | translate" icon="pi pi-plus" (onClick)="creer()" />
     </div>
-    <p class="aide-txt">
-      La nouvelle année reprend les mêmes règles. Vous pourrez les ajuster après l'avoir choisie
-      dans la barre de gauche.
-    </p>
+    <p class="aide-txt">{{ 'param.creerAide' | translate }}</p>
 
     @if (p.statut !== 'cloture') {
       <div class="actions">
         <button type="button" class="lien-danger" (click)="cloturer()">
-          Clôturer l'année en cours
+          {{ 'param.cloturerLien' | translate }}
         </button>
       </div>
     }
   </section>
 
   <section class="carte">
-    <h2>La caisse</h2>
+    <h2>{{ 'param.caisseTitre' | translate }}</h2>
     <div class="champs">
       <label>
-        <span>Nom de la caisse</span>
+        <span>{{ 'param.nomCaisse' | translate }}</span>
         <input class="champ" [ngModel]="caisseNom()" (ngModelChange)="caisseNom.set($event)" />
       </label>
     </div>
     <div class="actions">
-      <p-button label="Enregistrer" icon="pi pi-check" (onClick)="enregistrerCaisse()" />
+      <p-button [label]="'param.enregistrer' | translate" icon="pi pi-check" (onClick)="enregistrerCaisse()" />
     </div>
   </section>
 
   <section class="carte">
-    <h2>Affichage</h2>
+    <h2>{{ 'param.affichageTitre' | translate }}</h2>
     <div class="champs">
       <label>
-        <span>Thème</span>
+        <span>{{ 'param.theme' | translate }}</span>
         <p-selectbutton
-          [options]="optTheme"
+          [options]="optTheme()"
           [ngModel]="theme.sombre()"
           (ngModelChange)="theme.basculer($event)"
           optionLabel="label"
@@ -129,7 +126,7 @@
         />
       </label>
       <label>
-        <span>Langue</span>
+        <span>{{ 'param.langue' | translate }}</span>
         <p-selectbutton
           [options]="optLangue"
           [ngModel]="lang.langue()"
@@ -140,9 +137,9 @@
         />
       </label>
     </div>
-    <p class="aide-txt">Le choix est retenu pour vos prochaines visites.</p>
+    <p class="aide-txt">{{ 'param.choixRetenu' | translate }}</p>
   </section>
   </div>
 } @else {
-  <p class="muted">Cycle introuvable.</p>
+  <p class="muted">{{ 'param.introuvable' | translate }}</p>
 }

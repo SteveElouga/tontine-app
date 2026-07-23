@@ -38,7 +38,7 @@ Un sélecteur de cycle (barre latérale) permet de changer le cycle courant.
 
 ## Stack
 
-- **Frontend** : Angular (PWA) + Apollo GraphQL. Voir [`frontend/`](frontend/README.md).
+- **Frontend** : Angular (PWA) + Apollo GraphQL, interface **bilingue français / anglais** (ngx-translate, bascule dans les Paramètres). Voir [`frontend/`](frontend/README.md).
 - **Backend** : Django + DRF + GraphQL (Strawberry), **monolithe modulaire**. Voir [`backend/`](backend/README.md).
 - **Base de données** : PostgreSQL (SQLite en développement).
 

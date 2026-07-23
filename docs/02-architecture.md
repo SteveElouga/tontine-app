@@ -196,7 +196,7 @@ tontine-app/
 2. Consultation membre (lecture seule) + export PDF de clôture.
 3. Synchronisation hors ligne robuste (Phase 2).
 4. Module **Tontine rotative** (cotisations, tours, rappels).
-5. Intégration Mobile Money (fonds hors app), i18n anglais.
+5. Intégration Mobile Money (fonds hors app). *(i18n français / anglais : livré en v1.)*
 
 ---
 

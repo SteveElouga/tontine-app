@@ -1,19 +1,20 @@
 import { Component } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-aide',
-  imports: [],
+  imports: [TranslatePipe],
   templateUrl: './aide.html',
   styleUrl: './aide.scss',
 })
 export class Aide {
   protected readonly ecrans = [
-    { icon: 'pi pi-home', nom: 'Tableau de bord', desc: "Les grands totaux de la caisse, d'un seul coup d'œil." },
-    { icon: 'pi pi-pencil', nom: 'Saisie des dépôts', desc: 'Noter les versements, par mois ou par membre.' },
-    { icon: 'pi pi-money-bill', nom: 'Prêts', desc: "Noter un prêt, puis son remboursement quand l'argent revient." },
-    { icon: 'pi pi-list', nom: 'Récapitulatif', desc: "Ce que chaque membre reçoit à la fin de l'année." },
-    { icon: 'pi pi-users', nom: 'Membres', desc: 'Ajouter, renommer ou retirer un membre.' },
-    { icon: 'pi pi-calculator', nom: 'Simulation', desc: 'Voir ce que rapporterait un dépôt ou un prêt, sans rien enregistrer.' },
-    { icon: 'pi pi-history', nom: 'Historique', desc: 'Tout ce qui a été fait, du plus récent au plus ancien.' },
+    { icon: 'pi pi-home', nomKey: 'nav.tableau', descKey: 'aide.e1' },
+    { icon: 'pi pi-pencil', nomKey: 'nav.saisie', descKey: 'aide.e2' },
+    { icon: 'pi pi-money-bill', nomKey: 'nav.prets', descKey: 'aide.e3' },
+    { icon: 'pi pi-list', nomKey: 'nav.recap', descKey: 'aide.e4' },
+    { icon: 'pi pi-users', nomKey: 'nav.membres', descKey: 'aide.e5' },
+    { icon: 'pi pi-calculator', nomKey: 'nav.simulation', descKey: 'aide.e6' },
+    { icon: 'pi pi-history', nomKey: 'nav.historique', descKey: 'aide.e7' },
   ];
 }

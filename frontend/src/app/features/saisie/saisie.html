@@ -1,54 +1,54 @@
 <header class="entete">
-  <h1>Saisie des dépôts</h1>
-  <p class="sub">Caisse mutuelle, cycle 2025-2026.</p>
+  <h1>{{ 'saisie.titre' | translate }}</h1>
+  <p class="sub">{{ 'saisie.sous' | translate }}</p>
 </header>
 
 <div class="bascule">
   <button type="button" class="seg" [class.actif]="vue() === 'mois'" (click)="changerVue('mois')">
-    <i class="pi pi-calendar"></i> Par mois
+    <i class="pi pi-calendar"></i> {{ 'saisie.parMois' | translate }}
   </button>
   <button type="button" class="seg" [class.actif]="vue() === 'membre'" (click)="changerVue('membre')">
-    <i class="pi pi-user"></i> Par membre
+    <i class="pi pi-user"></i> {{ 'saisie.parMembre' | translate }}
   </button>
 </div>
 
 @if (vue() === 'mois') {
   <div class="stepper">
-    <button class="step-btn" (click)="moisPrecedent()" aria-label="Mois précédent">
+    <button class="step-btn" (click)="moisPrecedent()" [attr.aria-label]="'saisie.moisPrec' | translate">
       <i class="pi pi-chevron-left"></i>
     </button>
     <div class="step-mois">
       <span class="mois">{{ moisNom() }}</span>
-      <span class="sous">mois {{ moisIndex() }} sur 9</span>
+      <span class="sous">{{ 'saisie.moisSur' | translate: { i: moisIndex(), n: 9 } }}</span>
     </div>
-    <button class="step-btn" (click)="moisSuivant()" aria-label="Mois suivant">
+    <button class="step-btn" (click)="moisSuivant()" [attr.aria-label]="'saisie.moisSuiv' | translate">
       <i class="pi pi-chevron-right"></i>
     </button>
   </div>
-  <p class="consigne">Notez le versement de chaque membre.</p>
+  <p class="consigne">{{ 'saisie.consigneMois' | translate }}</p>
 } @else {
   <div class="stepper">
-    <button class="step-btn" (click)="membrePrecedent()" aria-label="Membre précédent">
+    <button class="step-btn" (click)="membrePrecedent()" [attr.aria-label]="'saisie.membrePrec' | translate">
       <i class="pi pi-chevron-left"></i>
     </button>
     <div class="step-mois">
       <span class="mois">{{ membreCourant()?.nom }}</span>
-      <span class="sous">membre {{ membreIndex() + 1 }} sur {{ membres().length }}</span>
+      <span class="sous">{{ 'saisie.membreSur' | translate: { i: membreIndex() + 1, n: membres().length } }}</span>
     </div>
-    <button class="step-btn" (click)="membreSuivant()" aria-label="Membre suivant">
+    <button class="step-btn" (click)="membreSuivant()" [attr.aria-label]="'saisie.membreSuiv' | translate">
       <i class="pi pi-chevron-right"></i>
     </button>
   </div>
-  <p class="consigne">Notez les versements de ce membre, mois par mois.</p>
+  <p class="consigne">{{ 'saisie.consigneMembre' | translate }}</p>
 }
 
 @if (chargement()) {
-  <p class="muted">Chargement…</p>
+  <p class="muted">{{ 'commun.chargement' | translate }}</p>
 } @else {
   <div class="grille-membres">
     @for (ligne of lignes(); track ligne.memberId + '_' + ligne.moisIndex) {
       <div class="ligne">
-        <span class="nom">{{ ligne.label }}</span>
+        <span class="nom">{{ vue() === 'membre' ? (('mois.' + ligne.moisIndex) | translate) : ligne.label }}</span>
         <p-inputnumber
           [ngModel]="ligne.montant"
           (ngModelChange)="setMontant(ligne, $event)"
@@ -61,9 +61,9 @@
         />
         <span class="unite">FCFA</span>
         @if (ligne.enregistre) {
-          <i class="pi pi-check-circle etat ok" aria-label="enregistré"></i>
+          <i class="pi pi-check-circle etat ok" [attr.aria-label]="'saisie.okTitre' | translate"></i>
         } @else {
-          <i class="pi pi-clock etat attente" aria-label="en attente"></i>
+          <i class="pi pi-clock etat attente" [attr.aria-label]="'saisie.attente' | translate"></i>
         }
       </div>
     }
@@ -71,15 +71,16 @@
 
   <div class="pied">
     <span class="total">
-      Total : <strong>{{ format(total()) }} FCFA</strong>. {{ nbEnregistres() }} sur {{ lignes().length }} enregistrés.
+      {{ 'saisie.totalLabel' | translate }} <strong>{{ format(total()) }} FCFA</strong>.
+      {{ 'saisie.totalCompte' | translate: { k: nbEnregistres(), n: lignes().length } }}
     </span>
-    <p-button label="Terminer" (onClick)="terminer()" />
+    <p-button [label]="'saisie.terminer' | translate" (onClick)="terminer()" />
   </div>
 
   @if (vue() === 'mois') {
     <div class="astuce">
       <i class="pi pi-info-circle"></i>
-      <span>Un dépôt de {{ moisNom() }} rapporte {{ taux() }} % à la fin de l'année. Le calcul se fait tout seul.</span>
+      <span>{{ 'saisie.astuce' | translate: { mois: moisNom(), taux: taux() } }}</span>
     </div>
   }
 }

@@ -3,9 +3,11 @@ import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { InputNumber } from 'primeng/inputnumber';
 import { Button } from 'primeng/button';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
+import { LangStore } from '../../core/state/lang-store';
 import { MOIS } from '../../core/domain/caisse.models';
 
 const NB_MOIS = 9;
@@ -26,7 +28,7 @@ function versLigne(valeur: string): { montant: number | null; enregistre: boolea
 
 @Component({
   selector: 'app-saisie',
-  imports: [FormsModule, InputNumber, Button],
+  imports: [FormsModule, InputNumber, Button, TranslatePipe],
   templateUrl: './saisie.html',
   styleUrl: './saisie.scss',
 })
@@ -34,6 +36,8 @@ export class Saisie implements OnInit {
   private readonly caisse = inject(CaisseService);
   private readonly cycleStore = inject(CycleStore);
   private readonly toast = inject(MessageService);
+  private readonly i18n = inject(TranslateService);
+  private readonly lang = inject(LangStore);
 
   protected readonly vue = signal<'mois' | 'membre'>('mois');
   protected readonly moisIndex = signal(2); // Octobre
@@ -42,7 +46,10 @@ export class Saisie implements OnInit {
   protected readonly lignes = signal<Ligne[]>([]);
   protected readonly chargement = signal(true);
 
-  protected readonly moisNom = computed(() => MOIS[this.moisIndex()]);
+  protected readonly moisNom = computed(() => {
+    this.lang.langue();
+    return this.i18n.instant('mois.' + this.moisIndex());
+  });
   protected readonly membreCourant = computed(() => this.membres()[this.membreIndex()]);
   protected readonly taux = computed(() => 5 * (NB_MOIS - this.moisIndex() + 1));
   protected readonly total = computed(() =>
@@ -117,19 +124,19 @@ export class Saisie implements OnInit {
           );
           this.toast.add({
             severity: 'success',
-            summary: 'Dépôt enregistré',
+            summary: this.i18n.instant('saisie.okTitre'),
             detail:
               this.vue() === 'mois'
                 ? `${courant.label}, ${this.moisNom()}`
-                : `${MOIS[courant.moisIndex]}, ${this.membreCourant()?.nom}`,
+                : `${this.i18n.instant('mois.' + courant.moisIndex)}, ${this.membreCourant()?.nom}`,
             life: 2500,
           });
         },
         error: () =>
           this.toast.add({
             severity: 'error',
-            summary: 'Enregistrement impossible',
-            detail: 'Réessayez.',
+            summary: this.i18n.instant('saisie.errTitre'),
+            detail: this.i18n.instant('saisie.reessayez'),
           }),
       });
   }
@@ -137,8 +144,11 @@ export class Saisie implements OnInit {
   terminer(): void {
     this.toast.add({
       severity: 'info',
-      summary: 'Saisie terminée',
-      detail: `${this.nbEnregistres()} versements enregistrés, total ${this.format(this.total())} FCFA`,
+      summary: this.i18n.instant('saisie.finTitre'),
+      detail: this.i18n.instant('saisie.finDetail', {
+        k: this.nbEnregistres(),
+        montant: this.format(this.total()),
+      }),
     });
   }
 
@@ -192,8 +202,8 @@ export class Saisie implements OnInit {
     this.chargement.set(false);
     this.toast.add({
       severity: 'error',
-      summary: 'Chargement impossible',
-      detail: 'Réessayez dans un moment.',
+      summary: this.i18n.instant('saisie.chargeTitre'),
+      detail: this.i18n.instant('saisie.chargeDetail'),
     });
   }
 
