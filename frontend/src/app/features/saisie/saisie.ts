@@ -120,8 +120,8 @@ export class Saisie implements OnInit {
             summary: 'Dépôt enregistré',
             detail:
               this.vue() === 'mois'
-                ? `${courant.label} — ${this.moisNom()}`
-                : `${MOIS[courant.moisIndex]} — ${this.membreCourant()?.nom}`,
+                ? `${courant.label}, ${this.moisNom()}`
+                : `${MOIS[courant.moisIndex]}, ${this.membreCourant()?.nom}`,
             life: 2500,
           });
         },
@@ -129,7 +129,7 @@ export class Saisie implements OnInit {
           this.toast.add({
             severity: 'error',
             summary: 'Enregistrement impossible',
-            detail: 'Réessaie.',
+            detail: 'Réessayez.',
           }),
       });
   }
@@ -138,7 +138,7 @@ export class Saisie implements OnInit {
     this.toast.add({
       severity: 'info',
       summary: 'Saisie terminée',
-      detail: `${this.nbEnregistres()} enregistrement(s) · total ${this.format(this.total())} FCFA`,
+      detail: `${this.nbEnregistres()} versements enregistrés, total ${this.format(this.total())} FCFA`,
     });
   }
 
@@ -193,7 +193,7 @@ export class Saisie implements OnInit {
     this.toast.add({
       severity: 'error',
       summary: 'Chargement impossible',
-      detail: 'Vérifie que le serveur est démarré.',
+      detail: 'Réessayez dans un moment.',
     });
   }
 

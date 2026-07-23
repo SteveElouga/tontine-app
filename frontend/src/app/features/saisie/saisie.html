@@ -1,6 +1,6 @@
 <header class="entete">
   <h1>Saisie des dépôts</h1>
-  <p class="sub">Caisse mutuelle (pilote) · 2025–2026</p>
+  <p class="sub">Caisse mutuelle, cycle 2025-2026.</p>
 </header>
 
 <div class="bascule">
@@ -25,7 +25,7 @@
       <i class="pi pi-chevron-right"></i>
     </button>
   </div>
-  <p class="consigne">Enregistre le versement de chaque membre.</p>
+  <p class="consigne">Notez le versement de chaque membre.</p>
 } @else {
   <div class="stepper">
     <button class="step-btn" (click)="membrePrecedent()" aria-label="Membre précédent">
@@ -39,7 +39,7 @@
       <i class="pi pi-chevron-right"></i>
     </button>
   </div>
-  <p class="consigne">Enregistre les versements de ce membre, mois par mois.</p>
+  <p class="consigne">Notez les versements de ce membre, mois par mois.</p>
 }
 
 @if (chargement()) {
@@ -71,7 +71,7 @@
 
   <div class="pied">
     <span class="total">
-      Total : <strong>{{ format(total()) }} FCFA</strong> · {{ nbEnregistres() }} / {{ lignes().length }}
+      Total : <strong>{{ format(total()) }} FCFA</strong>. {{ nbEnregistres() }} sur {{ lignes().length }} enregistrés.
     </span>
     <p-button label="Terminer" (onClick)="terminer()" />
   </div>
@@ -79,7 +79,7 @@
   @if (vue() === 'mois') {
     <div class="astuce">
       <i class="pi pi-info-circle"></i>
-      <span>Un dépôt de {{ moisNom() }} rapporte {{ taux() }} % à la clôture. Le calcul est automatique.</span>
+      <span>Un dépôt de {{ moisNom() }} rapporte {{ taux() }} % à la fin de l'année. Le calcul se fait tout seul.</span>
     </div>
   }
 }
