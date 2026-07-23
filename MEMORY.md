@@ -78,6 +78,7 @@ gitGraph
 
 | Date | Auteur | Résumé de ce qui a été fait | Branches / PR |
 |------|--------|-----------------------------|---------------|
+| 2026-07-23 | Steve + agent | **Historique : recherche + filtre par type** — champ de recherche par **nom de membre** et bouton segmenté **Tout / Dépôts / Prêts**, filtrage côté client (aucun changement backend), réactif à la langue ; message « Aucun résultat » distinct de « Aucune opération ». Vérifié `ngc` exit 0 + symétrie i18n (235/235). | feat/historique-recherche |
 | 2026-07-23 | Steve + agent | **Internationalisation FR/EN de tous les écrans** : après l'infra ngx-translate et le menu (#22), traduction écran par écran — tableau de bord, récap, saisie, membres, prêts, simulation, historique, fiche membre, aide, paramètres. Noms de **mois**, **dates** et **listes déroulantes** réactifs à la langue ; dictionnaire intégré `core/i18n/translations.ts` (**230 clés**, FR/EN symétriques). Vérifié `ngc` exit 0 + contrôle de symétrie des clés FR/EN. | feat/i18n-ecrans |
 | 2026-07-22 | Steve + agent | Écran **Aide** (guide de la caisse et des écrans) + colonnes **Épargne / Intérêts** séparées sur le récap + **simplification de tous les textes** (français simple, vouvoiement, sans « — » ni « · »), pour des utilisateurs de 40-60 ans. Mise à jour de la doc (spec + archi). Vérifié `ngc`. | feat/aide-et-textes |
 | 2026-07-22 | Steve + agent | Story **modes de clôture sur le récap** (TON-16) : `recapCycle(mode, nMois)` + query `infosCloture` (gains, intérêts promis, réduction suggérée) ; sur le récap, sélecteur des 4 modes + champ N pré-rempli par la suggestion, recalcul en direct. Vérifié `ngc` + `py_compile`. | feat/TON-16-recap-modes |
@@ -136,7 +137,8 @@ gitGraph
 | 19 | **Authentification** (login trésorière + protéger les mutations) | à faire | — |
 | 20 | **Déploiement** en ligne (back + front + PostgreSQL) | à faire | — |
 | 21 | Confort : cycle instantané, `GRAPHQL_URI` en env, Paramètres, PWA hors-ligne | à faire | — |
-| 22 | **Bilingue FR/EN** : infra ngx-translate + menu (PR #22), puis tous les écrans traduits | fait | feat/i18n-ecrans |
+| 22 | **Bilingue FR/EN** : infra ngx-translate + menu (PR #22), puis tous les écrans traduits (PR #23) | fait | feat/i18n-ecrans |
+| 23 | Historique : recherche par nom + filtre Tout/Dépôts/Prêts | fait | feat/historique-recherche |
 
 ## 9. Stack & conventions du projet
 - **Frontend** : Angular (PWA), TypeScript, Apollo GraphQL. Web d'abord ; mobile plus tard.

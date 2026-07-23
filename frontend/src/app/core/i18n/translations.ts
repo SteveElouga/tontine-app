@@ -208,6 +208,11 @@ export const FR = {
     rembourseEn: 'Remboursé en {{mois}}',
     enCours: 'En cours',
     vide: "Aucune opération pour l'instant.",
+    recherche: 'Rechercher un membre…',
+    tout: 'Tout',
+    filtreDepots: 'Dépôts',
+    filtrePrets: 'Prêts',
+    aucunResultat: 'Aucun résultat.',
   },
   fiche: {
     retour: 'Récapitulatif',
@@ -460,6 +465,11 @@ export const EN = {
     rembourseEn: 'Repaid in {{mois}}',
     enCours: 'Ongoing',
     vide: 'No activity yet.',
+    recherche: 'Search a member…',
+    tout: 'All',
+    filtreDepots: 'Deposits',
+    filtrePrets: 'Loans',
+    aucunResultat: 'No results.',
   },
   fiche: {
     retour: 'Summary',
