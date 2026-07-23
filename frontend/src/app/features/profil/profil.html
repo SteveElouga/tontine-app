@@ -1,0 +1,64 @@
+<header class="entete">
+  <h1>{{ 'profil.titre' | translate }}</h1>
+  <p class="sub">{{ 'profil.sous' | translate }}</p>
+</header>
+
+<div class="cartes">
+  <section class="carte">
+    <h2>{{ 'profil.compte' | translate }}</h2>
+    <p class="ident">
+      <i class="pi pi-user"></i>
+      {{ 'profil.connecteeEnTant' | translate: { nom: username() ?? '—' } }}
+    </p>
+    <button type="button" class="lien-deco" (click)="deconnecter()">
+      <i class="pi pi-sign-out"></i> {{ 'nav.deconnexion' | translate }}
+    </button>
+  </section>
+
+  <section class="carte">
+    <h2>{{ 'profil.motDePasseTitre' | translate }}</h2>
+    <form class="champs" (ngSubmit)="changer()">
+      <label>
+        <span>{{ 'profil.ancien' | translate }}</span>
+        <p-password
+          name="ancien"
+          autocomplete="current-password"
+          [feedback]="false"
+          [toggleMask]="true"
+          [ngModel]="ancien()"
+          (ngModelChange)="ancien.set($event)"
+          [style]="{ width: '100%' }"
+          [inputStyle]="{ width: '100%' }"
+        />
+      </label>
+      <label>
+        <span>{{ 'profil.nouveau' | translate }}</span>
+        <p-password
+          name="nouveau"
+          autocomplete="new-password"
+          [toggleMask]="true"
+          [ngModel]="nouveau()"
+          (ngModelChange)="nouveau.set($event)"
+          [style]="{ width: '100%' }"
+          [inputStyle]="{ width: '100%' }"
+        />
+      </label>
+      <label>
+        <span>{{ 'profil.confirmation' | translate }}</span>
+        <p-password
+          name="confirmation"
+          autocomplete="new-password"
+          [feedback]="false"
+          [toggleMask]="true"
+          [ngModel]="confirmation()"
+          (ngModelChange)="confirmation.set($event)"
+          [style]="{ width: '100%' }"
+          [inputStyle]="{ width: '100%' }"
+        />
+      </label>
+      <div class="actions">
+        <p-button type="submit" [label]="'profil.bouton' | translate" [disabled]="enCours()" />
+      </div>
+    </form>
+  </section>
+</div>
