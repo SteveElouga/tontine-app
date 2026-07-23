@@ -1,27 +1,36 @@
 <header class="entete">
-  <h1>Membres</h1>
-  <p class="sub">La liste des membres de la caisse. Cliquez sur un nom pour le corriger.</p>
+  <h1>{{ 'membres.titre' | translate }}</h1>
+  <p class="sub">{{ 'membres.sous' | translate }}</p>
 </header>
 
 <div class="ajout">
-  <input #nomInp class="champ" placeholder="Nom du nouveau membre" (keyup.enter)="ajouter(nomInp.value, telInp.value); nomInp.value=''; telInp.value=''; nomInp.focus()" />
-  <input #telInp class="champ tel" placeholder="Téléphone (optionnel)" />
+  <input
+    #nomInp
+    class="champ"
+    [placeholder]="'membres.nouveauNom' | translate"
+    (keyup.enter)="ajouter(nomInp.value, telInp.value); nomInp.value=''; telInp.value=''; nomInp.focus()"
+  />
+  <input #telInp class="champ tel" [placeholder]="'membres.telephone' | translate" />
   <p-button
-    label="Ajouter"
+    [label]="'membres.ajouter' | translate"
     icon="pi pi-plus"
     (onClick)="ajouter(nomInp.value, telInp.value); nomInp.value=''; telInp.value=''; nomInp.focus()"
   />
 </div>
 
 @if (chargement()) {
-  <p class="muted">Chargement…</p>
+  <p class="muted">{{ 'commun.chargement' | translate }}</p>
 } @else {
   <div class="liste">
     @for (m of membres(); track m.id) {
       <div class="ligne">
         <input #nomEdit class="champ nom" [value]="m.nom" (blur)="renommer(m, nomEdit.value)" />
         <span class="tel-aff">{{ m.telephone || '—' }}</span>
-        <button class="retirer" (click)="retirer(m)" [attr.aria-label]="'Retirer ' + m.nom">
+        <button
+          class="retirer"
+          (click)="retirer(m)"
+          [attr.aria-label]="'membres.retirerAria' | translate: { nom: m.nom }"
+        >
           <i class="pi pi-trash"></i>
         </button>
       </div>

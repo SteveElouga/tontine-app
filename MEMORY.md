@@ -64,8 +64,8 @@ gitGraph
 ## 5. État courant du projet
 > Mis à jour à la FIN de chaque session (E7). Doit répondre en 30 s à « où en est-on ? ».
 - **Phase** : développement
-- **Dernier jalon atteint** : **v1 fonctionnellement complète**. Tous les écrans sont construits (tableau de bord, saisie, prêts, récap, membres, simulation, historique, fiches, aide) ; le récap propose les **4 modes de répartition** à la clôture (choix de la trésorière) ; les textes ont été **simplifiés** pour l'audience (40-60 ans, sans jargon, sans « — » ni « · »). Derniers mergés : modes de clôture (#16), colonnes Épargne/Intérêts séparées, écran Aide + passe de textes (`feat/aide-et-textes`).
-- **En cours** : rien en développement. Mise à jour de la documentation (spec §5 « règle tranchée » + liste des écrans ; archi §5 + statuts).
+- **Dernier jalon atteint** : **v1 fonctionnellement complète**. Tous les écrans sont construits (tableau de bord, saisie, prêts, récap, membres, simulation, historique, fiches, aide) ; le récap propose les **4 modes de répartition** à la clôture (choix de la trésorière) ; les textes ont été **simplifiés** pour l'audience (40-60 ans, sans jargon, sans « — » ni « · »). Derniers mergés : modes de clôture (#16), colonnes Épargne/Intérêts séparées, écran Aide + passe de textes (`feat/aide-et-textes`). Application **bilingue français / anglais** : bascule dans Paramètres, **tous les écrans traduits** (ngx-translate, dictionnaire intégré `frontend/src/app/core/i18n/translations.ts`, **230 clés FR/EN symétriques** ; noms de mois, dates et listes déroulantes réactifs à la langue).
+- **En cours** : rien en développement.
 - **Prochaine étape** : **valider** avec le vrai cycle 2025-2026 (saisir avec Thérèse, comparer au calcul manuel) ; puis **authentification** (login trésorière + protéger les mutations) et **déploiement**. Confort : rechargement instantané au changement de cycle, `GRAPHQL_URI` en environnement, écran Paramètres, PWA hors-ligne.
 - **Points d'attention / dette** :
   - **Règle d'ajustement des intérêts** : ✅ **tranchée et implémentée**. 4 modes au choix de la trésorière à la clôture : (1) complets ; (2) réduction du même nombre de mois pour tous — elle fixe N, favorise les dépôts anciens ; (3a) partage équitable au prorata du montant déposé ; (3b) partage équitable en parts égales. Moteur `apps/core/domain/interest.py` (`InteretsComplets`, `InteretsReductionMois`, `InteretsEquitableProrata`, `InteretsEquitableEgal`, `suggerer_reduction_mois`), testé ; exposé via `recapCycle(mode, nMois)` + `infosCloture`.
@@ -78,6 +78,7 @@ gitGraph
 
 | Date | Auteur | Résumé de ce qui a été fait | Branches / PR |
 |------|--------|-----------------------------|---------------|
+| 2026-07-23 | Steve + agent | **Internationalisation FR/EN de tous les écrans** : après l'infra ngx-translate et le menu (#22), traduction écran par écran — tableau de bord, récap, saisie, membres, prêts, simulation, historique, fiche membre, aide, paramètres. Noms de **mois**, **dates** et **listes déroulantes** réactifs à la langue ; dictionnaire intégré `core/i18n/translations.ts` (**230 clés**, FR/EN symétriques). Vérifié `ngc` exit 0 + contrôle de symétrie des clés FR/EN. | feat/i18n-ecrans |
 | 2026-07-22 | Steve + agent | Écran **Aide** (guide de la caisse et des écrans) + colonnes **Épargne / Intérêts** séparées sur le récap + **simplification de tous les textes** (français simple, vouvoiement, sans « — » ni « · »), pour des utilisateurs de 40-60 ans. Mise à jour de la doc (spec + archi). Vérifié `ngc`. | feat/aide-et-textes |
 | 2026-07-22 | Steve + agent | Story **modes de clôture sur le récap** (TON-16) : `recapCycle(mode, nMois)` + query `infosCloture` (gains, intérêts promis, réduction suggérée) ; sur le récap, sélecteur des 4 modes + champ N pré-rempli par la suggestion, recalcul en direct. Vérifié `ngc` + `py_compile`. | feat/TON-16-recap-modes |
 | 2026-07-22 | Steve + agent | Story **moteur des intérêts** (TON-15) : Thérèse a tranché → 4 modes de répartition à la clôture (complets / réduction de N mois / équitable prorata / équitable parts égales) + `total_majorations` + `suggerer_reduction_mois` dans `interest.py`. Tests 13/13 (exemple Awa/Béa). | feat/TON-15-moteur-interets → PR #15 |
@@ -135,6 +136,7 @@ gitGraph
 | 19 | **Authentification** (login trésorière + protéger les mutations) | à faire | — |
 | 20 | **Déploiement** en ligne (back + front + PostgreSQL) | à faire | — |
 | 21 | Confort : cycle instantané, `GRAPHQL_URI` en env, Paramètres, PWA hors-ligne | à faire | — |
+| 22 | **Bilingue FR/EN** : infra ngx-translate + menu (PR #22), puis tous les écrans traduits | fait | feat/i18n-ecrans |
 
 ## 9. Stack & conventions du projet
 - **Frontend** : Angular (PWA), TypeScript, Apollo GraphQL. Web d'abord ; mobile plus tard.

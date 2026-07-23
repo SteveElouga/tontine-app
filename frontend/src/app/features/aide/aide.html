@@ -1,73 +1,60 @@
 <header class="entete">
-  <h1>Aide</h1>
-  <p class="sub">Comment marche la caisse, et comment vous servir de l'application.</p>
+  <h1>{{ 'aide.titre' | translate }}</h1>
+  <p class="sub">{{ 'aide.sous' | translate }}</p>
 </header>
 
 <section class="bloc">
-  <h2>Le principe de la caisse</h2>
+  <h2>{{ 'aide.principeTitre' | translate }}</h2>
   <div class="cartes">
     <div class="carte">
-      <h3><i class="pi pi-calendar"></i> Le cycle</h3>
-      <p>
-        Un cycle dure un an. On dépose de septembre à mai. On rembourse les prêts jusqu'en août.
-        Après, on fait les comptes de fin d'année.
-      </p>
+      <h3><i class="pi pi-calendar"></i> {{ 'aide.cycleTitre' | translate }}</h3>
+      <p>{{ 'aide.cycleTexte' | translate }}</p>
     </div>
     <div class="carte">
-      <h3><i class="pi pi-wallet"></i> L'épargne rapporte</h3>
-      <p>
-        Chaque dépôt rapporte 5 % par mois jusqu'à la fin de l'année. Plus on dépose tôt, plus on
-        gagne : un dépôt de septembre rapporte 45 %, un dépôt d'octobre 40 %, et ainsi de suite
-        jusqu'à mai qui rapporte 5 %.
-      </p>
+      <h3><i class="pi pi-wallet"></i> {{ 'aide.epargneTitre' | translate }}</h3>
+      <p>{{ 'aide.epargneTexte' | translate }}</p>
     </div>
     <div class="carte">
-      <h3><i class="pi pi-money-bill"></i> Les prêts</h3>
-      <p>
-        Quand une personne emprunte, elle rembourse 5 % de plus par mois, tant qu'elle n'a pas
-        rendu l'argent. C'est cet argent en plus qui paie les intérêts des épargnants.
-      </p>
+      <h3><i class="pi pi-money-bill"></i> {{ 'aide.pretsTitre' | translate }}</h3>
+      <p>{{ 'aide.pretsTexte' | translate }}</p>
     </div>
     <div class="carte">
-      <h3><i class="pi pi-flag"></i> La fin de l'année</h3>
-      <p>
-        À la fin, chaque membre reçoit son épargne, plus ses intérêts, moins ce qu'il doit encore.
-        Sa fiche montre le détail, ligne par ligne.
-      </p>
+      <h3><i class="pi pi-flag"></i> {{ 'aide.finTitre' | translate }}</h3>
+      <p>{{ 'aide.finTexte' | translate }}</p>
     </div>
   </div>
 </section>
 
 <section class="bloc">
-  <h2>Les années où l'on prête peu</h2>
+  <h2>{{ 'aide.modesTitre' | translate }}</h2>
   <div class="carte large">
-    <p>
-      Certaines années, on ne prête pas tout l'argent. La caisse gagne donc moins, et ne peut pas
-      payer tous les intérêts prévus. Dans ce cas, la trésorière choisit comment partager, sur le
-      Récapitulatif. Quatre façons sont possibles :
-    </p>
+    <p>{{ 'aide.modesIntro' | translate }}</p>
     <ul>
-      <li><strong>Intérêts complets</strong> : tout a été prêté, chacun reçoit tous ses intérêts.</li>
       <li>
-        <strong>Réduction de mois</strong> : on enlève le même nombre de mois à tout le monde. Ceux
-        qui ont déposé tôt gardent le plus. L'application propose un nombre, la trésorière peut le
-        changer.
+        <strong>{{ 'recap.mode.complet' | translate }}</strong>{{ 'aide.deuxPoints' | translate }}{{ 'aide.mode1' | translate }}
       </li>
-      <li><strong>Partage selon les dépôts</strong> : ce qui a été gagné est partagé selon ce que chacun a mis.</li>
-      <li><strong>Partage en parts égales</strong> : ce qui a été gagné est partagé en parts égales.</li>
+      <li>
+        <strong>{{ 'recap.mode.reduction' | translate }}</strong>{{ 'aide.deuxPoints' | translate }}{{ 'aide.mode2' | translate }}
+      </li>
+      <li>
+        <strong>{{ 'recap.mode.prorata' | translate }}</strong>{{ 'aide.deuxPoints' | translate }}{{ 'aide.mode3' | translate }}
+      </li>
+      <li>
+        <strong>{{ 'recap.mode.egal' | translate }}</strong>{{ 'aide.deuxPoints' | translate }}{{ 'aide.mode4' | translate }}
+      </li>
     </ul>
   </div>
 </section>
 
 <section class="bloc">
-  <h2>Les écrans, un par un</h2>
+  <h2>{{ 'aide.ecransTitre' | translate }}</h2>
   <div class="grille-ecrans">
-    @for (e of ecrans; track e.nom) {
+    @for (e of ecrans; track e.nomKey) {
       <div class="ecran">
         <i [class]="e.icon"></i>
         <span class="txt">
-          <span class="nom">{{ e.nom }}</span>
-          <span class="desc">{{ e.desc }}</span>
+          <span class="nom">{{ e.nomKey | translate }}</span>
+          <span class="desc">{{ e.descKey | translate }}</span>
         </span>
       </div>
     }
@@ -75,9 +62,6 @@
 </section>
 
 <section class="bloc">
-  <h2>Une question ?</h2>
-  <p class="contact">
-    Si un membre doute d'un calcul, ouvrez sa fiche. Elle montre exactement d'où vient son montant,
-    dépôt par dépôt, avec le détail de son prêt. C'est fait pour que tout le monde soit rassuré.
-  </p>
+  <h2>{{ 'aide.questionTitre' | translate }}</h2>
+  <p class="contact">{{ 'aide.contact' | translate }}</p>
 </section>

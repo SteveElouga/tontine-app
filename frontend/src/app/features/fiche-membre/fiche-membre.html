@@ -1,49 +1,49 @@
 @if (chargement()) {
-  <p class="muted">Chargement…</p>
+  <p class="muted">{{ 'commun.chargement' | translate }}</p>
 } @else if (fiche(); as f) {
   <a class="retour" routerLink="/recapitulatif">
-    <i class="pi pi-arrow-left"></i> Récapitulatif
+    <i class="pi pi-arrow-left"></i> {{ 'fiche.retour' | translate }}
   </a>
 
   <header class="membre">
     <span class="avatar">{{ initiales() }}</span>
     <span class="ident">
       <span class="nom">{{ f.nom }}</span>
-      <span class="cycle">Cycle 2025–2026</span>
+      <span class="cycle">{{ 'fiche.cycle' | translate }}</span>
     </span>
   </header>
 
   <section class="resultat">
-    <span class="lbl">À recevoir à la clôture</span>
+    <span class="lbl">{{ 'fiche.aRecevoir' | translate }}</span>
     <span class="val">{{ fmt(f.positionNette) }} FCFA</span>
   </section>
 
-  <h2 class="titre">Épargne et intérêts</h2>
+  <h2 class="titre">{{ 'fiche.epargneInterets' | translate }}</h2>
   <table class="detail">
     <thead>
       <tr>
-        <th>Mois du dépôt</th>
-        <th class="num">Déposé</th>
-        <th class="num">Taux</th>
-        <th class="num">Intérêt</th>
+        <th>{{ 'fiche.colMoisDepot' | translate }}</th>
+        <th class="num">{{ 'fiche.colDepose' | translate }}</th>
+        <th class="num">{{ 'fiche.colTaux' | translate }}</th>
+        <th class="num">{{ 'fiche.colInteret' | translate }}</th>
       </tr>
     </thead>
     <tbody>
       @for (d of f.depots; track d.moisIndex) {
         <tr>
-          <td>{{ MOIS[d.moisIndex] }}</td>
+          <td>{{ 'mois.' + d.moisIndex | translate }}</td>
           <td class="num">{{ fmt(d.montant) }}</td>
           <td class="num sub">{{ pct(d.taux) }}</td>
           <td class="num vert">+{{ fmt(d.interet) }}</td>
         </tr>
       } @empty {
-        <tr><td colspan="4" class="muted">Aucun dépôt enregistré.</td></tr>
+        <tr><td colspan="4" class="muted">{{ 'fiche.vide' | translate }}</td></tr>
       }
     </tbody>
     @if (f.depots.length) {
       <tfoot>
         <tr>
-          <td class="sub">Sous-total</td>
+          <td class="sub">{{ 'fiche.sousTotal' | translate }}</td>
           <td class="num fort">{{ fmt(f.totalDepose) }}</td>
           <td></td>
           <td class="num fort vert">+{{ fmt(f.interets) }}</td>
@@ -52,24 +52,24 @@
     }
   </table>
   <p class="ligne-cle">
-    <span class="sub">Épargne et intérêts</span>
+    <span class="sub">{{ 'fiche.epargneInterets' | translate }}</span>
     <strong>{{ fmt(f.epargnePlusInterets) }} FCFA</strong>
   </p>
 
   @if (f.prets.length) {
-    <h2 class="titre">Prêt</h2>
+    <h2 class="titre">{{ 'fiche.titrePret' | translate }}</h2>
     @for (p of f.prets; track $index) {
       <div class="pret">
         <div class="pl">
-          <span>Pris en {{ MOIS[p.moisPret] }}</span>
+          <span>{{ 'fiche.prisEn' | translate: { mois: ('mois.' + p.moisPret | translate) } }}</span>
           <span>{{ fmt(p.montant) }}</span>
         </div>
         <div class="pl">
-          <span class="sub">Majoration ({{ p.moisDeDette }} mois à 5 %)</span>
+          <span class="sub">{{ 'fiche.majoration' | translate: { n: p.moisDeDette } }}</span>
           <span class="rouge">+{{ fmt(p.majoration) }}</span>
         </div>
         <div class="pl fort">
-          <span>À rembourser</span>
+          <span>{{ 'fiche.aRembourser' | translate }}</span>
           <span class="rouge">{{ fmt(p.totalARembourser) }}</span>
         </div>
       </div>
@@ -81,5 +81,5 @@
     <span class="net">= {{ fmt(f.positionNette) }} FCFA</span>
   </section>
 } @else {
-  <p class="muted">Membre introuvable.</p>
+  <p class="muted">{{ 'fiche.introuvable' | translate }}</p>
 }

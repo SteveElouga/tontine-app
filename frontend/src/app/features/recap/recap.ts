@@ -5,14 +5,16 @@ import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { InputNumber } from 'primeng/inputnumber';
 import { Select } from 'primeng/select';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
+import { LangStore } from '../../core/state/lang-store';
 import { InfosCloture, RecapMembre } from '../../core/domain/caisse.models';
 
 @Component({
   selector: 'app-recap',
-  imports: [Button, RouterLink, FormsModule, InputText, InputNumber, Select],
+  imports: [Button, RouterLink, FormsModule, InputText, InputNumber, Select, TranslatePipe],
   templateUrl: './recap.html',
   styleUrl: './recap.scss',
 })
@@ -49,12 +51,18 @@ export class Recap implements OnInit {
   protected readonly nMois = signal(0);
   protected readonly infos = signal<InfosCloture | null>(null);
 
-  protected readonly optModes = [
-    { label: 'Intérêts complets', value: 'complet' },
-    { label: 'Réduction de mois', value: 'reduction' },
-    { label: 'Partage selon les dépôts', value: 'prorata' },
-    { label: 'Partage en parts égales', value: 'egal' },
-  ];
+  private readonly i18n = inject(TranslateService);
+  private readonly lang = inject(LangStore);
+
+  protected readonly optModes = computed(() => {
+    this.lang.langue();
+    return [
+      { label: this.i18n.instant('recap.mode.complet'), value: 'complet' },
+      { label: this.i18n.instant('recap.mode.reduction'), value: 'reduction' },
+      { label: this.i18n.instant('recap.mode.prorata'), value: 'prorata' },
+      { label: this.i18n.instant('recap.mode.egal'), value: 'egal' },
+    ];
+  });
 
   ngOnInit(): void {
     this.caisse.infosCloture(this.cycleStore.cycleId()).subscribe({

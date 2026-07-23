@@ -1,13 +1,14 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
-import { FicheMembre, MOIS } from '../../core/domain/caisse.models';
+import { FicheMembre } from '../../core/domain/caisse.models';
 
 @Component({
   selector: 'app-fiche-membre',
-  imports: [RouterLink],
+  imports: [RouterLink, TranslatePipe],
   templateUrl: './fiche-membre.html',
   styleUrl: './fiche-membre.scss',
 })
@@ -18,7 +19,6 @@ export class FicheMembrePage implements OnInit {
 
   protected readonly fiche = signal<FicheMembre | null>(null);
   protected readonly chargement = signal(true);
-  protected readonly MOIS = MOIS;
 
   /** Initiales pour l'avatar (« Membre 03 » → « M0 »). */
   protected readonly initiales = computed(() => {

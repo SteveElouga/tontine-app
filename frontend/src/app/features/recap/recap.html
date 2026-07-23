@@ -1,10 +1,10 @@
 <header class="entete">
-  <h1>Récapitulatif</h1>
-  <p class="sub">Ce que chaque membre reçoit à la fin de l'année. Cliquez sur un nom pour voir le détail.</p>
+  <h1>{{ 'recap.titre' | translate }}</h1>
+  <p class="sub">{{ 'recap.sous' | translate }}</p>
 </header>
 
 @if (chargement()) {
-  <p class="muted">Chargement…</p>
+  <p class="muted">{{ 'commun.chargement' | translate }}</p>
 } @else {
   <div class="barre">
     <span class="recherche">
@@ -14,15 +14,15 @@
         type="search"
         [ngModel]="recherche()"
         (ngModelChange)="recherche.set($event)"
-        placeholder="Rechercher un membre…"
+        placeholder="{{ 'recap.recherche' | translate }}"
       />
     </span>
   </div>
 
   <div class="cloture">
-    <span class="lbl">Répartition des intérêts</span>
+    <span class="lbl">{{ 'recap.repartition' | translate }}</span>
     <p-select
-      [options]="optModes"
+      [options]="optModes()"
       [ngModel]="mode()"
       (ngModelChange)="changerMode($event)"
       optionLabel="label"
@@ -31,20 +31,22 @@
     />
     @if (mode() === 'reduction') {
       <span class="nred">
-        retrancher
+        {{ 'recap.retrancher' | translate }}
         <p-inputnumber
           [ngModel]="nMois()"
           (ngModelChange)="setN($event)"
           [inputStyle]="{ width: '56px', 'text-align': 'center' }"
         />
-        mois
+        {{ 'recap.moisLabel' | translate }}
         @if (infos(); as inf) {
-          <span class="sugg">conseillé : {{ inf.reductionSuggeree }}</span>
+          <span class="sugg">{{ 'recap.conseille' | translate: { n: inf.reductionSuggeree } }}</span>
         }
       </span>
     }
     @if (infos(); as inf) {
-      <span class="gains">Majorations encaissées : <strong>{{ format(inf.gains) }}</strong> FCFA</span>
+      <span class="gains">
+        {{ 'recap.majorations' | translate }} <strong>{{ format(inf.gains) }}</strong> FCFA
+      </span>
     }
   </div>
 
@@ -52,11 +54,11 @@
     <table class="recap">
       <thead>
         <tr>
-          <th class="g">Membre</th>
-          <th class="d">Épargne</th>
-          <th class="d">Intérêts</th>
-          <th class="d">Dette</th>
-          <th class="d">À recevoir</th>
+          <th class="g">{{ 'recap.colMembre' | translate }}</th>
+          <th class="d">{{ 'recap.colEpargne' | translate }}</th>
+          <th class="d">{{ 'recap.colInterets' | translate }}</th>
+          <th class="d">{{ 'recap.colDette' | translate }}</th>
+          <th class="d">{{ 'recap.colRecevoir' | translate }}</th>
           <th class="chev"></th>
         </tr>
       </thead>
@@ -78,13 +80,13 @@
           </tr>
         } @empty {
           <tr>
-            <td colspan="6" class="muted centre">Aucun membre trouvé.</td>
+            <td colspan="6" class="muted centre">{{ 'recap.vide' | translate }}</td>
           </tr>
         }
       </tbody>
       <tfoot>
         <tr>
-          <td class="g fort">Total</td>
+          <td class="g fort">{{ 'recap.total' | translate }}</td>
           <td class="d muted2">{{ format(totalDepose()) }}</td>
           <td class="d vert">{{ format(totalInterets()) }}</td>
           <td class="d">
@@ -102,6 +104,6 @@
   </div>
 
   <div class="pied">
-    <p-button label="Imprimer" icon="pi pi-print" (onClick)="imprimer()" />
+    <p-button [label]="'recap.imprimer' | translate" icon="pi pi-print" (onClick)="imprimer()" />
   </div>
 }
