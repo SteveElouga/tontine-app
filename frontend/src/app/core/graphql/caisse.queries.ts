@@ -12,6 +12,70 @@ export const CYCLES = gql`
   }
 `;
 
+/** Règles complètes d'un cycle (écran Paramètres). */
+export const PARAMETRES_CYCLE = gql`
+  query ParametresCycle($cycleId: ID!) {
+    parametresCycle(cycleId: $cycleId) {
+      id
+      libelle
+      statut
+      caisseNom
+      dureeDepot
+      moisDelai
+      tauxEpargne
+      tauxMajoration
+    }
+  }
+`;
+
+export const MODIFIER_CYCLE = gql`
+  mutation ModifierCycle(
+    $cycleId: ID!
+    $libelle: String!
+    $dureeDepot: Int!
+    $moisDelai: Int!
+    $tauxEpargne: Decimal!
+    $tauxMajoration: Decimal!
+  ) {
+    modifierCycle(
+      cycleId: $cycleId
+      libelle: $libelle
+      dureeDepot: $dureeDepot
+      moisDelai: $moisDelai
+      tauxEpargne: $tauxEpargne
+      tauxMajoration: $tauxMajoration
+    ) {
+      id
+      libelle
+      statut
+      caisseNom
+      dureeDepot
+      moisDelai
+      tauxEpargne
+      tauxMajoration
+    }
+  }
+`;
+
+export const CREER_CYCLE = gql`
+  mutation CreerCycle($cycleReferenceId: ID!, $libelle: String!) {
+    creerCycle(cycleReferenceId: $cycleReferenceId, libelle: $libelle) {
+      id
+      libelle
+      statut
+    }
+  }
+`;
+
+export const CLOTURER_CYCLE = gql`
+  mutation CloturerCycle($cycleId: ID!) {
+    cloturerCycle(cycleId: $cycleId) {
+      id
+      statut
+    }
+  }
+`;
+
 /** Récapitulatif des membres d'un cycle, selon le mode de répartition des intérêts. */
 export const RECAP_CYCLE = gql`
   query RecapCycle($cycleId: ID!, $mode: String, $nMois: Int) {
