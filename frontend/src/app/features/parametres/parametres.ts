@@ -4,14 +4,16 @@ import { MessageService } from 'primeng/api';
 import { InputNumber } from 'primeng/inputnumber';
 import { Select } from 'primeng/select';
 import { Button } from 'primeng/button';
+import { SelectButton } from 'primeng/selectbutton';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
+import { ThemeStore } from '../../core/state/theme-store';
 import { MOIS, ParametresCycle } from '../../core/domain/caisse.models';
 
 @Component({
   selector: 'app-parametres',
-  imports: [FormsModule, InputNumber, Select, Button],
+  imports: [FormsModule, InputNumber, Select, Button, SelectButton],
   templateUrl: './parametres.html',
   styleUrl: './parametres.scss',
 })
@@ -19,9 +21,18 @@ export class Parametres implements OnInit {
   private readonly caisse = inject(CaisseService);
   private readonly cycleStore = inject(CycleStore);
   private readonly toast = inject(MessageService);
+  protected readonly theme = inject(ThemeStore);
 
   protected readonly chargement = signal(true);
   protected readonly params = signal<ParametresCycle | null>(null);
+
+  // La caisse
+  protected readonly caisseNom = signal('');
+
+  protected readonly optTheme = [
+    { label: 'Clair', value: false },
+    { label: 'Sombre', value: true },
+  ];
 
   // Règles du cycle
   protected readonly libelle = signal('');
@@ -48,6 +59,7 @@ export class Parametres implements OnInit {
     this.caisse.parametresCycle(this.cycleStore.cycleId()).subscribe({
       next: (p) => {
         this.params.set(p);
+        this.caisseNom.set(p.caisseNom);
         this.libelle.set(p.libelle);
         this.tauxEpargnePct.set(Math.round(Number(p.tauxEpargne) * 100));
         this.tauxMajoPct.set(Math.round(Number(p.tauxMajoration) * 100));
@@ -127,6 +139,27 @@ export class Parametres implements OnInit {
         });
       },
       error: () => this.erreur('Clôture impossible.'),
+    });
+  }
+
+  enregistrerCaisse(): void {
+    const nom = this.caisseNom().trim();
+    if (!nom) {
+      this.erreur('Le nom de la caisse est obligatoire.');
+      return;
+    }
+    this.caisse.renommerCaisse(this.cycleStore.cycleId(), nom).subscribe({
+      next: (p) => {
+        this.params.set(p);
+        this.cycleStore.charger();
+        this.toast.add({
+          severity: 'success',
+          summary: 'Caisse renommée',
+          detail: p.caisseNom,
+          life: 2500,
+        });
+      },
+      error: () => this.erreur('Enregistrement impossible.'),
     });
   }
 

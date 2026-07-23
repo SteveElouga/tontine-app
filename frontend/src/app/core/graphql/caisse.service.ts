@@ -21,6 +21,7 @@ import {
   AJOUTER_PRET,
   CLOTURER_CYCLE,
   CREER_CYCLE,
+  RENOMMER_CAISSE,
   DEPOTS_MEMBRE,
   DEPOTS_MOIS,
   FICHE_MEMBRE,
@@ -274,5 +275,15 @@ export class CaisseService {
         variables: { cycleId },
       })
       .pipe(map((r) => r.data!.cloturerCycle as ParametresCycle));
+  }
+
+  /** Renomme la caisse du cycle. */
+  renommerCaisse(cycleId: string, nom: string): Observable<ParametresCycle> {
+    return this.apollo
+      .mutate<{ renommerCaisse: ParametresCycle }>({
+        mutation: RENOMMER_CAISSE,
+        variables: { cycleId, nom },
+      })
+      .pipe(map((r) => r.data!.renommerCaisse as ParametresCycle));
   }
 }
