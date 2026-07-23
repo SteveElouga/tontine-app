@@ -64,9 +64,9 @@ gitGraph
 ## 5. État courant du projet
 > Mis à jour à la FIN de chaque session (E7). Doit répondre en 30 s à « où en est-on ? ».
 - **Phase** : développement
-- **Dernier jalon atteint** : moteur des **4 modes de répartition des intérêts à la clôture** mergé (#15), avec tests (13/13). Avant : Simulation (#14), sélecteur de cycle + historique (#13). Tous les écrans du menu sont construits.
-- **En cours** : story **modes de clôture sur le récap** sur `feat/TON-16-recap-modes`. Le récap expose un sélecteur (Intérêts complets / Réduction de N mois / Équitable au prorata / Équitable en parts égales) ; en mode réduction, champ N pré-rempli avec la **suggestion** (query `infosCloture`) ; les colonnes se recalculent en direct (récap paramétré `recapCycle(mode, nMois)`). **Vérifié** : `ngc` exit 0, `py_compile` OK.
-- **Prochaine étape** : rechargement instantané au changement de cycle (v2) ; sortir `GRAPHQL_URI` en fichier d'environnement ; durcissement avant prod (auth/rôles sur les mutations).
+- **Dernier jalon atteint** : **v1 fonctionnellement complète**. Tous les écrans sont construits (tableau de bord, saisie, prêts, récap, membres, simulation, historique, fiches, aide) ; le récap propose les **4 modes de répartition** à la clôture (choix de la trésorière) ; les textes ont été **simplifiés** pour l'audience (40-60 ans, sans jargon, sans « — » ni « · »). Derniers mergés : modes de clôture (#16), colonnes Épargne/Intérêts séparées, écran Aide + passe de textes (`feat/aide-et-textes`).
+- **En cours** : rien en développement. Mise à jour de la documentation (spec §5 « règle tranchée » + liste des écrans ; archi §5 + statuts).
+- **Prochaine étape** : **valider** avec le vrai cycle 2025-2026 (saisir avec Thérèse, comparer au calcul manuel) ; puis **authentification** (login trésorière + protéger les mutations) et **déploiement**. Confort : rechargement instantané au changement de cycle, `GRAPHQL_URI` en environnement, écran Paramètres, PWA hors-ligne.
 - **Points d'attention / dette** :
   - **Règle d'ajustement des intérêts** : ✅ **tranchée et implémentée**. 4 modes au choix de la trésorière à la clôture : (1) complets ; (2) réduction du même nombre de mois pour tous — elle fixe N, favorise les dépôts anciens ; (3a) partage équitable au prorata du montant déposé ; (3b) partage équitable en parts égales. Moteur `apps/core/domain/interest.py` (`InteretsComplets`, `InteretsReductionMois`, `InteretsEquitableProrata`, `InteretsEquitableEgal`, `suggerer_reduction_mois`), testé ; exposé via `recapCycle(mode, nMois)` + `infosCloture`.
   - Frontend : **Angular 22 + PrimeNG 21 (MIT, gratuit)** — ne pas passer à PrimeNG 22 (licence). Preset PrimeNG personnalisé (bleu) dans `app.config.ts`. Cycle courant centralisé dans `core/state/cycle-store.ts` (fini le `CYCLE_ID` codé en dur) ; l'URL GraphQL reste en dur (`GRAPHQL_URI`), à sortir en fichier d'environnement avant prod.
@@ -78,6 +78,7 @@ gitGraph
 
 | Date | Auteur | Résumé de ce qui a été fait | Branches / PR |
 |------|--------|-----------------------------|---------------|
+| 2026-07-22 | Steve + agent | Écran **Aide** (guide de la caisse et des écrans) + colonnes **Épargne / Intérêts** séparées sur le récap + **simplification de tous les textes** (français simple, vouvoiement, sans « — » ni « · »), pour des utilisateurs de 40-60 ans. Mise à jour de la doc (spec + archi). Vérifié `ngc`. | feat/aide-et-textes |
 | 2026-07-22 | Steve + agent | Story **modes de clôture sur le récap** (TON-16) : `recapCycle(mode, nMois)` + query `infosCloture` (gains, intérêts promis, réduction suggérée) ; sur le récap, sélecteur des 4 modes + champ N pré-rempli par la suggestion, recalcul en direct. Vérifié `ngc` + `py_compile`. | feat/TON-16-recap-modes |
 | 2026-07-22 | Steve + agent | Story **moteur des intérêts** (TON-15) : Thérèse a tranché → 4 modes de répartition à la clôture (complets / réduction de N mois / équitable prorata / équitable parts égales) + `total_majorations` + `suggerer_reduction_mois` dans `interest.py`. Tests 13/13 (exemple Awa/Béa). | feat/TON-15-moteur-interets → PR #15 |
 | 2026-07-22 | Steve + agent | Story **Simulation** (TON-14) : queries `simulerEpargne`/`simulerPret` (calcul par le moteur de domaine), écran `features/simulation/` — 2 volets Épargne/Prêt à résultat instantané, nav + route `/simulation`. Vérifié `ngc` exit 0. TON-12 (cycle) + TON-13 (historique) mergés via PR #13. | feat/TON-14-simulation |
@@ -124,11 +125,16 @@ gitGraph
 | 9 | Fiche membre détaillée (transparence, sur `ficheMembre`) (TON-9) | fait | PR #8 |
 | 10 | Tous les écrans en pleine largeur (retrait des plafonds `max-width`) | fait | PR #9 |
 | 11 | Module Prêts — saisie + remboursement (TON-10) | fait | PR #10 |
-| 11b | Récap : recherche + défilement interne (TON-11) | fait | PR #11 |
-| 11c | Sélecteur de cycle courant (TON-12) | en cours | feat/TON-12-selecteur-cycle |
-| 12 | Brancher la règle d'ajustement des intérêts (Règle 2 + réduire les mois, montant auto) | en attente | 1 précision Thérèse |
-| 13 | Sélecteur de cycle/caisse (retirer le `CYCLE_ID` codé en dur) | à faire | — |
-| 14 | Récap : recherche par nom + tableau à défilement interne (TON-11) | en cours | feat/TON-11-recap-recherche-scroll |
+| 12 | Récap : recherche + défilement interne (TON-11) | fait | PR #11 |
+| 13 | Sélecteur de cycle (TON-12) + Historique (TON-13) | fait | PR #13 |
+| 14 | Simulation (TON-14) | fait | PR #14 |
+| 15 | Moteur des 4 modes d'intérêts + tests (TON-15) | fait | PR #15 |
+| 16 | Récap : choix du mode de répartition à la clôture (TON-16) | fait | PR #16 |
+| 17 | Écran Aide + colonnes Épargne/Intérêts + simplification des textes | fait | feat/aide-et-textes |
+| 18 | **Valider avec le vrai cycle 2025-2026** (saisie réelle avec Thérèse) | à faire | — |
+| 19 | **Authentification** (login trésorière + protéger les mutations) | à faire | — |
+| 20 | **Déploiement** en ligne (back + front + PostgreSQL) | à faire | — |
+| 21 | Confort : cycle instantané, `GRAPHQL_URI` en env, Paramètres, PWA hors-ligne | à faire | — |
 
 ## 9. Stack & conventions du projet
 - **Frontend** : Angular (PWA), TypeScript, Apollo GraphQL. Web d'abord ; mobile plus tard.

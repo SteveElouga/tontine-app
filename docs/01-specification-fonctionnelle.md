@@ -1,9 +1,9 @@
 # Spécification fonctionnelle — Module « Caisse mutuelle »
 
 **Projet :** Application de gestion de tontines (Cameroun)
-**Version du document :** 0.1 (première version)
+**Version du document :** 0.2
 **Périmètre de cette version :** module Caisse mutuelle uniquement (épargne, intérêts, prêts)
-**Statut :** brouillon de travail — à valider avec le terrain (pilote : la caisse de la mère du porteur)
+**Statut :** v1 implémentée (tous les écrans + moteur de calcul testé). Règle d'ajustement des intérêts tranchée avec la trésorière (voir §5). Reste à valider avec une année réelle, puis authentification et mise en ligne.
 
 ---
 
@@ -77,9 +77,16 @@ Règle générale : `taux = 5 % × (nombre de mois restants jusqu'à la clôture
 
 ---
 
-## 5. Question ouverte à trancher avant développement définitif
+## 5. Ajustement des intérêts quand tout n'a pas été prêté (règle tranchée)
 
-**Ajustement des intérêts quand tout l'argent déposé n'a pas été prêté.** Les intérêts versés aux épargnants sont financés par les majorations des emprunteurs. Si peu d'argent a été prêté, la caisse encaisse peu de majorations. La règle d'ajustement (intérêts complets ? intérêts réduits, et selon quel calcul ?) **est en attente de réponse de la trésorière pilote**. Le moteur de calcul doit être conçu pour accueillir cette règle sans refonte (voir doc d'architecture, § moteur de calcul).
+Les intérêts versés aux épargnants sont financés par les majorations des emprunteurs. Certaines années, la caisse prête peu : elle encaisse peu de majorations et ne peut pas verser tous les intérêts promis. La trésorière pilote a tranché : **à la clôture, elle choisit l'un des quatre modes de répartition** suivants.
+
+1. **Intérêts complets.** Tout a été prêté : chaque membre reçoit tous ses intérêts (barème dégressif complet).
+2. **Réduction d'un nombre de mois.** On retranche le **même nombre de mois** à chaque dépôt, ce nombre étant fixé par la trésorière. Un dépôt de septembre (9 mois) avec 3 mois en moins ne compte plus que 6 mois (30 %). Cela **favorise ceux qui ont déposé tôt** ; les dépôts les plus tardifs peuvent tomber à zéro. L'application **propose** un nombre (celui qui fait tenir le total des intérêts dans les majorations réellement encaissées), que la trésorière peut modifier.
+3. **Partage équitable au prorata des dépôts.** Les gains réellement encaissés sont partagés selon ce que chaque membre a déposé (les mois sont ignorés).
+4. **Partage équitable en parts égales.** Les gains réellement encaissés sont partagés en parts égales entre les épargnants.
+
+Le moteur implémente ces quatre modes via une stratégie enfichable (`RepartitionInterets`), couverte par des tests. Le choix se fait sur l'écran Récapitulatif (voir doc d'architecture, §5).
 
 ---
 
@@ -106,14 +113,19 @@ Règle générale : `taux = 5 % × (nombre de mois restants jusqu'à la clôture
 - Je consulte un contrôle indicatif de la caisse (intérêts promis vs majorations perçues).
 - Je peux exporter / imprimer le récapitulatif pour la réunion de clôture.
 
-### 6.2 Écrans clés (v1)
+### 6.2 Écrans (v1, tous réalisés)
 
-1. **Accueil / tableau de bord** — état du cycle en cours, totaux, raccourcis.
-2. **Membres** — liste, ajout, fiche membre.
-3. **Saisie des dépôts** — grille membres × mois, saisie rapide.
-4. **Prêts** — liste des prêts, ajout, calcul de majoration.
-5. **Fiche membre** — détail épargne, intérêts, prêts, position nette.
-6. **Récapitulatif de clôture** — vue d'ensemble + export.
+1. **Tableau de bord** : totaux du cycle et raccourcis.
+2. **Saisie des dépôts** : par mois ou par membre, avec pré-remplissage des montants déjà saisis.
+3. **Prêts** : liste, ajout d'un prêt, remboursement, calcul de la majoration.
+4. **Récapitulatif** : ce que chaque membre reçoit à la clôture, choix du mode de répartition, recherche, impression.
+5. **Membres** : liste, ajout, renommage, retrait.
+6. **Simulation** : projeter un dépôt ou un prêt sans rien enregistrer.
+7. **Historique** : journal de toutes les opérations.
+8. **Fiche membre** : le détail, d'où vient le montant de chacun (transparence).
+9. **Aide** : guide du fonctionnement de la caisse et des écrans.
+
+Un **sélecteur de cycle** (barre latérale) permet de changer le cycle courant.
 
 ### 6.3 Hors périmètre v1 (roadmap)
 
