@@ -4,6 +4,7 @@ import { map, Observable } from 'rxjs';
 
 import {
   FicheMembre,
+  InfosCloture,
   Membre,
   MembreMontant,
   MontantMois,
@@ -21,6 +22,7 @@ import {
   DEPOTS_MOIS,
   FICHE_MEMBRE,
   HISTORIQUE,
+  INFOS_CLOTURE,
   MEMBRES,
   PRETS_CYCLE,
   RECAP_CYCLE,
@@ -35,14 +37,26 @@ import {
 export class CaisseService {
   private readonly apollo = inject(Apollo);
 
-  /** Récapitulatif de tous les membres d'un cycle (épargne, intérêts, dettes, net). */
-  recapCycle(cycleId: string): Observable<RecapMembre[]> {
+  /** Récapitulatif des membres, selon le mode de répartition des intérêts à la clôture. */
+  recapCycle(cycleId: string, mode = 'complet', nMois = 0): Observable<RecapMembre[]> {
     return this.apollo
-      .watchQuery<{ recapCycle: RecapMembre[] }>({
+      .query<{ recapCycle: RecapMembre[] }>({
         query: RECAP_CYCLE,
-        variables: { cycleId },
+        variables: { cycleId, mode, nMois },
+        fetchPolicy: 'network-only',
       })
-      .valueChanges.pipe(map((res) => (res.data?.recapCycle ?? []) as RecapMembre[]));
+      .pipe(map((res) => (res.data?.recapCycle ?? []) as RecapMembre[]));
+  }
+
+  /** Contexte de clôture : gains encaissés, intérêts promis, réduction suggérée. */
+  infosCloture(cycleId: string): Observable<InfosCloture> {
+    return this.apollo
+      .query<{ infosCloture: InfosCloture }>({
+        query: INFOS_CLOTURE,
+        variables: { cycleId },
+        fetchPolicy: 'network-only',
+      })
+      .pipe(map((r) => r.data!.infosCloture as InfosCloture));
   }
 
   /** Saisit un dépôt et renvoie le récap à jour du membre. */

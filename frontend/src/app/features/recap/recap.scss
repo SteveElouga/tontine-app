@@ -42,9 +42,42 @@
   }
 }
 
+.cloture {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  padding: 11px 14px;
+  background: var(--c-surface-1);
+  border-radius: 10px;
+  font-size: 14px;
+
+  .lbl {
+    font-weight: 600;
+    color: var(--c-text-2);
+  }
+
+  .nred {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--c-text-2);
+  }
+
+  .sugg {
+    color: var(--c-text-muted);
+  }
+
+  .gains {
+    margin-left: auto;
+    color: var(--c-text-2);
+  }
+}
+
 /* Zone défilante : le tableau scrolle ici (hauteur bornée), pas la page. */
 .tableau-wrap {
-  max-height: calc(100dvh - 250px);
+  max-height: calc(100dvh - 320px);
   overflow-y: auto;
   background: var(--c-surface);
   border: 1px solid var(--c-border);

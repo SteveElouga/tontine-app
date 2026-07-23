@@ -12,10 +12,10 @@ export const CYCLES = gql`
   }
 `;
 
-/** Récapitulatif de tous les membres d'un cycle. */
+/** Récapitulatif des membres d'un cycle, selon le mode de répartition des intérêts. */
 export const RECAP_CYCLE = gql`
-  query RecapCycle($cycleId: ID!) {
-    recapCycle(cycleId: $cycleId) {
+  query RecapCycle($cycleId: ID!, $mode: String, $nMois: Int) {
+    recapCycle(cycleId: $cycleId, mode: $mode, nMois: $nMois) {
       id
       nom
       totalDepose
@@ -23,6 +23,17 @@ export const RECAP_CYCLE = gql`
       epargnePlusInterets
       dettes
       positionNette
+    }
+  }
+`;
+
+/** Contexte de clôture : gains encaissés, intérêts promis, réduction suggérée. */
+export const INFOS_CLOTURE = gql`
+  query InfosCloture($cycleId: ID!) {
+    infosCloture(cycleId: $cycleId) {
+      gains
+      totalPromis
+      reductionSuggeree
     }
   }
 `;
