@@ -43,3 +43,62 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
+
+/* Visite guidée (Driver.js) accordée au thème de l'application (clair et sombre). */
+.driver-popover.tontine-tour {
+  background: var(--c-surface);
+  color: var(--c-text);
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.2);
+  font-family: inherit;
+  padding: 16px 18px;
+}
+
+.driver-popover.tontine-tour .driver-popover-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--c-text);
+}
+
+.driver-popover.tontine-tour .driver-popover-description {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--c-text-2);
+}
+
+.driver-popover.tontine-tour .driver-popover-progress-text {
+  font-size: 12px;
+  color: var(--c-text-muted);
+}
+
+.driver-popover.tontine-tour .driver-popover-close-btn {
+  color: var(--c-text-muted);
+}
+
+.driver-popover.tontine-tour button {
+  font: inherit;
+  font-size: 13px;
+  text-shadow: none;
+  background-image: none;
+  border-radius: 8px;
+  padding: 7px 14px;
+  cursor: pointer;
+}
+
+.driver-popover.tontine-tour .driver-popover-prev-btn {
+  background: transparent;
+  border: 1px solid var(--c-border);
+  color: var(--c-text-2);
+}
+
+.driver-popover.tontine-tour .driver-popover-next-btn {
+  background: var(--c-accent);
+  border: 1px solid var(--c-accent);
+  color: #fff;
+}
+
+/* Pas de flèche : le spotlight suffit à désigner l'élément. */
+.driver-popover.tontine-tour .driver-popover-arrow {
+  display: none;
+}
