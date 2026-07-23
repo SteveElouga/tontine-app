@@ -12,6 +12,14 @@ export const MOIS: Record<number, string> = {
   6: 'Février', 7: 'Mars', 8: 'Avril', 9: 'Mai', 10: 'Juin', 11: 'Juillet', 12: 'Août',
 };
 
+/** Un cycle de caisse (pour le sélecteur de cycle courant). */
+export interface CycleInfo {
+  id: string;
+  libelle: string;
+  caisseNom: string;
+  statut: string;
+}
+
 export interface RecapMembre {
   id: string;
   nom: string;
@@ -80,4 +88,15 @@ export interface Pret {
   majoration: string;
   totalARembourser: string;
   rembourse: boolean;
+}
+
+/** Une opération du journal (dépôt ou prêt). */
+export interface Operation {
+  type: 'depot' | 'pret';
+  date: string;
+  membreNom: string;
+  montant: string;
+  mois: number;
+  rembourse: boolean;
+  moisRemboursement: number | null;
 }

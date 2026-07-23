@@ -5,10 +5,8 @@ import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
+import { CycleStore } from '../../core/state/cycle-store';
 import { RecapMembre } from '../../core/domain/caisse.models';
-
-// Cycle pilote (dev). À remplacer par une vraie sélection de cycle plus tard.
-const CYCLE_ID = '8e7323b1-1277-47dd-b358-ee0354d52b3d';
 
 @Component({
   selector: 'app-recap',
@@ -18,6 +16,7 @@ const CYCLE_ID = '8e7323b1-1277-47dd-b358-ee0354d52b3d';
 })
 export class Recap implements OnInit {
   private readonly caisse = inject(CaisseService);
+  private readonly cycleStore = inject(CycleStore);
 
   protected readonly membres = signal<RecapMembre[]>([]);
   protected readonly chargement = signal(true);
@@ -41,7 +40,7 @@ export class Recap implements OnInit {
   );
 
   ngOnInit(): void {
-    this.caisse.recapCycle(CYCLE_ID).subscribe({
+    this.caisse.recapCycle(this.cycleStore.cycleId()).subscribe({
       next: (rows) => {
         this.membres.set(rows);
         this.chargement.set(false);

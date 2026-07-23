@@ -6,10 +6,8 @@ import { Button } from 'primeng/button';
 import { Select } from 'primeng/select';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
+import { CycleStore } from '../../core/state/cycle-store';
 import { MOIS, Membre, Pret } from '../../core/domain/caisse.models';
-
-// Cycle pilote (dev). À remplacer par une vraie sélection de cycle plus tard.
-const CYCLE_ID = '8e7323b1-1277-47dd-b358-ee0354d52b3d';
 
 @Component({
   selector: 'app-prets',
@@ -19,6 +17,7 @@ const CYCLE_ID = '8e7323b1-1277-47dd-b358-ee0354d52b3d';
 })
 export class Prets implements OnInit {
   private readonly caisse = inject(CaisseService);
+  private readonly cycleStore = inject(CycleStore);
   private readonly toast = inject(MessageService);
 
   protected readonly MOIS = MOIS;
@@ -55,11 +54,11 @@ export class Prets implements OnInit {
   );
 
   ngOnInit(): void {
-    this.caisse.membres(CYCLE_ID).subscribe({
+    this.caisse.membres(this.cycleStore.cycleId()).subscribe({
       next: (m) => this.membres.set(m),
       error: () => this.erreur('Chargement des membres impossible.'),
     });
-    this.caisse.pretsCycle(CYCLE_ID).subscribe({
+    this.caisse.pretsCycle(this.cycleStore.cycleId()).subscribe({
       next: (p) => {
         this.prets.set(p);
         this.chargement.set(false);
@@ -79,7 +78,7 @@ export class Prets implements OnInit {
       this.erreur('Choisis un membre, un montant et un mois.');
       return;
     }
-    this.caisse.ajouterPret(CYCLE_ID, membreId, montant, mois).subscribe({
+    this.caisse.ajouterPret(this.cycleStore.cycleId(), membreId, montant, mois).subscribe({
       next: (p) => {
         this.prets.update((l) => [...l, p].sort((a, b) => a.nom.localeCompare(b.nom, 'fr')));
         this.nMembre.set('');
