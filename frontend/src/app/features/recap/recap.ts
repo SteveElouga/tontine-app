@@ -52,8 +52,8 @@ export class Recap implements OnInit {
   protected readonly optModes = [
     { label: 'Intérêts complets', value: 'complet' },
     { label: 'Réduction de mois', value: 'reduction' },
-    { label: 'Équitable — au prorata', value: 'prorata' },
-    { label: 'Équitable — parts égales', value: 'egal' },
+    { label: 'Partage selon les dépôts', value: 'prorata' },
+    { label: 'Partage en parts égales', value: 'egal' },
   ];
 
   ngOnInit(): void {

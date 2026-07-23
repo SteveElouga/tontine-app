@@ -1,6 +1,6 @@
 <header class="entete">
   <h1>Historique</h1>
-  <p class="sub">Journal des opérations du cycle · le plus récent en haut</p>
+  <p class="sub">Tout ce qui a été fait dans la caisse, du plus récent au plus ancien.</p>
 </header>
 
 @if (chargement()) {
@@ -23,10 +23,10 @@
             {{ op.type === 'depot' ? 'a déposé' : 'a emprunté' }}
           </span>
           <span class="l2">
-            {{ MOIS[op.mois] }} · {{ date(op.date) }}
+            {{ MOIS[op.mois] }}, saisi le {{ date(op.date) }}
             @if (op.type === 'pret') {
               @if (op.rembourse) {
-                <span class="badge ok">Remboursé · {{ MOIS[op.moisRemboursement ?? 12] }}</span>
+                <span class="badge ok">Remboursé en {{ MOIS[op.moisRemboursement ?? 12] }}</span>
               } @else {
                 <span class="badge attente">En cours</span>
               }

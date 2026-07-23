@@ -86,7 +86,7 @@ export class Prets implements OnInit {
         this.toast.add({
           severity: 'success',
           summary: 'Prêt enregistré',
-          detail: `${p.nom} — ${this.format(p.montant)} FCFA`,
+          detail: `${p.nom}, ${this.format(p.montant)} FCFA`,
           life: 2500,
         });
       },
@@ -123,7 +123,7 @@ export class Prets implements OnInit {
         this.toast.add({
           severity: 'success',
           summary: 'Remboursement enregistré',
-          detail: `${maj.nom} — ${MOIS[mois]}`,
+          detail: `${maj.nom}, remboursé en ${MOIS[mois]}`,
           life: 2500,
         });
       },

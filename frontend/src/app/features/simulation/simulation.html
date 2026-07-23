@@ -1,6 +1,6 @@
 <header class="entete">
   <h1>Simulation</h1>
-  <p class="sub">Projette un dépôt ou un prêt — même calcul que la vraie caisse</p>
+  <p class="sub">Voyez ce que rapporterait un dépôt, ou ce que coûterait un prêt. C'est le même calcul que la vraie caisse.</p>
 </header>
 
 <div class="cartes">
@@ -39,7 +39,7 @@
         <div class="ligne fort"><span>Total à la clôture</span><span>{{ fmt(r.total) }} FCFA</span></div>
       </div>
     } @else {
-      <p class="hint">Entre un montant pour voir la projection.</p>
+      <p class="hint">Entrez un montant pour voir le résultat.</p>
     }
   </section>
 
@@ -91,7 +91,7 @@
         <div class="ligne fort"><span>Total à rembourser</span><span>{{ fmt(r.total) }} FCFA</span></div>
       </div>
     } @else {
-      <p class="hint">Entre un montant pour voir la projection.</p>
+      <p class="hint">Entrez un montant pour voir le résultat.</p>
     }
   </section>
 </div>

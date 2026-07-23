@@ -74,6 +74,6 @@ export class Membres implements OnInit {
   }
 
   private erreur(): void {
-    this.toast.add({ severity: 'error', summary: 'Action impossible', detail: 'Réessaie.' });
+    this.toast.add({ severity: 'error', summary: 'Action impossible', detail: 'Réessayez.' });
   }
 }

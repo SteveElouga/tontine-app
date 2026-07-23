@@ -31,9 +31,15 @@
     </nav>
     <div class="sidebar-bottom">
       @for (item of navBas; track item.label) {
-        <span class="nav-item todo">
-          <i [class]="item.icon"></i>{{ item.label }}<span class="soon-tag">bientôt</span>
-        </span>
+        @if (item.route) {
+          <a class="nav-item" [routerLink]="item.route" routerLinkActive="active">
+            <i [class]="item.icon"></i>{{ item.label }}
+          </a>
+        } @else {
+          <span class="nav-item todo">
+            <i [class]="item.icon"></i>{{ item.label }}<span class="soon-tag">bientôt</span>
+          </span>
+        }
       }
     </div>
   </aside>
