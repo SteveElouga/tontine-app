@@ -7,6 +7,7 @@ import { Prets } from './features/prets/prets';
 import { Historique } from './features/historique/historique';
 import { Simulation } from './features/simulation/simulation';
 import { Aide } from './features/aide/aide';
+import { Parametres } from './features/parametres/parametres';
 import { FicheMembrePage } from './features/fiche-membre/fiche-membre';
 
 export const routes: Routes = [
@@ -19,5 +20,6 @@ export const routes: Routes = [
   { path: 'historique', component: Historique },
   { path: 'simulation', component: Simulation },
   { path: 'aide', component: Aide },
+  { path: 'parametres', component: Parametres },
   { path: 'membre/:id', component: FicheMembrePage },
 ];

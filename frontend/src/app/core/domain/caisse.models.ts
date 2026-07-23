@@ -20,6 +20,18 @@ export interface CycleInfo {
   statut: string;
 }
 
+/** Règles complètes d'un cycle (écran Paramètres). */
+export interface ParametresCycle {
+  id: string;
+  libelle: string;
+  statut: string;
+  caisseNom: string;
+  dureeDepot: number;
+  moisDelai: number;
+  tauxEpargne: string;
+  tauxMajoration: string;
+}
+
 export interface RecapMembre {
   id: string;
   nom: string;

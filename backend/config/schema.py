@@ -201,6 +201,31 @@ class InfosCloture:
 
 
 @strawberry.type
+class ParametresCycle:
+    id: strawberry.ID
+    libelle: str
+    statut: str
+    caisse_nom: str
+    duree_depot: int
+    mois_delai: int
+    taux_epargne: Decimal
+    taux_majoration: Decimal
+
+
+def _params_cycle(c: Cycle) -> "ParametresCycle":
+    return ParametresCycle(
+        id=strawberry.ID(str(c.id)),
+        libelle=c.libelle,
+        statut=c.statut,
+        caisse_nom=c.caisse.nom,
+        duree_depot=c.duree_depot,
+        mois_delai=c.mois_delai,
+        taux_epargne=c.taux_epargne,
+        taux_majoration=c.taux_majoration,
+    )
+
+
+@strawberry.type
 class Query:
     @strawberry.field
     def sante(self) -> str:
@@ -288,6 +313,11 @@ class Query:
             )
             for c in Cycle.objects.select_related("caisse").order_by("caisse__nom", "libelle")
         ]
+
+    @strawberry.field
+    def parametres_cycle(self, cycle_id: strawberry.ID) -> ParametresCycle:
+        """Règles complètes d'un cycle (pour l'écran Paramètres)."""
+        return _params_cycle(Cycle.objects.select_related("caisse").get(id=cycle_id))
 
     @strawberry.field
     def historique(self, cycle_id: strawberry.ID) -> List[Operation]:
@@ -481,6 +511,57 @@ class Mutation:
         loan.mois_remboursement = mois_remboursement
         loan.save(update_fields=["mois_remboursement"])
         return _pret(loan)
+
+    @strawberry.mutation
+    def modifier_cycle(
+        self,
+        cycle_id: strawberry.ID,
+        libelle: str,
+        duree_depot: int,
+        mois_delai: int,
+        taux_epargne: Decimal,
+        taux_majoration: Decimal,
+    ) -> ParametresCycle:
+        """Modifie les règles d'un cycle. Attention : recalcule les montants déjà saisis."""
+        if duree_depot < 1 or mois_delai < duree_depot:
+            raise ValueError("Le délai doit être au moins égal à la durée des dépôts.")
+        c = Cycle.objects.select_related("caisse").get(id=cycle_id)
+        c.libelle = libelle
+        c.duree_depot = duree_depot
+        c.mois_delai = mois_delai
+        c.taux_epargne = taux_epargne
+        c.taux_majoration = taux_majoration
+        c.save(
+            update_fields=[
+                "libelle", "duree_depot", "mois_delai", "taux_epargne", "taux_majoration"
+            ]
+        )
+        return _params_cycle(c)
+
+    @strawberry.mutation
+    def creer_cycle(self, cycle_reference_id: strawberry.ID, libelle: str) -> ParametresCycle:
+        """Crée une nouvelle année dans la même caisse, en reprenant les règles du cycle donné."""
+        ref = Cycle.objects.select_related("caisse").get(id=cycle_reference_id)
+        if Cycle.objects.filter(caisse=ref.caisse, libelle=libelle).exists():
+            raise ValueError("Un cycle porte déjà ce libellé.")
+        c = Cycle.objects.create(
+            caisse=ref.caisse,
+            libelle=libelle,
+            mois_debut=ref.mois_debut,
+            duree_depot=ref.duree_depot,
+            mois_delai=ref.mois_delai,
+            taux_epargne=ref.taux_epargne,
+            taux_majoration=ref.taux_majoration,
+        )
+        return _params_cycle(c)
+
+    @strawberry.mutation
+    def cloturer_cycle(self, cycle_id: strawberry.ID) -> ParametresCycle:
+        """Clôture un cycle (statut = clôturé)."""
+        c = Cycle.objects.select_related("caisse").get(id=cycle_id)
+        c.statut = "cloture"
+        c.save(update_fields=["statut"])
+        return _params_cycle(c)
 
 
 schema = strawberry.Schema(query=Query, mutation=Mutation)

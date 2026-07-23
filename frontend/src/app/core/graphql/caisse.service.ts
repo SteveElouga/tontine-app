@@ -9,6 +9,7 @@ import {
   MembreMontant,
   MontantMois,
   Operation,
+  ParametresCycle,
   Pret,
   RecapMembre,
   SimEpargne,
@@ -18,12 +19,16 @@ import {
   AJOUTER_DEPOT,
   AJOUTER_MEMBRE,
   AJOUTER_PRET,
+  CLOTURER_CYCLE,
+  CREER_CYCLE,
   DEPOTS_MEMBRE,
   DEPOTS_MOIS,
   FICHE_MEMBRE,
   HISTORIQUE,
   INFOS_CLOTURE,
   MEMBRES,
+  MODIFIER_CYCLE,
+  PARAMETRES_CYCLE,
   PRETS_CYCLE,
   RECAP_CYCLE,
   REMBOURSER_PRET,
@@ -221,5 +226,53 @@ export class CaisseService {
         fetchPolicy: 'network-only',
       })
       .pipe(map((r) => r.data!.simulerPret as SimPret));
+  }
+
+  /** Règles complètes d'un cycle. */
+  parametresCycle(cycleId: string): Observable<ParametresCycle> {
+    return this.apollo
+      .query<{ parametresCycle: ParametresCycle }>({
+        query: PARAMETRES_CYCLE,
+        variables: { cycleId },
+        fetchPolicy: 'network-only',
+      })
+      .pipe(map((r) => r.data!.parametresCycle as ParametresCycle));
+  }
+
+  /** Modifie les règles d'un cycle (recalcule les montants existants). */
+  modifierCycle(
+    cycleId: string,
+    libelle: string,
+    dureeDepot: number,
+    moisDelai: number,
+    tauxEpargne: number,
+    tauxMajoration: number,
+  ): Observable<ParametresCycle> {
+    return this.apollo
+      .mutate<{ modifierCycle: ParametresCycle }>({
+        mutation: MODIFIER_CYCLE,
+        variables: { cycleId, libelle, dureeDepot, moisDelai, tauxEpargne, tauxMajoration },
+      })
+      .pipe(map((r) => r.data!.modifierCycle as ParametresCycle));
+  }
+
+  /** Crée une nouvelle année (reprend les règles du cycle de référence). */
+  creerCycle(cycleReferenceId: string, libelle: string): Observable<ParametresCycle> {
+    return this.apollo
+      .mutate<{ creerCycle: ParametresCycle }>({
+        mutation: CREER_CYCLE,
+        variables: { cycleReferenceId, libelle },
+      })
+      .pipe(map((r) => r.data!.creerCycle as ParametresCycle));
+  }
+
+  /** Clôture un cycle. */
+  cloturerCycle(cycleId: string): Observable<ParametresCycle> {
+    return this.apollo
+      .mutate<{ cloturerCycle: ParametresCycle }>({
+        mutation: CLOTURER_CYCLE,
+        variables: { cycleId },
+      })
+      .pipe(map((r) => r.data!.cloturerCycle as ParametresCycle));
   }
 }

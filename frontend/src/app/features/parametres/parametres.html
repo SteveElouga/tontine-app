@@ -1,0 +1,106 @@
+<header class="entete">
+  <h1>Paramètres</h1>
+  <p class="sub">Les règles du cycle et la gestion des années.</p>
+</header>
+
+@if (chargement()) {
+  <p class="muted">Chargement…</p>
+} @else if (params(); as p) {
+  <div class="cartes">
+  <section class="carte">
+    <h2>Règles du cycle</h2>
+    <div class="champs">
+      <label>
+        <span>Année</span>
+        <input
+          class="champ"
+          [ngModel]="libelle()"
+          (ngModelChange)="libelle.set($event)"
+          placeholder="ex. 2025-2026"
+        />
+      </label>
+      <label>
+        <span>Taux d'épargne (par mois)</span>
+        <p-inputnumber
+          [ngModel]="tauxEpargnePct()"
+          (ngModelChange)="tauxEpargnePct.set($event)"
+          [maxFractionDigits]="1"
+          suffix=" %"
+          [inputStyle]="{ width: '110px', 'text-align': 'right' }"
+        />
+      </label>
+      <label>
+        <span>Taux de majoration des prêts (par mois)</span>
+        <p-inputnumber
+          [ngModel]="tauxMajoPct()"
+          (ngModelChange)="tauxMajoPct.set($event)"
+          [maxFractionDigits]="1"
+          suffix=" %"
+          [inputStyle]="{ width: '110px', 'text-align': 'right' }"
+        />
+      </label>
+      <label>
+        <span>Nombre de mois de dépôt</span>
+        <p-inputnumber
+          [ngModel]="dureeDepot()"
+          (ngModelChange)="dureeDepot.set($event)"
+          [inputStyle]="{ width: '90px', 'text-align': 'right' }"
+        />
+      </label>
+      <label>
+        <span>Remboursement au plus tard en</span>
+        <p-select
+          [options]="optDelai"
+          [ngModel]="moisDelai()"
+          (ngModelChange)="moisDelai.set($event)"
+          optionLabel="label"
+          optionValue="value"
+          [style]="{ width: '150px' }"
+        />
+      </label>
+    </div>
+    <p class="avert">
+      <i class="pi pi-exclamation-triangle"></i>
+      Modifier les taux recalcule les montants de tous les membres de ce cycle.
+    </p>
+    <div class="actions">
+      <p-button label="Enregistrer" icon="pi pi-check" (onClick)="enregistrer()" />
+    </div>
+  </section>
+
+  <section class="carte">
+    <h2>Les années</h2>
+    <p class="info">
+      Année en cours : <strong>{{ p.libelle }}</strong>
+      ({{ p.statut === 'cloture' ? 'clôturée' : 'ouverte' }}).
+    </p>
+
+    <div class="bloc-annee">
+      <label>
+        <span>Créer une nouvelle année</span>
+        <input
+          class="champ"
+          [ngModel]="nouveauLibelle()"
+          (ngModelChange)="nouveauLibelle.set($event)"
+          placeholder="ex. 2026-2027"
+        />
+      </label>
+      <p-button label="Créer" icon="pi pi-plus" (onClick)="creer()" />
+    </div>
+    <p class="aide-txt">
+      La nouvelle année reprend les mêmes règles. Vous pourrez les ajuster après l'avoir choisie
+      dans la barre de gauche.
+    </p>
+
+    @if (p.statut !== 'cloture') {
+      <div class="actions">
+        <button type="button" class="lien-danger" (click)="cloturer()">
+          Clôturer l'année en cours
+        </button>
+      </div>
+    }
+  </section>
+  </div>
+} @else {
+  <p class="muted">Cycle introuvable.</p>
+}
