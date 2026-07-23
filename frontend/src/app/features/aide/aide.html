@@ -8,15 +8,28 @@
   <div class="cartes">
     <div class="carte">
       <h3><i class="pi pi-calendar"></i> {{ 'aide.cycleTitre' | translate }}</h3>
-      <p>{{ 'aide.cycleTexte' | translate }}</p>
+      <p>{{ 'aide.cycleTexte' | translate: { premier: infos().premier, dernier: infos().dernier, delai: infos().delai } }}</p>
     </div>
     <div class="carte">
       <h3><i class="pi pi-wallet"></i> {{ 'aide.epargneTitre' | translate }}</h3>
-      <p>{{ 'aide.epargneTexte' | translate }}</p>
+      <p>
+        {{
+          'aide.epargneTexte'
+            | translate
+              : {
+                  taux: infos().taux,
+                  premier: infos().premier,
+                  deuxieme: infos().deuxieme,
+                  dernier: infos().dernier,
+                  tauxPremier: infos().tauxPremier,
+                  tauxDeuxieme: infos().tauxDeuxieme
+                }
+        }}
+      </p>
     </div>
     <div class="carte">
       <h3><i class="pi pi-money-bill"></i> {{ 'aide.pretsTitre' | translate }}</h3>
-      <p>{{ 'aide.pretsTexte' | translate }}</p>
+      <p>{{ 'aide.pretsTexte' | translate: { tauxMajo: infos().tauxMajo } }}</p>
     </div>
     <div class="carte">
       <h3><i class="pi pi-flag"></i> {{ 'aide.finTitre' | translate }}</h3>
