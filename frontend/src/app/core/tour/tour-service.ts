@@ -9,6 +9,7 @@ const CLE_VU = 'tontine.tourVu';
 export class TourService {
   private readonly i18n = inject(TranslateService);
 
+  /* v8 ignore start -- lancement de Driver.js (manipule le DOM), non testable unitairement */
   private construire() {
     const t = (k: string): string => this.i18n.instant(k);
     const etape = (cle: string, sel?: string) => ({
@@ -43,6 +44,7 @@ export class TourService {
   demarrer(): void {
     this.construire().drive();
   }
+  /* v8 ignore stop */
 
   /** Lance la visite une seule fois (première connexion). */
   demarrerSiPremiereFois(): void {
