@@ -3,14 +3,16 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
+import { InputNumber } from 'primeng/inputnumber';
+import { Select } from 'primeng/select';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
-import { RecapMembre } from '../../core/domain/caisse.models';
+import { InfosCloture, RecapMembre } from '../../core/domain/caisse.models';
 
 @Component({
   selector: 'app-recap',
-  imports: [Button, RouterLink, FormsModule, InputText],
+  imports: [Button, RouterLink, FormsModule, InputText, InputNumber, Select],
   templateUrl: './recap.html',
   styleUrl: './recap.scss',
 })
@@ -39,8 +41,42 @@ export class Recap implements OnInit {
     this.membresFiltres().reduce((s, m) => s + Number(m.positionNette), 0),
   );
 
+  // Mode de répartition des intérêts à la clôture
+  protected readonly mode = signal('complet');
+  protected readonly nMois = signal(0);
+  protected readonly infos = signal<InfosCloture | null>(null);
+
+  protected readonly optModes = [
+    { label: 'Intérêts complets', value: 'complet' },
+    { label: 'Réduction de mois', value: 'reduction' },
+    { label: 'Équitable — au prorata', value: 'prorata' },
+    { label: 'Équitable — parts égales', value: 'egal' },
+  ];
+
   ngOnInit(): void {
-    this.caisse.recapCycle(this.cycleStore.cycleId()).subscribe({
+    this.caisse.infosCloture(this.cycleStore.cycleId()).subscribe({
+      next: (i) => this.infos.set(i),
+      error: () => {},
+    });
+    this.recharger();
+  }
+
+  changerMode(mode: string): void {
+    this.mode.set(mode);
+    if (mode === 'reduction' && this.nMois() === 0) {
+      this.nMois.set(this.infos()?.reductionSuggeree ?? 0);
+    }
+    this.recharger();
+  }
+
+  setN(n: number | null): void {
+    this.nMois.set(Math.max(0, Math.min(9, n ?? 0)));
+    this.recharger();
+  }
+
+  private recharger(): void {
+    this.chargement.set(true);
+    this.caisse.recapCycle(this.cycleStore.cycleId(), this.mode(), this.nMois()).subscribe({
       next: (rows) => {
         this.membres.set(rows);
         this.chargement.set(false);

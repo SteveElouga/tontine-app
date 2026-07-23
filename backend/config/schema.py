@@ -116,7 +116,29 @@ class FicheMembre:
     position_nette: Decimal
 
 
-def _recap_membre(member: Member, cycle: Cycle) -> RecapMembre:
+def _strategie_cloture(cycle: Cycle, mode: str, n_mois: int):
+    """Stratégie de répartition des intérêts selon le mode choisi à la clôture."""
+    params = cycle.to_params()
+    if mode == "reduction":
+        return interest.InteretsReductionMois(max(n_mois, 0))
+    if mode in ("prorata", "egal"):
+        from apps.savings.models import Deposit
+        from apps.loans.models import Loan
+
+        prets = [
+            interest.Pret(l.montant, l.mois_pret, l.mois_remboursement)
+            for l in Loan.objects.filter(cycle=cycle)
+        ]
+        gains = interest.total_majorations(prets, params)
+        if mode == "prorata":
+            total = sum((d.montant for d in Deposit.objects.filter(cycle=cycle)), Decimal(0))
+            return interest.InteretsEquitableProrata(gains, total)
+        nb = Deposit.objects.filter(cycle=cycle).values("member").distinct().count()
+        return interest.InteretsEquitableEgal(gains, nb)
+    return interest.InteretsComplets()
+
+
+def _recap_membre(member: Member, cycle: Cycle, strategie=None) -> RecapMembre:
     params = cycle.to_params()
     depots = [
         interest.Depot(d.mois_index, d.montant)
@@ -127,14 +149,18 @@ def _recap_membre(member: Member, cycle: Cycle) -> RecapMembre:
         for p in member.prets.filter(cycle=cycle)
     ]
     dettes = sum((interest.total_a_rembourser(p, params) for p in prets), Decimal(0))
+    strategie = strategie or interest.InteretsComplets()
+    interets = strategie.interets(depots, params)
+    total_depose = interest.total_depose(depots)
+    epargne_plus_interets = total_depose + interets
     return RecapMembre(
         id=strawberry.ID(str(member.id)),
         nom=member.nom,
-        total_depose=interest.total_depose(depots),
-        interets=interest.interets_membre(depots, params),
-        epargne_plus_interets=interest.epargne_plus_interets(depots, params),
+        total_depose=total_depose,
+        interets=interets,
+        epargne_plus_interets=epargne_plus_interets,
         dettes=dettes,
-        position_nette=interest.position_nette(depots, prets, params),
+        position_nette=epargne_plus_interets - dettes,
     )
 
 
@@ -168,6 +194,13 @@ def _pret(loan) -> "Pret":
 
 
 @strawberry.type
+class InfosCloture:
+    gains: Decimal            # majorations réellement encaissées
+    total_promis: Decimal     # intérêts complets dus (mode 1)
+    reduction_suggeree: int   # N suggéré pour que le total <= gains
+
+
+@strawberry.type
 class Query:
     @strawberry.field
     def sante(self) -> str:
@@ -175,11 +208,36 @@ class Query:
         return "ok"
 
     @strawberry.field
-    def recap_cycle(self, cycle_id: strawberry.ID) -> List[RecapMembre]:
-        """Récapitulatif de tous les membres d'un cycle."""
+    def recap_cycle(
+        self, cycle_id: strawberry.ID, mode: str = "complet", n_mois: int = 0
+    ) -> List[RecapMembre]:
+        """Récap de tous les membres selon le mode de répartition des intérêts à la clôture.
+
+        mode : "complet" | "reduction" (avec n_mois) | "prorata" | "egal".
+        """
         cycle = Cycle.objects.select_related("caisse").get(id=cycle_id)
+        strategie = _strategie_cloture(cycle, mode, n_mois)
         membres = Member.objects.filter(caisse=cycle.caisse, actif=True)
-        return [_recap_membre(m, cycle) for m in membres]
+        return [_recap_membre(m, cycle, strategie) for m in membres]
+
+    @strawberry.field
+    def infos_cloture(self, cycle_id: strawberry.ID) -> InfosCloture:
+        """Contexte de clôture : majorations encaissées, intérêts promis, réduction suggérée."""
+        from apps.savings.models import Deposit
+        from apps.loans.models import Loan
+
+        cycle = Cycle.objects.get(id=cycle_id)
+        params = cycle.to_params()
+        depots = [interest.Depot(d.mois_index, d.montant) for d in Deposit.objects.filter(cycle=cycle)]
+        prets = [
+            interest.Pret(l.montant, l.mois_pret, l.mois_remboursement)
+            for l in Loan.objects.filter(cycle=cycle)
+        ]
+        return InfosCloture(
+            gains=interest.total_majorations(prets, params),
+            total_promis=interest.interets_membre(depots, params),
+            reduction_suggeree=interest.suggerer_reduction_mois(depots, prets, params),
+        )
 
     @strawberry.field
     def depots_mois(self, cycle_id: strawberry.ID, mois_index: int) -> List[MembreMontant]:
