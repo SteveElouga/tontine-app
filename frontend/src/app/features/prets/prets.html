@@ -50,7 +50,10 @@
         <th class="d">{{ 'prets.colMontant' | translate }}</th>
         <th class="c">{{ 'prets.colPret' | translate }}</th>
         <th class="d">{{ 'prets.colMoisDette' | translate }}</th>
-        <th class="d">{{ 'prets.colMajoration' | translate }}</th>
+        <th class="d">
+          {{ 'prets.colMajoration' | translate }}
+          <i class="pi pi-info-circle tip" [pTooltip]="'prets.tipMajoration' | translate" tooltipPosition="top"></i>
+        </th>
         <th class="d">{{ 'prets.colARembourser' | translate }}</th>
         <th class="a">{{ 'prets.colStatut' | translate }}</th>
       </tr>
@@ -62,7 +65,13 @@
           <td class="d">{{ format(p.montant) }}</td>
           <td class="c">{{ p.moisPret | moisNom }}</td>
           <td class="d">{{ p.moisDeDette }}</td>
-          <td class="d rouge">+{{ format(p.majoration) }}</td>
+          <td
+            class="d rouge"
+            [pTooltip]="'prets.tipMajoCalc' | translate: { n: p.moisDeDette }"
+            tooltipPosition="top"
+          >
+            +{{ format(p.majoration) }}
+          </td>
           <td class="d fort">{{ format(p.totalARembourser) }}</td>
           <td class="a">
             @if (p.rembourse) {

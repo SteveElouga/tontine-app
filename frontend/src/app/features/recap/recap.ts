@@ -5,6 +5,7 @@ import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { InputNumber } from 'primeng/inputnumber';
 import { Select } from 'primeng/select';
+import { Tooltip } from 'primeng/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
@@ -14,7 +15,7 @@ import { InfosCloture, RecapMembre } from '../../core/domain/caisse.models';
 
 @Component({
   selector: 'app-recap',
-  imports: [Button, RouterLink, FormsModule, InputText, InputNumber, Select, TranslatePipe],
+  imports: [Button, RouterLink, FormsModule, InputText, InputNumber, Select, TranslatePipe, Tooltip],
   templateUrl: './recap.html',
   styleUrl: './recap.scss',
 })

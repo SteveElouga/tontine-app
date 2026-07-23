@@ -5,6 +5,7 @@ import { InputNumber } from 'primeng/inputnumber';
 import { Select } from 'primeng/select';
 import { Button } from 'primeng/button';
 import { SelectButton } from 'primeng/selectbutton';
+import { Tooltip } from 'primeng/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
@@ -15,7 +16,7 @@ import { ParametresCycle, moisCalendaire } from '../../core/domain/caisse.models
 
 @Component({
   selector: 'app-parametres',
-  imports: [FormsModule, InputNumber, Select, Button, SelectButton, TranslatePipe],
+  imports: [FormsModule, InputNumber, Select, Button, SelectButton, TranslatePipe, Tooltip],
   templateUrl: './parametres.html',
   styleUrl: './parametres.scss',
 })
