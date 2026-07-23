@@ -78,6 +78,7 @@ gitGraph
 
 | Date | Auteur | Résumé de ce qui a été fait | Branches / PR |
 |------|--------|-----------------------------|---------------|
+| 2026-07-23 | Steve + agent | **Écran Profil** : compte connecté (« Connectée en tant que … »), **changement de mot de passe** (endpoint DRF authentifié `/api/auth/mot-de-passe` + validation Django ; formulaire avec confirmation) et bouton Déconnexion. Item de menu « Profil » activé (route `/profil`) ; `AuthStore` retient l'identifiant. `py_compile` + `ngc` 0 + i18n 258/258. | feat/profil |
 | 2026-07-23 | Steve + agent | **Authentification (JWT)** : login trésorière via `simplejwt` (`/api/auth/token` + refresh), endpoint `/graphql/` **protégé** (wrapper JWT, 401 sans jeton valide), commande `creer_tresoriere`. Frontend : écran `/login`, `AuthStore` (jeton persisté + contrôle d'expiration), lien Apollo `Authorization: Bearer`, garde de route, bouton Déconnexion, barre latérale masquée hors connexion. Compte unique, connexion requise pour tout. `py_compile` + `ngc` 0 + i18n 244/244 ; **test de connexion réel à faire en local** (lancer `creer_tresoriere`). | feat/authentification |
 | 2026-07-23 | Steve + agent | **Aide dynamique** : l'écran Aide lit les paramètres du cycle (`parametresCycle`) et affiche les **vrais** taux d'épargne et de majoration, le mois d'ouverture, la période de dépôt (premier→dernier mois) et le mois de remboursement, avec les pourcentages dégressifs calculés (taux × durée…). Réactif à la langue et au cycle ; plus aucun chiffre en dur dans le guide. `ngc` 0, i18n 236/236. | feat/aide-dynamique |
 | 2026-07-23 | Steve + agent | **Mois d'ouverture configurable** : `mois_debut` exposé et éditable (API `modifier_cycle` + select « Mois d'ouverture » dans Paramètres). Les libellés de mois deviennent **relatifs à l'ouverture** — clés `mois.*` re‑basées sur le calendrier (janvier→décembre), helper `moisCalendaire(position, moisDebut)` et pipe `moisNom`, appliqués à saisie, prêts, simulation, historique, fiche et au délai de remboursement. **Calcul inchangé** (positionnel) : 13/13 tests, aucun montant recalculé. `ngc` 0, i18n 236/236, `py_compile` OK. | feat/mois-ouverture |
@@ -145,6 +146,7 @@ gitGraph
 | 23 | Historique : recherche par nom + filtre Tout/Dépôts/Prêts | fait | feat/historique-recherche |
 | 24 | Mois d'ouverture configurable (libellés de mois relatifs à l'ouverture) | fait | feat/mois-ouverture |
 | 25 | Aide dynamique (refléter taux, mois d'ouverture, durées du cycle) | fait | feat/aide-dynamique |
+| 26 | Écran Profil (compte + changement de mot de passe + déconnexion) | fait | feat/profil |
 
 ## 9. Stack & conventions du projet
 - **Frontend** : Angular (PWA), TypeScript, Apollo GraphQL. Web d'abord ; mobile plus tard.

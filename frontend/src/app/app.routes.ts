@@ -10,6 +10,7 @@ import { Aide } from './features/aide/aide';
 import { Parametres } from './features/parametres/parametres';
 import { FicheMembrePage } from './features/fiche-membre/fiche-membre';
 import { Login } from './features/login/login';
+import { Profil } from './features/profil/profil';
 import { authGuard } from './core/auth/auth-guard';
 
 export const routes: Routes = [
@@ -24,5 +25,6 @@ export const routes: Routes = [
   { path: 'simulation', component: Simulation, canActivate: [authGuard] },
   { path: 'aide', component: Aide, canActivate: [authGuard] },
   { path: 'parametres', component: Parametres, canActivate: [authGuard] },
+  { path: 'profil', component: Profil, canActivate: [authGuard] },
   { path: 'membre/:id', component: FicheMembrePage, canActivate: [authGuard] },
 ];

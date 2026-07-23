@@ -56,6 +56,6 @@ export class App {
   protected readonly navBas: NavItem[] = [
     { label: 'nav.aide', icon: 'pi pi-question-circle', route: '/aide' },
     { label: 'nav.parametres', icon: 'pi pi-cog', route: '/parametres' },
-    { label: 'nav.profil', icon: 'pi pi-user', soon: true },
+    { label: 'nav.profil', icon: 'pi pi-user', route: '/profil' },
   ];
 }
