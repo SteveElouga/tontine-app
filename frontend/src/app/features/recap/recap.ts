@@ -31,8 +31,11 @@ export class Recap implements OnInit {
     return q ? rows.filter((m) => m.nom.toLowerCase().includes(q)) : rows;
   });
 
-  protected readonly totalEpargne = computed(() =>
-    this.membresFiltres().reduce((s, m) => s + Number(m.epargnePlusInterets), 0),
+  protected readonly totalDepose = computed(() =>
+    this.membresFiltres().reduce((s, m) => s + Number(m.totalDepose), 0),
+  );
+  protected readonly totalInterets = computed(() =>
+    this.membresFiltres().reduce((s, m) => s + Number(m.interets), 0),
   );
   protected readonly totalDettes = computed(() =>
     this.membresFiltres().reduce((s, m) => s + Number(m.dettes), 0),
