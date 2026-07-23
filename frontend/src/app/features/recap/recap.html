@@ -19,6 +19,35 @@
     </span>
   </div>
 
+  <div class="cloture">
+    <span class="lbl">Répartition des intérêts</span>
+    <p-select
+      [options]="optModes"
+      [ngModel]="mode()"
+      (ngModelChange)="changerMode($event)"
+      optionLabel="label"
+      optionValue="value"
+      [style]="{ 'min-width': '230px' }"
+    />
+    @if (mode() === 'reduction') {
+      <span class="nred">
+        retrancher
+        <p-inputnumber
+          [ngModel]="nMois()"
+          (ngModelChange)="setN($event)"
+          [inputStyle]="{ width: '56px', 'text-align': 'center' }"
+        />
+        mois
+        @if (infos(); as inf) {
+          <span class="sugg">· suggéré : {{ inf.reductionSuggeree }}</span>
+        }
+      </span>
+    }
+    @if (infos(); as inf) {
+      <span class="gains">Majorations encaissées : <strong>{{ format(inf.gains) }}</strong> FCFA</span>
+    }
+  </div>
+
   <div class="tableau-wrap">
     <table class="recap">
       <thead>

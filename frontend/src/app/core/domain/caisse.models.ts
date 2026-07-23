@@ -30,6 +30,13 @@ export interface RecapMembre {
   positionNette: string;
 }
 
+/** Contexte de clôture (pour le sélecteur de mode de répartition des intérêts). */
+export interface InfosCloture {
+  gains: string;
+  totalPromis: string;
+  reductionSuggeree: number;
+}
+
 export interface MembreMontant {
   id: string;
   nom: string;
