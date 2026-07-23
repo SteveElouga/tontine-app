@@ -66,6 +66,10 @@ export const FR = {
     confirmCloturer: "Clôturer l'année en cours ? Elle sera marquée comme terminée.",
     errCloture: 'Clôture impossible.',
     errCaisseNom: 'Le nom de la caisse est obligatoire.',
+    tipTauxEpargne: "Ce que rapporte un dépôt, par mois, jusqu'à la clôture.",
+    tipTauxMajo: "Ce qu'un prêt coûte en plus, par mois de retard.",
+    tipMoisOuverture: 'Le premier mois du cycle. Les autres mois se décalent en conséquence.',
+    tipRemboursement: 'Le dernier mois où un prêt peut être remboursé.',
   },
   commun: {
     chargement: 'Chargement…',
@@ -155,6 +159,11 @@ export const FR = {
     vide: 'Aucun membre trouvé.',
     total: 'Total',
     imprimer: 'Imprimer',
+    tipEpargne: 'Le total que le membre a déposé cette année.',
+    tipInterets: 'Ce que son épargne a rapporté, selon le mois de chaque dépôt.',
+    tipDette: "Ce qu'il doit encore à la caisse (prêt non remboursé).",
+    tipRecevoir: "Son épargne, plus ses intérêts, moins sa dette. C'est ce qu'il touche à la clôture.",
+    tipRecevoirCalc: 'Épargne {{e}} + intérêts {{i}} − dette {{d}}',
     mode: {
       complet: 'Intérêts complets',
       reduction: 'Réduction de mois',
@@ -238,6 +247,8 @@ export const FR = {
     errRemb: 'Enregistrement du remboursement impossible.',
     errChargeMembres: 'Chargement des membres impossible.',
     errChargePrets: 'Chargement des prêts impossible.',
+    tipMajoration: "La somme en plus à payer, qui grandit chaque mois tant que le prêt n'est pas remboursé.",
+    tipMajoCalc: 'Calculée sur {{n}} mois de dette.',
   },
   simulation: {
     titre: 'Simulation',
@@ -255,6 +266,7 @@ export const FR = {
     majoration: 'Majoration (5 % × mois)',
     totalRembourser: 'Total à rembourser',
     hint: 'Entrez un montant pour voir le résultat.',
+    tipTaux: 'Le pourcentage gagné à la clôture, selon le mois du dépôt.',
   },
   historique: {
     titre: 'Historique',
@@ -380,6 +392,10 @@ export const EN = {
     confirmCloturer: 'Close the current year? It will be marked as finished.',
     errCloture: 'Could not close.',
     errCaisseNom: 'The fund name is required.',
+    tipTauxEpargne: 'What a deposit earns, per month, until closing.',
+    tipTauxMajo: 'What a loan costs extra, per month of delay.',
+    tipMoisOuverture: 'The first month of the cycle. The other months shift accordingly.',
+    tipRemboursement: 'The last month a loan can be repaid.',
   },
   commun: {
     chargement: 'Loading…',
@@ -469,6 +485,11 @@ export const EN = {
     vide: 'No member found.',
     total: 'Total',
     imprimer: 'Print',
+    tipEpargne: 'The total the member has deposited this year.',
+    tipInterets: 'What their savings earned, based on the month of each deposit.',
+    tipDette: 'What they still owe the fund (an unpaid loan).',
+    tipRecevoir: "Their savings, plus interest, minus their debt. That's what they get at closing.",
+    tipRecevoirCalc: 'Savings {{e}} + interest {{i}} − debt {{d}}',
     mode: {
       complet: 'Full interest',
       reduction: 'Reduce months',
@@ -552,6 +573,8 @@ export const EN = {
     errRemb: 'Could not save the repayment.',
     errChargeMembres: 'Could not load members.',
     errChargePrets: 'Could not load loans.',
+    tipMajoration: 'The extra amount to pay, growing each month until the loan is repaid.',
+    tipMajoCalc: 'Based on {{n}} months of debt.',
   },
   simulation: {
     titre: 'Simulation',
@@ -569,6 +592,7 @@ export const EN = {
     majoration: 'Surcharge (5 % × months)',
     totalRembourser: 'Total to repay',
     hint: 'Enter an amount to see the result.',
+    tipTaux: 'The percentage earned at closing, based on the deposit month.',
   },
   historique: {
     titre: 'History',

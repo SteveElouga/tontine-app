@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { InputNumber } from 'primeng/inputnumber';
 import { Select } from 'primeng/select';
+import { Tooltip } from 'primeng/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
@@ -11,7 +12,7 @@ import { SimEpargne, SimPret, moisCalendaire } from '../../core/domain/caisse.mo
 
 @Component({
   selector: 'app-simulation',
-  imports: [FormsModule, InputNumber, Select, TranslatePipe],
+  imports: [FormsModule, InputNumber, Select, TranslatePipe, Tooltip],
   templateUrl: './simulation.html',
   styleUrl: './simulation.scss',
 })

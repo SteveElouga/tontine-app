@@ -35,7 +35,11 @@
     @if (epResultat(); as r) {
       <div class="res">
         <div class="ligne">
-          <span>{{ 'simulation.tauxCloture' | translate }}</span><span>{{ pct(r.taux) }}</span>
+          <span>
+            {{ 'simulation.tauxCloture' | translate }}
+            <i class="pi pi-info-circle tip" [pTooltip]="'simulation.tipTaux' | translate" tooltipPosition="top"></i>
+          </span>
+          <span>{{ pct(r.taux) }}</span>
         </div>
         <div class="ligne">
           <span>{{ 'simulation.interet' | translate }}</span><span class="vert">+{{ fmt(r.interet) }}</span>
