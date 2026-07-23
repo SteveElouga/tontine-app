@@ -18,6 +18,7 @@ export class TourService {
     return driver({
       showProgress: true,
       progressText: '{{current}} / {{total}}',
+      popoverClass: 'tontine-tour',
       nextBtnText: t('tour.suivant'),
       prevBtnText: t('tour.precedent'),
       doneBtnText: t('tour.terminer'),
