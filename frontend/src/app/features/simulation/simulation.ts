@@ -7,7 +7,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
 import { LangStore } from '../../core/state/lang-store';
-import { SimEpargne, SimPret } from '../../core/domain/caisse.models';
+import { SimEpargne, SimPret, moisCalendaire } from '../../core/domain/caisse.models';
 
 @Component({
   selector: 'app-simulation',
@@ -23,8 +23,9 @@ export class Simulation {
 
   protected readonly optMoisDepot = computed(() => {
     this.lang.langue();
+    const debut = this.cycleStore.moisDebut();
     return [1, 2, 3, 4, 5, 6, 7, 8, 9].map((mi) => ({
-      label: this.i18n.instant('mois.' + mi),
+      label: this.i18n.instant('mois.' + moisCalendaire(mi, debut)),
       value: mi,
     }));
   });
@@ -43,9 +44,10 @@ export class Simulation {
 
   /** Mois de remboursement possibles (après le mois du prêt). */
   protected optMoisRemb(): { label: string; value: number }[] {
+    const debut = this.cycleStore.moisDebut();
     return this.moisTous
       .filter((mi) => mi > this.prMois())
-      .map((mi) => ({ label: this.i18n.instant('mois.' + mi), value: mi }));
+      .map((mi) => ({ label: this.i18n.instant('mois.' + moisCalendaire(mi, debut)), value: mi }));
   }
 
   calculerEpargne(): void {

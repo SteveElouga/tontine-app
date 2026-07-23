@@ -46,12 +46,12 @@
             {{ (op.type === 'depot' ? 'historique.aDepose' : 'historique.aEmprunte') | translate }}
           </span>
           <span class="l2">
-            {{ 'mois.' + op.mois | translate }},
+            {{ op.mois | moisNom }},
             {{ 'historique.saisiLe' | translate: { date: date(op.date) } }}
             @if (op.type === 'pret') {
               @if (op.rembourse) {
                 <span class="badge ok">
-                  {{ 'historique.rembourseEn' | translate: { mois: ('mois.' + (op.moisRemboursement ?? 12) | translate) } }}
+                  {{ 'historique.rembourseEn' | translate: { mois: ((op.moisRemboursement ?? 12) | moisNom) } }}
                 </span>
               } @else {
                 <span class="badge attente">{{ 'historique.enCours' | translate }}</span>

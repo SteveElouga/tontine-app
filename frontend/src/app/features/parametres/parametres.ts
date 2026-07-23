@@ -11,7 +11,7 @@ import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
 import { ThemeStore } from '../../core/state/theme-store';
 import { LangStore, Langue } from '../../core/state/lang-store';
-import { ParametresCycle } from '../../core/domain/caisse.models';
+import { ParametresCycle, moisCalendaire } from '../../core/domain/caisse.models';
 
 @Component({
   selector: 'app-parametres',
@@ -49,6 +49,7 @@ export class Parametres implements OnInit {
 
   // Règles du cycle
   protected readonly libelle = signal('');
+  protected readonly moisDebut = signal(9);
   protected readonly tauxEpargnePct = signal(5);
   protected readonly tauxMajoPct = signal(5);
   protected readonly dureeDepot = signal(9);
@@ -57,13 +58,21 @@ export class Parametres implements OnInit {
   // Nouvelle année
   protected readonly nouveauLibelle = signal('');
 
+  protected readonly optMoisDebut = computed(() => {
+    this.lang.langue();
+    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((m) => ({
+      label: this.i18n.instant('mois.' + m),
+      value: m,
+    }));
+  });
+
   protected readonly optDelai = computed(() => {
     this.lang.langue();
-    return [
-      { label: this.i18n.instant('mois.10'), value: 10 },
-      { label: this.i18n.instant('mois.11'), value: 11 },
-      { label: this.i18n.instant('mois.12'), value: 12 },
-    ];
+    const debut = this.moisDebut();
+    return [10, 11, 12].map((mi) => ({
+      label: this.i18n.instant('mois.' + moisCalendaire(mi, debut)),
+      value: mi,
+    }));
   });
 
   ngOnInit(): void {
@@ -77,6 +86,7 @@ export class Parametres implements OnInit {
         this.params.set(p);
         this.caisseNom.set(p.caisseNom);
         this.libelle.set(p.libelle);
+        this.moisDebut.set(p.moisDebut);
         this.tauxEpargnePct.set(Math.round(Number(p.tauxEpargne) * 100));
         this.tauxMajoPct.set(Math.round(Number(p.tauxMajoration) * 100));
         this.dureeDepot.set(p.dureeDepot);
@@ -100,6 +110,7 @@ export class Parametres implements OnInit {
       .modifierCycle(
         this.cycleStore.cycleId(),
         lib,
+        this.moisDebut(),
         this.dureeDepot(),
         this.moisDelai(),
         this.tauxEpargnePct() / 100,

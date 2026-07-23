@@ -20,6 +20,17 @@
         />
       </label>
       <label>
+        <span>{{ 'param.moisOuverture' | translate }}</span>
+        <p-select
+          [options]="optMoisDebut()"
+          [ngModel]="moisDebut()"
+          (ngModelChange)="moisDebut.set($event)"
+          optionLabel="label"
+          optionValue="value"
+          [style]="{ width: '150px' }"
+        />
+      </label>
+      <label>
         <span>{{ 'param.tauxEpargne' | translate }}</span>
         <p-inputnumber
           [ngModel]="tauxEpargnePct()"

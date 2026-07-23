@@ -4,11 +4,12 @@ import { TranslatePipe } from '@ngx-translate/core';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
+import { MoisNomPipe } from '../../core/i18n/mois.pipe';
 import { FicheMembre } from '../../core/domain/caisse.models';
 
 @Component({
   selector: 'app-fiche-membre',
-  imports: [RouterLink, TranslatePipe],
+  imports: [RouterLink, TranslatePipe, MoisNomPipe],
   templateUrl: './fiche-membre.html',
   styleUrl: './fiche-membre.scss',
 })
