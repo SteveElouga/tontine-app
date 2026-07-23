@@ -100,3 +100,17 @@ export interface Operation {
   rembourse: boolean;
   moisRemboursement: number | null;
 }
+
+/** Résultat d'une simulation d'épargne. */
+export interface SimEpargne {
+  taux: string;
+  interet: string;
+  total: string;
+}
+
+/** Résultat d'une simulation de prêt. */
+export interface SimPret {
+  moisDeDette: number;
+  majoration: string;
+  total: string;
+}
