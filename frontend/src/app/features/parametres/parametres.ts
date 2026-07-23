@@ -1,20 +1,21 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { InputNumber } from 'primeng/inputnumber';
 import { Select } from 'primeng/select';
 import { Button } from 'primeng/button';
 import { SelectButton } from 'primeng/selectbutton';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
 import { ThemeStore } from '../../core/state/theme-store';
 import { LangStore, Langue } from '../../core/state/lang-store';
-import { MOIS, ParametresCycle } from '../../core/domain/caisse.models';
+import { ParametresCycle } from '../../core/domain/caisse.models';
 
 @Component({
   selector: 'app-parametres',
-  imports: [FormsModule, InputNumber, Select, Button, SelectButton],
+  imports: [FormsModule, InputNumber, Select, Button, SelectButton, TranslatePipe],
   templateUrl: './parametres.html',
   styleUrl: './parametres.scss',
 })
@@ -22,9 +23,11 @@ export class Parametres implements OnInit {
   private readonly caisse = inject(CaisseService);
   private readonly cycleStore = inject(CycleStore);
   private readonly toast = inject(MessageService);
+  private readonly i18n = inject(TranslateService);
   protected readonly theme = inject(ThemeStore);
   protected readonly lang = inject(LangStore);
 
+  // Les noms de langue restent dans leur propre langue (endonymes).
   protected readonly optLangue: { label: string; value: Langue }[] = [
     { label: 'Français', value: 'fr' },
     { label: 'English', value: 'en' },
@@ -36,10 +39,13 @@ export class Parametres implements OnInit {
   // La caisse
   protected readonly caisseNom = signal('');
 
-  protected readonly optTheme = [
-    { label: 'Clair', value: false },
-    { label: 'Sombre', value: true },
-  ];
+  protected readonly optTheme = computed(() => {
+    this.lang.langue();
+    return [
+      { label: this.i18n.instant('param.themeClair'), value: false },
+      { label: this.i18n.instant('param.themeSombre'), value: true },
+    ];
+  });
 
   // Règles du cycle
   protected readonly libelle = signal('');
@@ -51,11 +57,14 @@ export class Parametres implements OnInit {
   // Nouvelle année
   protected readonly nouveauLibelle = signal('');
 
-  protected readonly optDelai = [
-    { label: MOIS[10], value: 10 },
-    { label: MOIS[11], value: 11 },
-    { label: MOIS[12], value: 12 },
-  ];
+  protected readonly optDelai = computed(() => {
+    this.lang.langue();
+    return [
+      { label: this.i18n.instant('mois.10'), value: 10 },
+      { label: this.i18n.instant('mois.11'), value: 11 },
+      { label: this.i18n.instant('mois.12'), value: 12 },
+    ];
+  });
 
   ngOnInit(): void {
     this.charger();
@@ -76,7 +85,7 @@ export class Parametres implements OnInit {
       },
       error: () => {
         this.chargement.set(false);
-        this.erreur('Chargement impossible.');
+        this.erreur(this.i18n.instant('param.errCharge'));
       },
     });
   }
@@ -84,7 +93,7 @@ export class Parametres implements OnInit {
   enregistrer(): void {
     const lib = this.libelle().trim();
     if (!lib) {
-      this.erreur('Le nom du cycle est obligatoire.');
+      this.erreur(this.i18n.instant('param.errLibObligatoire'));
       return;
     }
     this.caisse
@@ -102,19 +111,19 @@ export class Parametres implements OnInit {
           this.cycleStore.charger();
           this.toast.add({
             severity: 'success',
-            summary: 'Règles enregistrées',
+            summary: this.i18n.instant('param.okRegles'),
             detail: p.libelle,
             life: 2500,
           });
         },
-        error: () => this.erreur('Enregistrement impossible.'),
+        error: () => this.erreur(this.i18n.instant('param.errEnr')),
       });
   }
 
   creer(): void {
     const lib = this.nouveauLibelle().trim();
     if (!lib) {
-      this.erreur('Donnez un nom à la nouvelle année.');
+      this.erreur(this.i18n.instant('param.errNouvNom'));
       return;
     }
     this.caisse.creerCycle(this.cycleStore.cycleId(), lib).subscribe({
@@ -123,36 +132,36 @@ export class Parametres implements OnInit {
         this.cycleStore.charger();
         this.toast.add({
           severity: 'success',
-          summary: 'Nouvelle année créée',
-          detail: `${p.libelle}. Sélectionnez-la à gauche pour la remplir.`,
+          summary: this.i18n.instant('param.okNouvelle'),
+          detail: this.i18n.instant('param.okNouvelleDetail', { lib: p.libelle }),
           life: 3500,
         });
       },
-      error: () => this.erreur("Impossible de créer l'année (ce nom existe peut-être déjà)."),
+      error: () => this.erreur(this.i18n.instant('param.errCreer')),
     });
   }
 
   cloturer(): void {
-    if (!confirm("Clôturer l'année en cours ? Elle sera marquée comme terminée.")) return;
+    if (!confirm(this.i18n.instant('param.confirmCloturer'))) return;
     this.caisse.cloturerCycle(this.cycleStore.cycleId()).subscribe({
       next: (p) => {
         this.params.set(p);
         this.cycleStore.charger();
         this.toast.add({
           severity: 'success',
-          summary: 'Année clôturée',
+          summary: this.i18n.instant('param.okCloture'),
           detail: p.libelle,
           life: 2500,
         });
       },
-      error: () => this.erreur('Clôture impossible.'),
+      error: () => this.erreur(this.i18n.instant('param.errCloture')),
     });
   }
 
   enregistrerCaisse(): void {
     const nom = this.caisseNom().trim();
     if (!nom) {
-      this.erreur('Le nom de la caisse est obligatoire.');
+      this.erreur(this.i18n.instant('param.errCaisseNom'));
       return;
     }
     this.caisse.renommerCaisse(this.cycleStore.cycleId(), nom).subscribe({
@@ -161,16 +170,16 @@ export class Parametres implements OnInit {
         this.cycleStore.charger();
         this.toast.add({
           severity: 'success',
-          summary: 'Caisse renommée',
+          summary: this.i18n.instant('param.okCaisse'),
           detail: p.caisseNom,
           life: 2500,
         });
       },
-      error: () => this.erreur('Enregistrement impossible.'),
+      error: () => this.erreur(this.i18n.instant('param.errEnr')),
     });
   }
 
   private erreur(detail: string): void {
-    this.toast.add({ severity: 'error', summary: 'Action impossible', detail });
+    this.toast.add({ severity: 'error', summary: this.i18n.instant('param.errTitre'), detail });
   }
 }

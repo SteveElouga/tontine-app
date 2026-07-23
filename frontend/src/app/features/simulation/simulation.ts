@@ -1,27 +1,33 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { InputNumber } from 'primeng/inputnumber';
 import { Select } from 'primeng/select';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
-import { MOIS, SimEpargne, SimPret } from '../../core/domain/caisse.models';
+import { LangStore } from '../../core/state/lang-store';
+import { SimEpargne, SimPret } from '../../core/domain/caisse.models';
 
 @Component({
   selector: 'app-simulation',
-  imports: [FormsModule, InputNumber, Select],
+  imports: [FormsModule, InputNumber, Select, TranslatePipe],
   templateUrl: './simulation.html',
   styleUrl: './simulation.scss',
 })
 export class Simulation {
   private readonly caisse = inject(CaisseService);
   private readonly cycleStore = inject(CycleStore);
+  private readonly i18n = inject(TranslateService);
+  private readonly lang = inject(LangStore);
 
-  protected readonly MOIS = MOIS;
-  protected readonly optMoisDepot = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((mi) => ({
-    label: MOIS[mi],
-    value: mi,
-  }));
+  protected readonly optMoisDepot = computed(() => {
+    this.lang.langue();
+    return [1, 2, 3, 4, 5, 6, 7, 8, 9].map((mi) => ({
+      label: this.i18n.instant('mois.' + mi),
+      value: mi,
+    }));
+  });
   private readonly moisTous = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
   // Volet Épargne
@@ -39,7 +45,7 @@ export class Simulation {
   protected optMoisRemb(): { label: string; value: number }[] {
     return this.moisTous
       .filter((mi) => mi > this.prMois())
-      .map((mi) => ({ label: MOIS[mi], value: mi }));
+      .map((mi) => ({ label: this.i18n.instant('mois.' + mi), value: mi }));
   }
 
   calculerEpargne(): void {

@@ -1,6 +1,6 @@
 <header class="entete">
-  <h1>Prêts</h1>
-  <p class="sub">Caisse mutuelle, cycle 2025-2026.</p>
+  <h1>{{ 'prets.titre' | translate }}</h1>
+  <p class="sub">{{ 'prets.sous' | translate }}</p>
 </header>
 
 <div class="ajout">
@@ -10,7 +10,7 @@
     (ngModelChange)="nMembre.set($event)"
     optionLabel="label"
     optionValue="value"
-    placeholder="Choisir un membre…"
+    [placeholder]="'prets.choisirMembre' | translate"
     [filter]="true"
     filterBy="label"
     [style]="{ 'min-width': '220px' }"
@@ -22,37 +22,37 @@
     [maxFractionDigits]="0"
     [useGrouping]="true"
     locale="fr-FR"
-    placeholder="Montant"
+    [placeholder]="'prets.montant' | translate"
     [inputStyle]="{ width: '150px', 'text-align': 'right' }"
   />
   <span class="unite">FCFA</span>
 
   <p-select
-    [options]="optMoisPret"
+    [options]="optMoisPret()"
     [ngModel]="nMois()"
     (ngModelChange)="nMois.set($event)"
     optionLabel="label"
     optionValue="value"
-    placeholder="Choisir le mois…"
+    [placeholder]="'prets.choisirMois' | translate"
     [style]="{ 'min-width': '160px' }"
   />
 
-  <p-button label="Ajouter le prêt" icon="pi pi-plus" (onClick)="ajouter()" />
+  <p-button [label]="'prets.ajouterPret' | translate" icon="pi pi-plus" (onClick)="ajouter()" />
 </div>
 
 @if (chargement()) {
-  <p class="muted">Chargement…</p>
+  <p class="muted">{{ 'commun.chargement' | translate }}</p>
 } @else {
   <table class="prets">
     <thead>
       <tr>
-        <th class="g">Membre</th>
-        <th class="d">Montant</th>
-        <th class="c">Prêt</th>
-        <th class="d">Mois de dette</th>
-        <th class="d">Majoration</th>
-        <th class="d">À rembourser</th>
-        <th class="a">Statut</th>
+        <th class="g">{{ 'prets.colMembre' | translate }}</th>
+        <th class="d">{{ 'prets.colMontant' | translate }}</th>
+        <th class="c">{{ 'prets.colPret' | translate }}</th>
+        <th class="d">{{ 'prets.colMoisDette' | translate }}</th>
+        <th class="d">{{ 'prets.colMajoration' | translate }}</th>
+        <th class="d">{{ 'prets.colARembourser' | translate }}</th>
+        <th class="a">{{ 'prets.colStatut' | translate }}</th>
       </tr>
     </thead>
     <tbody>
@@ -60,14 +60,15 @@
         <tr>
           <td class="g">{{ p.nom }}</td>
           <td class="d">{{ format(p.montant) }}</td>
-          <td class="c">{{ MOIS[p.moisPret] }}</td>
+          <td class="c">{{ 'mois.' + p.moisPret | translate }}</td>
           <td class="d">{{ p.moisDeDette }}</td>
           <td class="d rouge">+{{ format(p.majoration) }}</td>
           <td class="d fort">{{ format(p.totalARembourser) }}</td>
           <td class="a">
             @if (p.rembourse) {
               <span class="badge ok">
-                <i class="pi pi-check-circle"></i> Remboursé en {{ MOIS[p.moisRemboursement ?? 12] }}
+                <i class="pi pi-check-circle"></i>
+                {{ 'prets.rembourseEn' | translate: { mois: ('mois.' + (p.moisRemboursement ?? 12) | translate) } }}
               </span>
             } @else if (remboursementDe() === p.id) {
               <span class="remb">
@@ -79,30 +80,30 @@
                   optionValue="value"
                   [style]="{ 'min-width': '150px' }"
                 />
-                <button type="button" class="mini-btn ok" (click)="valider(p)" aria-label="Valider">
+                <button type="button" class="mini-btn ok" (click)="valider(p)" [attr.aria-label]="'prets.valider' | translate">
                   <i class="pi pi-check"></i>
                 </button>
-                <button type="button" class="mini-btn" (click)="annuler()" aria-label="Annuler">
+                <button type="button" class="mini-btn" (click)="annuler()" [attr.aria-label]="'prets.annuler' | translate">
                   <i class="pi pi-times"></i>
                 </button>
               </span>
             } @else {
               <button type="button" class="lien" (click)="ouvrirRemboursement(p)">
-                Marquer remboursé
+                {{ 'prets.marquerRembourse' | translate }}
               </button>
             }
           </td>
         </tr>
       } @empty {
         <tr>
-          <td colspan="7" class="muted centre">Aucun prêt enregistré pour l'instant.</td>
+          <td colspan="7" class="muted centre">{{ 'prets.vide' | translate }}</td>
         </tr>
       }
     </tbody>
     @if (prets().length) {
       <tfoot>
         <tr>
-          <td class="g fort">Total</td>
+          <td class="g fort">{{ 'prets.total' | translate }}</td>
           <td class="d fort">{{ format(totalPrete()) }}</td>
           <td class="c"></td>
           <td class="d"></td>
@@ -116,9 +117,6 @@
 
   <div class="astuce">
     <i class="pi pi-info-circle"></i>
-    <span>
-      Chaque mois sans rembourser ajoute 5 % à payer, jusqu'au remboursement (au plus tard en
-      août). Le calcul se fait tout seul.
-    </span>
+    <span>{{ 'prets.astuce' | translate }}</span>
   </div>
 }

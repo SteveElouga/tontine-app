@@ -1,14 +1,14 @@
 <header class="entete">
-  <h1>Simulation</h1>
-  <p class="sub">Voyez ce que rapporterait un dépôt, ou ce que coûterait un prêt. C'est le même calcul que la vraie caisse.</p>
+  <h1>{{ 'simulation.titre' | translate }}</h1>
+  <p class="sub">{{ 'simulation.sous' | translate }}</p>
 </header>
 
 <div class="cartes">
   <section class="carte">
-    <h2><i class="pi pi-wallet"></i> Épargne</h2>
+    <h2><i class="pi pi-wallet"></i> {{ 'simulation.epargne' | translate }}</h2>
     <div class="champs">
       <label>
-        <span>Montant</span>
+        <span>{{ 'simulation.montant' | translate }}</span>
         <p-inputnumber
           [ngModel]="epMontant()"
           (ngModelChange)="epMontant.set($event); calculerEpargne()"
@@ -21,9 +21,9 @@
         />
       </label>
       <label>
-        <span>Mois du dépôt</span>
+        <span>{{ 'simulation.moisDepot' | translate }}</span>
         <p-select
-          [options]="optMoisDepot"
+          [options]="optMoisDepot()"
           [ngModel]="epMois()"
           (ngModelChange)="epMois.set($event); calculerEpargne()"
           optionLabel="label"
@@ -34,20 +34,26 @@
     </div>
     @if (epResultat(); as r) {
       <div class="res">
-        <div class="ligne"><span>Taux à la clôture</span><span>{{ pct(r.taux) }}</span></div>
-        <div class="ligne"><span>Intérêt</span><span class="vert">+{{ fmt(r.interet) }}</span></div>
-        <div class="ligne fort"><span>Total à la clôture</span><span>{{ fmt(r.total) }} FCFA</span></div>
+        <div class="ligne">
+          <span>{{ 'simulation.tauxCloture' | translate }}</span><span>{{ pct(r.taux) }}</span>
+        </div>
+        <div class="ligne">
+          <span>{{ 'simulation.interet' | translate }}</span><span class="vert">+{{ fmt(r.interet) }}</span>
+        </div>
+        <div class="ligne fort">
+          <span>{{ 'simulation.totalCloture' | translate }}</span><span>{{ fmt(r.total) }} FCFA</span>
+        </div>
       </div>
     } @else {
-      <p class="hint">Entrez un montant pour voir le résultat.</p>
+      <p class="hint">{{ 'simulation.hint' | translate }}</p>
     }
   </section>
 
   <section class="carte">
-    <h2><i class="pi pi-money-bill"></i> Prêt</h2>
+    <h2><i class="pi pi-money-bill"></i> {{ 'simulation.pret' | translate }}</h2>
     <div class="champs">
       <label>
-        <span>Montant</span>
+        <span>{{ 'simulation.montant' | translate }}</span>
         <p-inputnumber
           [ngModel]="prMontant()"
           (ngModelChange)="prMontant.set($event); calculerPret()"
@@ -60,9 +66,9 @@
         />
       </label>
       <label>
-        <span>Mois du prêt</span>
+        <span>{{ 'simulation.moisPret' | translate }}</span>
         <p-select
-          [options]="optMoisDepot"
+          [options]="optMoisDepot()"
           [ngModel]="prMois()"
           (ngModelChange)="prMois.set($event); calculerPret()"
           optionLabel="label"
@@ -71,7 +77,7 @@
         />
       </label>
       <label>
-        <span>Remboursement</span>
+        <span>{{ 'simulation.remboursement' | translate }}</span>
         <p-select
           [options]="optMoisRemb()"
           [ngModel]="prRemb()"
@@ -84,14 +90,18 @@
     </div>
     @if (prResultat(); as r) {
       <div class="res">
-        <div class="ligne"><span>Mois de dette</span><span>{{ r.moisDeDette }}</span></div>
         <div class="ligne">
-          <span>Majoration (5 % × mois)</span><span class="rouge">+{{ fmt(r.majoration) }}</span>
+          <span>{{ 'simulation.moisDette' | translate }}</span><span>{{ r.moisDeDette }}</span>
         </div>
-        <div class="ligne fort"><span>Total à rembourser</span><span>{{ fmt(r.total) }} FCFA</span></div>
+        <div class="ligne">
+          <span>{{ 'simulation.majoration' | translate }}</span><span class="rouge">+{{ fmt(r.majoration) }}</span>
+        </div>
+        <div class="ligne fort">
+          <span>{{ 'simulation.totalRembourser' | translate }}</span><span>{{ fmt(r.total) }} FCFA</span>
+        </div>
       </div>
     } @else {
-      <p class="hint">Entrez un montant pour voir le résultat.</p>
+      <p class="hint">{{ 'simulation.hint' | translate }}</p>
     }
   </section>
 </div>

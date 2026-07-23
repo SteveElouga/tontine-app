@@ -4,14 +4,16 @@ import { MessageService } from 'primeng/api';
 import { InputNumber } from 'primeng/inputnumber';
 import { Button } from 'primeng/button';
 import { Select } from 'primeng/select';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
-import { MOIS, Membre, Pret } from '../../core/domain/caisse.models';
+import { LangStore } from '../../core/state/lang-store';
+import { Membre, Pret } from '../../core/domain/caisse.models';
 
 @Component({
   selector: 'app-prets',
-  imports: [FormsModule, InputNumber, Button, Select],
+  imports: [FormsModule, InputNumber, Button, Select, TranslatePipe],
   templateUrl: './prets.html',
   styleUrl: './prets.scss',
 })
@@ -19,13 +21,17 @@ export class Prets implements OnInit {
   private readonly caisse = inject(CaisseService);
   private readonly cycleStore = inject(CycleStore);
   private readonly toast = inject(MessageService);
+  private readonly i18n = inject(TranslateService);
+  private readonly lang = inject(LangStore);
 
-  protected readonly MOIS = MOIS;
   private readonly moisRembTous = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-  protected readonly optMoisPret = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((mi) => ({
-    label: MOIS[mi],
-    value: mi,
-  }));
+  protected readonly optMoisPret = computed(() => {
+    this.lang.langue();
+    return [1, 2, 3, 4, 5, 6, 7, 8, 9].map((mi) => ({
+      label: this.i18n.instant('mois.' + mi),
+      value: mi,
+    }));
+  });
 
   protected readonly prets = signal<Pret[]>([]);
   protected readonly membres = signal<Membre[]>([]);
@@ -56,7 +62,7 @@ export class Prets implements OnInit {
   ngOnInit(): void {
     this.caisse.membres(this.cycleStore.cycleId()).subscribe({
       next: (m) => this.membres.set(m),
-      error: () => this.erreur('Chargement des membres impossible.'),
+      error: () => this.erreur(this.i18n.instant('prets.errChargeMembres')),
     });
     this.caisse.pretsCycle(this.cycleStore.cycleId()).subscribe({
       next: (p) => {
@@ -65,7 +71,7 @@ export class Prets implements OnInit {
       },
       error: () => {
         this.chargement.set(false);
-        this.erreur('Chargement des prêts impossible.');
+        this.erreur(this.i18n.instant('prets.errChargePrets'));
       },
     });
   }
@@ -75,7 +81,7 @@ export class Prets implements OnInit {
     const montant = this.nMontant();
     const mois = this.nMois();
     if (!membreId || !montant || montant <= 0 || mois == null) {
-      this.erreur('Choisis un membre, un montant et un mois.');
+      this.erreur(this.i18n.instant('prets.errChamps'));
       return;
     }
     this.caisse.ajouterPret(this.cycleStore.cycleId(), membreId, montant, mois).subscribe({
@@ -85,12 +91,12 @@ export class Prets implements OnInit {
         this.nMontant.set(null);
         this.toast.add({
           severity: 'success',
-          summary: 'Prêt enregistré',
+          summary: this.i18n.instant('prets.okPret'),
           detail: `${p.nom}, ${this.format(p.montant)} FCFA`,
           life: 2500,
         });
       },
-      error: () => this.erreur('Enregistrement impossible.'),
+      error: () => this.erreur(this.i18n.instant('prets.errAjout')),
     });
   }
 
@@ -107,13 +113,13 @@ export class Prets implements OnInit {
   optMoisRemb(moisPret: number): { label: string; value: number }[] {
     return this.moisRembTous
       .filter((mi) => mi >= moisPret)
-      .map((mi) => ({ label: MOIS[mi], value: mi }));
+      .map((mi) => ({ label: this.i18n.instant('mois.' + mi), value: mi }));
   }
 
   valider(p: Pret): void {
     const mois = this.moisRemb();
     if (mois < p.moisPret) {
-      this.erreur('Le remboursement ne peut pas précéder le prêt.');
+      this.erreur(this.i18n.instant('prets.errAvantPret'));
       return;
     }
     this.caisse.rembourserPret(p.id, mois).subscribe({
@@ -122,17 +128,20 @@ export class Prets implements OnInit {
         this.remboursementDe.set(null);
         this.toast.add({
           severity: 'success',
-          summary: 'Remboursement enregistré',
-          detail: `${maj.nom}, remboursé en ${MOIS[mois]}`,
+          summary: this.i18n.instant('prets.okRemb'),
+          detail: this.i18n.instant('prets.okRembDetail', {
+            nom: maj.nom,
+            mois: this.i18n.instant('mois.' + mois),
+          }),
           life: 2500,
         });
       },
-      error: () => this.erreur('Enregistrement du remboursement impossible.'),
+      error: () => this.erreur(this.i18n.instant('prets.errRemb')),
     });
   }
 
   private erreur(detail: string): void {
-    this.toast.add({ severity: 'error', summary: 'Action impossible', detail });
+    this.toast.add({ severity: 'error', summary: this.i18n.instant('prets.errTitre'), detail });
   }
 
   protected readonly format = (v: string | number): string => Number(v).toLocaleString('fr-FR');

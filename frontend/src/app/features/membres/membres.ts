@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { Button } from 'primeng/button';
 import { MessageService } from 'primeng/api';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
@@ -8,7 +9,7 @@ import { Membre } from '../../core/domain/caisse.models';
 
 @Component({
   selector: 'app-membres',
-  imports: [Button],
+  imports: [Button, TranslatePipe],
   templateUrl: './membres.html',
   styleUrl: './membres.scss',
 })
@@ -16,6 +17,7 @@ export class Membres implements OnInit {
   private readonly caisse = inject(CaisseService);
   private readonly cycleStore = inject(CycleStore);
   private readonly toast = inject(MessageService);
+  private readonly i18n = inject(TranslateService);
 
   protected readonly membres = signal<Membre[]>([]);
   protected readonly chargement = signal(true);
@@ -30,7 +32,12 @@ export class Membres implements OnInit {
     this.caisse.ajouterMembre(this.cycleStore.cycleId(), n, telephone.trim()).subscribe({
       next: (m) => {
         this.membres.update((l) => [...l, m]);
-        this.toast.add({ severity: 'success', summary: 'Membre ajouté', detail: m.nom, life: 2500 });
+        this.toast.add({
+          severity: 'success',
+          summary: this.i18n.instant('membres.okAjoute'),
+          detail: m.nom,
+          life: 2500,
+        });
       },
       error: () => this.erreur(),
     });
@@ -42,18 +49,28 @@ export class Membres implements OnInit {
     this.caisse.renommerMembre(m.id, n).subscribe({
       next: () => {
         m.nom = n;
-        this.toast.add({ severity: 'success', summary: 'Nom mis à jour', detail: n, life: 2000 });
+        this.toast.add({
+          severity: 'success',
+          summary: this.i18n.instant('membres.okNom'),
+          detail: n,
+          life: 2000,
+        });
       },
       error: () => this.erreur(),
     });
   }
 
   retirer(m: Membre): void {
-    if (!confirm(`Retirer ${m.nom} ? Ses dépôts et son historique sont conservés.`)) return;
+    if (!confirm(this.i18n.instant('membres.confirmRetirer', { nom: m.nom }))) return;
     this.caisse.retirerMembre(m.id).subscribe({
       next: () => {
         this.membres.update((l) => l.filter((x) => x.id !== m.id));
-        this.toast.add({ severity: 'success', summary: 'Membre retiré', detail: m.nom, life: 2500 });
+        this.toast.add({
+          severity: 'success',
+          summary: this.i18n.instant('membres.okRetire'),
+          detail: m.nom,
+          life: 2500,
+        });
       },
       error: () => this.erreur(),
     });
@@ -74,6 +91,10 @@ export class Membres implements OnInit {
   }
 
   private erreur(): void {
-    this.toast.add({ severity: 'error', summary: 'Action impossible', detail: 'Réessayez.' });
+    this.toast.add({
+      severity: 'error',
+      summary: this.i18n.instant('membres.errTitre'),
+      detail: this.i18n.instant('membres.reessayez'),
+    });
   }
 }

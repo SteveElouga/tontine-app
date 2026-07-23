@@ -1,28 +1,28 @@
 <header class="entete">
-  <h1>Tableau de bord</h1>
-  <p class="sub">Caisse mutuelle, cycle 2025-2026, {{ nbMembres() }} membres.</p>
+  <h1>{{ 'tdb.titre' | translate }}</h1>
+  <p class="sub">{{ 'tdb.sous' | translate: { n: nbMembres() } }}</p>
 </header>
 
 <div class="cartes">
   <div class="carte">
-    <div class="lbl">Épargne déposée</div>
+    <div class="lbl">{{ 'tdb.epargne' | translate }}</div>
     <div class="val">{{ format(epargne()) }}</div>
     <div class="unit">FCFA</div>
   </div>
   <div class="carte">
-    <div class="lbl">Intérêts à ce jour</div>
+    <div class="lbl">{{ 'tdb.interets' | translate }}</div>
     <div class="val">{{ format(interets()) }}</div>
     <div class="unit">FCFA</div>
   </div>
   <div class="carte">
-    <div class="lbl">À reverser à la clôture</div>
+    <div class="lbl">{{ 'tdb.areverser' | translate }}</div>
     <div class="val">{{ format(aReverser()) }}</div>
     <div class="unit">FCFA</div>
   </div>
   <div class="carte">
-    <div class="lbl">Prêts en cours</div>
+    <div class="lbl">{{ 'tdb.pretsEnCours' | translate }}</div>
     <div class="val">{{ pretsEnCours() }}</div>
-    <div class="unit">membre(s) à rembourser</div>
+    <div class="unit">{{ 'tdb.aRembourser' | translate }}</div>
   </div>
 </div>
 
@@ -30,16 +30,16 @@
   <a class="raccourci primaire" routerLink="/saisie">
     <i class="pi pi-pencil"></i>
     <span class="txt">
-      <span class="t">Saisir les dépôts</span>
-      <span class="s">Enregistrer les versements du mois</span>
+      <span class="t">{{ 'tdb.saisirTitre' | translate }}</span>
+      <span class="s">{{ 'tdb.saisirSous' | translate }}</span>
     </span>
     <i class="pi pi-chevron-right fl"></i>
   </a>
   <a class="raccourci" routerLink="/recapitulatif">
     <i class="pi pi-list"></i>
     <span class="txt">
-      <span class="t">Voir le récapitulatif</span>
-      <span class="s">Ce que chaque membre recevra à la clôture</span>
+      <span class="t">{{ 'tdb.recapTitre' | translate }}</span>
+      <span class="s">{{ 'tdb.recapSous' | translate }}</span>
     </span>
     <i class="pi pi-chevron-right fl"></i>
   </a>

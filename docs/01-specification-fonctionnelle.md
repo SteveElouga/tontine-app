@@ -133,7 +133,7 @@ Un **sélecteur de cycle** (barre latérale) permet de changer le cycle courant.
 - Accès en consultation pour les membres (comptes individuels).
 - Intégration Mobile Money (MTN MoMo / Orange Money) — *les fonds restent hors app.*
 - Multi-caisses / multi-tontines par utilisateur.
-- Version anglophone (njangi) et langues locales.
+- Langues locales camerounaises (le français et l'anglais sont déjà disponibles).
 - Gestion des amendes/retards, enchères (« tontine à la criée »).
 
 ---
@@ -143,7 +143,7 @@ Un **sélecteur de cycle** (barre latérale) permet de changer le cycle courant.
 - **Simplicité radicale.** Parcours de saisie minimal, gros boutons, libellés en langage courant. Référence : plus simple que WhatsApp.
 - **Hors ligne / connexion faible.** L'app doit rester utilisable sans réseau (PWA installable, saisie en local, synchronisation quand la connexion revient). Voir doc d'architecture.
 - **Appareils modestes.** Android d'entrée de gamme **et** iPhone/Safari iOS (50 % des répondants au sondage sont sur iPhone). Bundle léger.
-- **Français d'abord**, architecture prête pour l'anglais (i18n).
+- **Français et anglais** : interface entièrement traduite, bascule dans les Paramètres (i18n via ngx-translate).
 - **Confidentialité et sécurité** des données financières : accès protégé, données chiffrées en transit, sauvegarde.
 - **Coût quasi nul en données mobiles.**
 - **Transparence et traçabilité :** historique des saisies, pour remplacer le rôle de preuve du cahier en cas de litige.
