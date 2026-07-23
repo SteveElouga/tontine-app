@@ -9,6 +9,7 @@ import { SelectButton } from 'primeng/selectbutton';
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
 import { ThemeStore } from '../../core/state/theme-store';
+import { LangStore, Langue } from '../../core/state/lang-store';
 import { MOIS, ParametresCycle } from '../../core/domain/caisse.models';
 
 @Component({
@@ -22,6 +23,12 @@ export class Parametres implements OnInit {
   private readonly cycleStore = inject(CycleStore);
   private readonly toast = inject(MessageService);
   protected readonly theme = inject(ThemeStore);
+  protected readonly lang = inject(LangStore);
+
+  protected readonly optLangue: { label: string; value: Langue }[] = [
+    { label: 'Français', value: 'fr' },
+    { label: 'English', value: 'en' },
+  ];
 
   protected readonly chargement = signal(true);
   protected readonly params = signal<ParametresCycle | null>(null);

@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Toast } from 'primeng/toast';
 import { Select } from 'primeng/select';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { CycleStore } from './core/state/cycle-store';
 
@@ -15,7 +16,7 @@ interface NavItem {
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Toast, FormsModule, Select],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Toast, FormsModule, Select, TranslatePipe],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
@@ -32,18 +33,18 @@ export class App implements OnInit {
   }
 
   protected readonly nav: NavItem[] = [
-    { label: 'Tableau de bord', icon: 'pi pi-home', route: '/tableau-de-bord' },
-    { label: 'Saisie des dépôts', icon: 'pi pi-pencil', route: '/saisie' },
-    { label: 'Prêts', icon: 'pi pi-money-bill', route: '/prets' },
-    { label: 'Récapitulatif', icon: 'pi pi-list', route: '/recapitulatif' },
-    { label: 'Membres', icon: 'pi pi-users', route: '/membres' },
-    { label: 'Simulation', icon: 'pi pi-calculator', route: '/simulation' },
-    { label: 'Historique', icon: 'pi pi-history', route: '/historique' },
+    { label: 'nav.tableau', icon: 'pi pi-home', route: '/tableau-de-bord' },
+    { label: 'nav.saisie', icon: 'pi pi-pencil', route: '/saisie' },
+    { label: 'nav.prets', icon: 'pi pi-money-bill', route: '/prets' },
+    { label: 'nav.recap', icon: 'pi pi-list', route: '/recapitulatif' },
+    { label: 'nav.membres', icon: 'pi pi-users', route: '/membres' },
+    { label: 'nav.simulation', icon: 'pi pi-calculator', route: '/simulation' },
+    { label: 'nav.historique', icon: 'pi pi-history', route: '/historique' },
   ];
 
   protected readonly navBas: NavItem[] = [
-    { label: 'Aide', icon: 'pi pi-question-circle', route: '/aide' },
-    { label: 'Paramètres', icon: 'pi pi-cog', route: '/parametres' },
-    { label: 'Profil', icon: 'pi pi-user', soon: true },
+    { label: 'nav.aide', icon: 'pi pi-question-circle', route: '/aide' },
+    { label: 'nav.parametres', icon: 'pi pi-cog', route: '/parametres' },
+    { label: 'nav.profil', icon: 'pi pi-user', soon: true },
   ];
 }

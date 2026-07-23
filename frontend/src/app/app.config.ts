@@ -9,6 +9,9 @@ import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { ThemeStore } from './core/state/theme-store';
+import { LangStore } from './core/state/lang-store';
+import { provideTranslateService, provideTranslateLoader } from '@ngx-translate/core';
+import { InlineTranslateLoader } from './core/i18n/translations';
 import { provideServiceWorker } from '@angular/service-worker';
 import { provideHttpClient } from '@angular/common/http';
 import { provideApollo } from 'apollo-angular';
@@ -46,8 +49,13 @@ const GRAPHQL_URI = 'http://localhost:8000/graphql/';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
+    provideTranslateService({
+      fallbackLang: 'fr',
+      loader: provideTranslateLoader(InlineTranslateLoader),
+    }),
     provideAppInitializer(() => {
       inject(ThemeStore);
+      return inject(LangStore).init();
     }),
     provideAnimationsAsync(),
     providePrimeNG({ theme: { preset: TontinePreset, options: { darkModeSelector: '.app-dark' } } }),
