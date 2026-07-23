@@ -117,6 +117,11 @@ def total_a_rembourser(pret: Pret, cycle: Cycle) -> Decimal:
     return _fcfa(_money(pret.montant) + majoration_pret(pret, cycle))
 
 
+def total_majorations(prets: Iterable[Pret], cycle: Cycle) -> Decimal:
+    """Somme des majorations dues sur tous les prêts — les « gains » de la caisse à la clôture."""
+    return _fcfa(sum((majoration_pret(p, cycle) for p in prets), Decimal(0)))
+
+
 # --------------------------------------------------------------------------- #
 # Position nette d'un membre à la clôture
 # --------------------------------------------------------------------------- #
@@ -136,35 +141,94 @@ def position_nette(
 
 
 # --------------------------------------------------------------------------- #
-# Règle d'ajustement des intérêts — QUESTION OUVERTE (voir spec §5).
-# Stratégie enfichable : la trésorière tranchera, on branche la bonne implémentation
-# sans toucher au reste du code.
+# Répartition des intérêts à la clôture — RÈGLE TRANCHÉE PAR LA TRÉSORIÈRE.
+#
+# Les années où tout n'a pas été prêté, la caisse encaisse peu de majorations et ne peut
+# pas verser tous les intérêts promis. La trésorière choisit alors le mode :
+#   1.  Complets ................ tout a été prêté ; chacun touche ses intérêts pleins.
+#   2.  Réduction de N mois ..... on retranche le même N à chaque dépôt (elle fixe N) ;
+#                                 favorise les dépôts anciens, les tardifs peuvent tomber à 0.
+#   3a. Équitable au prorata .... les gains encaissés, partagés au prorata du montant déposé.
+#   3b. Équitable en parts égales entre les épargnants.
+# Modes enfichables : le récap et la position nette ne changent pas.
 # --------------------------------------------------------------------------- #
 class RepartitionInterets(Protocol):
     def interets(self, depots: Iterable[Depot], cycle: Cycle) -> Decimal: ...
 
 
 class InteretsComplets:
-    """Règle par défaut : chaque membre touche tous ses intérêts promis."""
+    """Mode 1 : chaque membre touche tous ses intérêts promis (barème dégressif complet)."""
 
     def interets(self, depots: Iterable[Depot], cycle: Cycle) -> Decimal:
         return interets_membre(depots, cycle)
 
 
-class InteretsAuProrataDuPrete:
-    """À ACTIVER si la trésorière répond « B » : on ne rémunère que la part réellement prêtée.
+class InteretsReductionMois:
+    """Mode 2 : on retranche le même nombre de mois à chaque dépôt (fixé par la trésorière).
 
-    `taux_prete` = (total prêté) / (total déposé) sur la caisse. À implémenter au niveau caisse
-    une fois la règle confirmée.
+    Un dépôt de septembre (9 mois) avec N=3 ne compte plus que 6 mois (30 %) ; un dépôt
+    dont les mois tombent à 0 ou moins ne rapporte rien. Favorise les dépôts les plus anciens.
     """
 
-    def __init__(self, taux_prete: Decimal):
-        self.taux_prete = _money(taux_prete)
+    def __init__(self, nb_mois: int):
+        if nb_mois < 0:
+            raise ValueError("nb_mois doit être >= 0")
+        self.nb_mois = nb_mois
 
     def interets(self, depots: Iterable[Depot], cycle: Cycle) -> Decimal:
-        return _fcfa(interets_membre(depots, cycle) * self.taux_prete)
+        total = Decimal(0)
+        for d in depots:
+            mois = (cycle.duree_depot - d.mois_index + 1) - self.nb_mois
+            if mois > 0:
+                total += _money(d.montant) * cycle.taux_epargne * mois
+        return _fcfa(total)
 
 
-# NB : la règle « C » (partage des majorations réellement encaissées au prorata des dépôts)
-# se calcule au niveau de la caisse entière, pas du membre seul : à ajouter dans `reporting`
-# quand la trésorière aura tranché.
+class InteretsEquitableProrata:
+    """Mode 3a : gains encaissés partagés au prorata du montant déposé (les mois sont ignorés).
+
+    `gains` = majorations encaissées sur la caisse ; `total_depose_caisse` = somme déposée par tous.
+    """
+
+    def __init__(self, gains, total_depose_caisse):
+        self.gains = _money(gains)
+        self.total_depose_caisse = _money(total_depose_caisse)
+
+    def interets(self, depots: Iterable[Depot], cycle: Cycle) -> Decimal:
+        if self.total_depose_caisse <= 0:
+            return Decimal(0)
+        depose = sum((_money(d.montant) for d in depots), Decimal(0))
+        return _fcfa(self.gains * depose / self.total_depose_caisse)
+
+
+class InteretsEquitableEgal:
+    """Mode 3b : gains encaissés partagés en parts égales entre les épargnants.
+
+    `gains` = majorations encaissées ; `nb_epargnants` = nombre de membres ayant déposé.
+    """
+
+    def __init__(self, gains, nb_epargnants: int):
+        self.gains = _money(gains)
+        self.nb_epargnants = nb_epargnants
+
+    def interets(self, depots: Iterable[Depot], cycle: Cycle) -> Decimal:
+        depots = list(depots)
+        if self.nb_epargnants <= 0 or not depots:
+            return Decimal(0)
+        return _fcfa(self.gains / self.nb_epargnants)
+
+
+def suggerer_reduction_mois(
+    tous_depots: Iterable[Depot], prets: Iterable[Pret], cycle: Cycle
+) -> int:
+    """Plus petit N tel que le total des intérêts (réduits de N mois) <= majorations encaissées.
+
+    Aide la trésorière : le total distribué ne dépasse pas ce que la caisse a réellement gagné.
+    Elle reste libre de choisir un autre N.
+    """
+    tous_depots = list(tous_depots)
+    gains = total_majorations(prets, cycle)
+    for n in range(0, cycle.duree_depot + 1):
+        if InteretsReductionMois(n).interets(tous_depots, cycle) <= gains:
+            return n
+    return cycle.duree_depot
