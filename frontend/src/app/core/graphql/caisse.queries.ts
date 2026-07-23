@@ -8,6 +8,7 @@ export const CYCLES = gql`
       libelle
       caisseNom
       statut
+      moisDebut
     }
   }
 `;
@@ -20,6 +21,7 @@ export const PARAMETRES_CYCLE = gql`
       libelle
       statut
       caisseNom
+      moisDebut
       dureeDepot
       moisDelai
       tauxEpargne
@@ -32,6 +34,7 @@ export const MODIFIER_CYCLE = gql`
   mutation ModifierCycle(
     $cycleId: ID!
     $libelle: String!
+    $moisDebut: Int!
     $dureeDepot: Int!
     $moisDelai: Int!
     $tauxEpargne: Decimal!
@@ -40,6 +43,7 @@ export const MODIFIER_CYCLE = gql`
     modifierCycle(
       cycleId: $cycleId
       libelle: $libelle
+      moisDebut: $moisDebut
       dureeDepot: $dureeDepot
       moisDelai: $moisDelai
       tauxEpargne: $tauxEpargne
@@ -49,6 +53,7 @@ export const MODIFIER_CYCLE = gql`
       libelle
       statut
       caisseNom
+      moisDebut
       dureeDepot
       moisDelai
       tauxEpargne

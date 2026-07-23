@@ -7,13 +7,14 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
 import { LangStore } from '../../core/state/lang-store';
+import { MoisNomPipe } from '../../core/i18n/mois.pipe';
 import { Operation } from '../../core/domain/caisse.models';
 
 type FiltreType = 'tout' | 'depot' | 'pret';
 
 @Component({
   selector: 'app-historique',
-  imports: [FormsModule, InputText, SelectButton, TranslatePipe],
+  imports: [FormsModule, InputText, SelectButton, TranslatePipe, MoisNomPipe],
   templateUrl: './historique.html',
   styleUrl: './historique.scss',
 })

@@ -244,6 +244,7 @@ export class CaisseService {
   modifierCycle(
     cycleId: string,
     libelle: string,
+    moisDebut: number,
     dureeDepot: number,
     moisDelai: number,
     tauxEpargne: number,
@@ -252,7 +253,7 @@ export class CaisseService {
     return this.apollo
       .mutate<{ modifierCycle: ParametresCycle }>({
         mutation: MODIFIER_CYCLE,
-        variables: { cycleId, libelle, dureeDepot, moisDelai, tauxEpargne, tauxMajoration },
+        variables: { cycleId, libelle, moisDebut, dureeDepot, moisDelai, tauxEpargne, tauxMajoration },
       })
       .pipe(map((r) => r.data!.modifierCycle as ParametresCycle));
   }

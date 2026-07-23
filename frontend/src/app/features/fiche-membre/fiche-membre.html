@@ -31,7 +31,7 @@
     <tbody>
       @for (d of f.depots; track d.moisIndex) {
         <tr>
-          <td>{{ 'mois.' + d.moisIndex | translate }}</td>
+          <td>{{ d.moisIndex | moisNom }}</td>
           <td class="num">{{ fmt(d.montant) }}</td>
           <td class="num sub">{{ pct(d.taux) }}</td>
           <td class="num vert">+{{ fmt(d.interet) }}</td>
@@ -61,7 +61,7 @@
     @for (p of f.prets; track $index) {
       <div class="pret">
         <div class="pl">
-          <span>{{ 'fiche.prisEn' | translate: { mois: ('mois.' + p.moisPret | translate) } }}</span>
+          <span>{{ 'fiche.prisEn' | translate: { mois: (p.moisPret | moisNom) } }}</span>
           <span>{{ fmt(p.montant) }}</span>
         </div>
         <div class="pl">

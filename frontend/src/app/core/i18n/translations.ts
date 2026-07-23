@@ -26,6 +26,7 @@ export const FR = {
     sous: 'Les règles du cycle et la gestion des années.',
     reglesTitre: 'Règles du cycle',
     annee: 'Année',
+    moisOuverture: "Mois d'ouverture",
     anneePlaceholder: 'ex. 2025-2026',
     tauxEpargne: "Taux d'épargne (par mois)",
     tauxMajo: 'Taux de majoration des prêts (par mois)',
@@ -106,9 +107,9 @@ export const FR = {
     },
   },
   mois: {
-    1: 'Septembre', 2: 'Octobre', 3: 'Novembre', 4: 'Décembre',
-    5: 'Janvier', 6: 'Février', 7: 'Mars', 8: 'Avril',
-    9: 'Mai', 10: 'Juin', 11: 'Juillet', 12: 'Août',
+    1: 'Janvier', 2: 'Février', 3: 'Mars', 4: 'Avril',
+    5: 'Mai', 6: 'Juin', 7: 'Juillet', 8: 'Août',
+    9: 'Septembre', 10: 'Octobre', 11: 'Novembre', 12: 'Décembre',
   },
   saisie: {
     titre: 'Saisie des dépôts',
@@ -283,6 +284,7 @@ export const EN = {
     sous: 'The cycle rules and management of years.',
     reglesTitre: 'Cycle rules',
     annee: 'Year',
+    moisOuverture: 'Opening month',
     anneePlaceholder: 'e.g. 2025-2026',
     tauxEpargne: 'Savings rate (per month)',
     tauxMajo: 'Loan surcharge rate (per month)',
@@ -363,9 +365,9 @@ export const EN = {
     },
   },
   mois: {
-    1: 'September', 2: 'October', 3: 'November', 4: 'December',
-    5: 'January', 6: 'February', 7: 'March', 8: 'April',
-    9: 'May', 10: 'June', 11: 'July', 12: 'August',
+    1: 'January', 2: 'February', 3: 'March', 4: 'April',
+    5: 'May', 6: 'June', 7: 'July', 8: 'August',
+    9: 'September', 10: 'October', 11: 'November', 12: 'December',
   },
   saisie: {
     titre: 'Enter deposits',

@@ -60,7 +60,7 @@
         <tr>
           <td class="g">{{ p.nom }}</td>
           <td class="d">{{ format(p.montant) }}</td>
-          <td class="c">{{ 'mois.' + p.moisPret | translate }}</td>
+          <td class="c">{{ p.moisPret | moisNom }}</td>
           <td class="d">{{ p.moisDeDette }}</td>
           <td class="d rouge">+{{ format(p.majoration) }}</td>
           <td class="d fort">{{ format(p.totalARembourser) }}</td>
@@ -68,7 +68,7 @@
             @if (p.rembourse) {
               <span class="badge ok">
                 <i class="pi pi-check-circle"></i>
-                {{ 'prets.rembourseEn' | translate: { mois: ('mois.' + (p.moisRemboursement ?? 12) | translate) } }}
+                {{ 'prets.rembourseEn' | translate: { mois: ((p.moisRemboursement ?? 12) | moisNom) } }}
               </span>
             } @else if (remboursementDe() === p.id) {
               <span class="remb">

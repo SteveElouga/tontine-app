@@ -1,4 +1,4 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { map } from 'rxjs';
 
@@ -21,6 +21,12 @@ export class CycleStore {
 
   /** Cycle actuellement sélectionné. */
   readonly cycleId = signal<string>(CYCLE_PILOTE);
+
+  /** Mois d'ouverture (calendaire) du cycle courant ; 9 = septembre par défaut. */
+  readonly moisDebut = computed(() => {
+    const cur = this.cycles().find((c) => c.id === this.cycleId());
+    return cur?.moisDebut ?? 9;
+  });
 
   /** Charge la liste des cycles ; garde la sélection valide. */
   charger(): void {
