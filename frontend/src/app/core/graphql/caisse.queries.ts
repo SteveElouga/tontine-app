@@ -1,5 +1,17 @@
 import { gql } from 'apollo-angular';
 
+/** Liste des cycles (pour le sélecteur de cycle courant). */
+export const CYCLES = gql`
+  query Cycles {
+    cycles {
+      id
+      libelle
+      caisseNom
+      statut
+    }
+  }
+`;
+
 /** Récapitulatif de tous les membres d'un cycle. */
 export const RECAP_CYCLE = gql`
   query RecapCycle($cycleId: ID!) {
@@ -172,6 +184,21 @@ export const REMBOURSER_PRET = gql`
       majoration
       totalARembourser
       rembourse
+    }
+  }
+`;
+
+/** Journal chronologique des opérations du cycle (dépôts + prêts). */
+export const HISTORIQUE = gql`
+  query Historique($cycleId: ID!) {
+    historique(cycleId: $cycleId) {
+      type
+      date
+      membreNom
+      montant
+      mois
+      rembourse
+      moisRemboursement
     }
   }
 `;

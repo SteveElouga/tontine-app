@@ -4,6 +4,7 @@ import { Saisie } from './features/saisie/saisie';
 import { Recap } from './features/recap/recap';
 import { Membres } from './features/membres/membres';
 import { Prets } from './features/prets/prets';
+import { Historique } from './features/historique/historique';
 import { FicheMembrePage } from './features/fiche-membre/fiche-membre';
 
 export const routes: Routes = [
@@ -13,5 +14,6 @@ export const routes: Routes = [
   { path: 'prets', component: Prets },
   { path: 'membres', component: Membres },
   { path: 'recapitulatif', component: Recap },
+  { path: 'historique', component: Historique },
   { path: 'membre/:id', component: FicheMembrePage },
 ];

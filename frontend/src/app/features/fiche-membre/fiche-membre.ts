@@ -2,10 +2,8 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
+import { CycleStore } from '../../core/state/cycle-store';
 import { FicheMembre, MOIS } from '../../core/domain/caisse.models';
-
-// Cycle pilote (dev). À remplacer par une vraie sélection de cycle plus tard.
-const CYCLE_ID = '8e7323b1-1277-47dd-b358-ee0354d52b3d';
 
 @Component({
   selector: 'app-fiche-membre',
@@ -15,6 +13,7 @@ const CYCLE_ID = '8e7323b1-1277-47dd-b358-ee0354d52b3d';
 })
 export class FicheMembrePage implements OnInit {
   private readonly caisse = inject(CaisseService);
+  private readonly cycleStore = inject(CycleStore);
   private readonly route = inject(ActivatedRoute);
 
   protected readonly fiche = signal<FicheMembre | null>(null);
@@ -33,7 +32,7 @@ export class FicheMembrePage implements OnInit {
       this.chargement.set(false);
       return;
     }
-    this.caisse.ficheMembre(CYCLE_ID, id).subscribe({
+    this.caisse.ficheMembre(this.cycleStore.cycleId(), id).subscribe({
       next: (f) => {
         this.fiche.set(f);
         this.chargement.set(false);

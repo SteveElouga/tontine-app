@@ -1,12 +1,8 @@
 :host {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 0;
+  display: block;
 }
 
 .entete {
-  flex: 0 0 auto;
   margin-bottom: 14px;
 
   h1 {
@@ -23,7 +19,6 @@
 }
 
 .barre {
-  flex: 0 0 auto;
   margin-bottom: 12px;
 }
 
@@ -47,10 +42,9 @@
   }
 }
 
-/* Zone défilante : le tableau scrolle ici, pas la page. */
+/* Zone défilante : le tableau scrolle ici (hauteur bornée), pas la page. */
 .tableau-wrap {
-  flex: 1 1 auto;
-  min-height: 0;
+  max-height: calc(100dvh - 250px);
   overflow-y: auto;
   background: var(--c-surface);
   border: 1px solid var(--c-border);
@@ -148,7 +142,6 @@
 }
 
 .pied {
-  flex: 0 0 auto;
   display: flex;
   justify-content: flex-end;
   margin-top: 16px;

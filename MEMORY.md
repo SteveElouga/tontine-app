@@ -64,12 +64,12 @@ gitGraph
 ## 5. État courant du projet
 > Mis à jour à la FIN de chaque session (E7). Doit répondre en 30 s à « où en est-on ? ».
 - **Phase** : développement
-- **Dernier jalon atteint** : TON-9 mergé (#8) — **fiche membre détaillée** (transparence, la douleur n°1 du sondage : la méfiance) : écran qui montre pour un membre **d'où vient chaque franc** (dépôt × taux → intérêt ; prêt → majoration ; `épargne + intérêts − dette = à recevoir`), accessible en touchant une ligne du Récapitulatif. Protection `develop` **ajustée pour le solo** (revue approuvée = 0) : les PR passent au vert sur la seule CI, sans bypass.
-- **En cours** : story **TON-10 Prêts** sur `feat/TON-10-prets`. Backend : type GraphQL `Pret`, query `pretsCycle`, mutations `ajouterPret`/`rembourserPret`. Frontend : écran `features/prets/` — liste des prêts du cycle (montant, mois de dette, majoration, total, statut), formulaire « nouveau prêt » (membre + montant + mois) et remboursement en ligne (choix du mois). Nav « Prêts » activée (route `/prets`). **Vérifié** : `ngc` AOT + templates = exit 0.
-- **Prochaine étape** : brancher la **règle d'ajustement des intérêts** dès la précision de Thérèse (voir points d'attention) ; puis **sélecteur de cycle/caisse** (retirer le `CYCLE_ID` codé en dur).
+- **Dernier jalon atteint** : TON-11 mergé (#11) — Récapitulatif avec **recherche par nom** + **défilement interne** du tableau (en-tête et Total figés). Avant : TON-10 (module Prêts, #10). L'app couvre désormais dépôts, prêts (saisie + remboursement), membres, récap, fiches de transparence.
+- **En cours** (dans l'arbre de travail) : **sélecteur de cycle** (TON-12) + **Historique** (TON-13). Cycle : service central `core/state/cycle-store.ts` + menu `p-select` en barre latérale, 6 écrans branchés (fini le `CYCLE_ID` en dur ; bascule effective à la navigation suivante, instantané = v2). Historique : query `historique`, écran journal chronologique des opérations (dépôts + prêts). ⚠️ Les deux stories **partagent des fichiers** (schema.py, models, queries, app.ts) → à livrer ensemble si TON-12 n'est pas déjà commité. **Vérifié** : `ngc` exit 0.
+- **Prochaine étape** : brancher la **règle d'ajustement des intérêts** dès la précision de Thérèse (plafonner ou retrancher les mois) ; puis rechargement instantané au changement de cycle.
 - **Points d'attention / dette** :
   - **Règle d'ajustement des intérêts** (quand tout n'est pas prêté) : Thérèse a tranché **Règle 2** (on ne rémunère que l'argent réellement prêté) en **réduisant le nombre de mois**, montant **calculé automatiquement** (total intérêts = majorations encaissées). Reste **1 précision** demandée : **plafonner** les mois (les déposants tôt baissent, les tardifs ne bougent pas) ou **retrancher** le même nombre de mois à tous (les tardifs peuvent tomber à 0). Moteur prêt à l'accueillir (`apps/core/domain/interest.py`, `RepartitionInterets`).
-  - Frontend : **Angular 22 + PrimeNG 21 (MIT, gratuit)** — ne pas passer à PrimeNG 22 (licence). Preset PrimeNG personnalisé (bleu) dans `app.config.ts`. Sélecteur GraphQL/cycle codé en dur pour l'instant (dev).
+  - Frontend : **Angular 22 + PrimeNG 21 (MIT, gratuit)** — ne pas passer à PrimeNG 22 (licence). Preset PrimeNG personnalisé (bleu) dans `app.config.ts`. Cycle courant centralisé dans `core/state/cycle-store.ts` (fini le `CYCLE_ID` codé en dur) ; l'URL GraphQL reste en dur (`GRAPHQL_URI`), à sortir en fichier d'environnement avant prod.
   - Montants renvoyés en **chaînes** par l'API (Decimal Strawberry) ; contrat aligné dans `caisse.models.ts`.
   - gitleaks et Task (go-task) à installer en local (`brew install gitleaks go-task`).
 
@@ -78,6 +78,8 @@ gitGraph
 
 | Date | Auteur | Résumé de ce qui a été fait | Branches / PR |
 |------|--------|-----------------------------|---------------|
+| 2026-07-22 | Steve + agent | Story **Historique** (TON-13) : query `historique` (dépôts + prêts fusionnés en événements datés, triés du plus récent), écran `features/historique/` — journal chronologique (icône dépôt/prêt, membre, mois, date, statut de remboursement), nav + route `/historique`. Vérifié `ngc` exit 0. | feat/TON-13-historique |
+| 2026-07-22 | Steve + agent | Story **sélecteur de cycle** (TON-12) : query `cycles`, service `CycleStore` (cycle courant centralisé), menu `p-select` en barre latérale, et les 6 écrans branchés dessus — fini le `CYCLE_ID` codé en dur. v1 : bascule effective à la navigation suivante. Vérifié `ngc` exit 0. (Aussi : `fix/recap-defilement` — défilement interne du récap via hauteur bornée.) | feat/TON-12-selecteur-cycle |
 | 2026-07-22 | Steve + agent | Story **TON-11 Récap** : recherche par nom (`pInputText`, totaux recalculés sur les lignes affichées) + tableau à **défilement interne** (en-tête et ligne Total figés en `sticky`, la barre de scroll de la page ne se déclenche plus). Menus de l'écran Prêts passés en `p-select` (cohérence PrimeNG, recherche membre). Vérifié `ngc` (exit 0). | feat/TON-11-recap-recherche-scroll → PR #11 |
 | 2026-07-22 | Steve + agent | Story **TON-10 Prêts** : backend (type `Pret`, query `pretsCycle`, mutations `ajouterPret`/`rembourserPret`) + écran Prêts (liste, ajout d'un prêt, remboursement en ligne) + nav/route `/prets`. Vérifié `ngc` (AOT + templates, exit 0) ; schéma testé côté Mac (curl `pretsCycle`). Réponse trésorière notée pour la règle d'intérêts (Règle 2 + réduire les mois). | feat/TON-10-prets → PR #10 |
 | 2026-07-22 | Steve + agent | TON-9 mergé (#8). Protection `develop` réglée pour le solo (revue approuvée → 0 ; CI/PR/historique linéaire/pas de push direct conservés — cf. §7). Story UI : **tous les écrans en pleine largeur** — retrait des plafonds `max-width` sur Membres, Fiche membre et la grille de raccourcis du tableau de bord. | refactor/pleine-largeur → PR #9 |
@@ -117,8 +119,10 @@ gitGraph
 | 7 | Tableau de bord (accueil + totaux) (TON-6) | fait | PR #6 |
 | 8 | Écran Membres — liste + ajouter/renommer/désactiver (TON-8) | fait | PR #7 |
 | 9 | Fiche membre détaillée (transparence, sur `ficheMembre`) (TON-9) | fait | PR #8 |
-| 10 | Tous les écrans en pleine largeur (retrait des plafonds `max-width`) | en cours | refactor/pleine-largeur |
-| 11 | Module Prêts — saisie + remboursement (TON-10) | en cours | feat/TON-10-prets |
+| 10 | Tous les écrans en pleine largeur (retrait des plafonds `max-width`) | fait | PR #9 |
+| 11 | Module Prêts — saisie + remboursement (TON-10) | fait | PR #10 |
+| 11b | Récap : recherche + défilement interne (TON-11) | fait | PR #11 |
+| 11c | Sélecteur de cycle courant (TON-12) | en cours | feat/TON-12-selecteur-cycle |
 | 12 | Brancher la règle d'ajustement des intérêts (Règle 2 + réduire les mois, montant auto) | en attente | 1 précision Thérèse |
 | 13 | Sélecteur de cycle/caisse (retirer le `CYCLE_ID` codé en dur) | à faire | — |
 | 14 | Récap : recherche par nom + tableau à défilement interne (TON-11) | en cours | feat/TON-11-recap-recherche-scroll |
