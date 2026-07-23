@@ -7,6 +7,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from strawberry.django.views import GraphQLView
 
 from config.auth import jwt_protected
+from config.auth_views import changer_mot_de_passe
 from config.schema import schema
 
 
@@ -22,4 +23,5 @@ urlpatterns = [
     # Auth JWT (login trésorière) : obtenir puis rafraîchir le jeton.
     path("api/auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("api/auth/mot-de-passe/", changer_mot_de_passe, name="changer_mot_de_passe"),
 ]

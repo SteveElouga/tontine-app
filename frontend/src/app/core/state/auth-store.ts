@@ -6,6 +6,7 @@ import { Observable, map, tap } from 'rxjs';
 const API_BASE = 'http://localhost:8000';
 const CLE_ACCESS = 'tontine.access';
 const CLE_REFRESH = 'tontine.refresh';
+const CLE_USER = 'tontine.user';
 
 /** Vrai si le jeton JWT est bien formé et non expiré (lecture du champ `exp`). */
 function jetonValide(token: string): boolean {
@@ -30,6 +31,8 @@ export class AuthStore {
 
   readonly accessToken = signal<string | null>(localStorage.getItem(CLE_ACCESS));
   private readonly refreshToken = signal<string | null>(localStorage.getItem(CLE_REFRESH));
+  /** Identifiant de connexion, pour l'affichage (écran Profil). */
+  readonly username = signal<string | null>(localStorage.getItem(CLE_USER));
 
   /** Vrai si un jeton d'accès valide (non expiré) est présent. */
   readonly connecte = computed(() => {
@@ -48,17 +51,33 @@ export class AuthStore {
         tap((r) => {
           this.accessToken.set(r.access);
           this.refreshToken.set(r.refresh);
+          this.username.set(username);
           localStorage.setItem(CLE_ACCESS, r.access);
           localStorage.setItem(CLE_REFRESH, r.refresh);
+          localStorage.setItem(CLE_USER, username);
         }),
         map(() => undefined),
       );
   }
 
+  /** Change le mot de passe de la trésorière connectée (jeton envoyé manuellement). */
+  changerMotDePasse(ancien: string, nouveau: string): Observable<void> {
+    const token = this.accessToken();
+    return this.http
+      .post(
+        `${API_BASE}/api/auth/mot-de-passe/`,
+        { ancien, nouveau },
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} },
+      )
+      .pipe(map(() => undefined));
+  }
+
   deconnecter(): void {
     this.accessToken.set(null);
     this.refreshToken.set(null);
+    this.username.set(null);
     localStorage.removeItem(CLE_ACCESS);
     localStorage.removeItem(CLE_REFRESH);
+    localStorage.removeItem(CLE_USER);
   }
 }
