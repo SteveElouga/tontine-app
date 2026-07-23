@@ -53,7 +53,8 @@
       <thead>
         <tr>
           <th class="g">Membre</th>
-          <th class="d">Épargne + intérêts</th>
+          <th class="d">Épargne</th>
+          <th class="d">Intérêts</th>
           <th class="d">Dette</th>
           <th class="d">À recevoir</th>
           <th class="chev"></th>
@@ -63,7 +64,8 @@
         @for (m of membresFiltres(); track m.id) {
           <tr class="clic" [routerLink]="['/membre', m.id]">
             <td class="g">{{ m.nom }}</td>
-            <td class="d muted2">{{ format(m.epargnePlusInterets) }}</td>
+            <td class="d muted2">{{ format(m.totalDepose) }}</td>
+            <td class="d vert">{{ format(m.interets) }}</td>
             <td class="d">
               @if (n(m.dettes) > 0) {
                 <span class="dette">−{{ format(m.dettes) }}</span>
@@ -76,14 +78,15 @@
           </tr>
         } @empty {
           <tr>
-            <td colspan="5" class="muted centre">Aucun membre trouvé.</td>
+            <td colspan="6" class="muted centre">Aucun membre trouvé.</td>
           </tr>
         }
       </tbody>
       <tfoot>
         <tr>
           <td class="g fort">Total</td>
-          <td class="d muted2">{{ format(totalEpargne()) }}</td>
+          <td class="d muted2">{{ format(totalDepose()) }}</td>
+          <td class="d vert">{{ format(totalInterets()) }}</td>
           <td class="d">
             @if (totalDettes() > 0) {
               <span class="dette">−{{ format(totalDettes()) }}</span>
