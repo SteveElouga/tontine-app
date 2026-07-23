@@ -4,6 +4,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
+import { TourService } from '../../core/tour/tour-service';
 import { RecapMembre } from '../../core/domain/caisse.models';
 
 @Component({
@@ -15,6 +16,7 @@ import { RecapMembre } from '../../core/domain/caisse.models';
 export class Dashboard implements OnInit {
   private readonly caisse = inject(CaisseService);
   private readonly cycleStore = inject(CycleStore);
+  private readonly tour = inject(TourService);
 
   protected readonly membres = signal<RecapMembre[]>([]);
   protected readonly chargement = signal(true);
@@ -41,6 +43,8 @@ export class Dashboard implements OnInit {
       },
       error: () => this.chargement.set(false),
     });
+    // Visite guidée à la toute première connexion (délai : laisser le menu s'afficher).
+    setTimeout(() => this.tour.demarrerSiPremiereFois(), 600);
   }
 
   protected readonly format = (n: number): string => n.toLocaleString('fr-FR');

@@ -4,6 +4,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
 import { LangStore } from '../../core/state/lang-store';
+import { TourService } from '../../core/tour/tour-service';
 import { ParametresCycle, moisCalendaire } from '../../core/domain/caisse.models';
 
 @Component({
@@ -17,6 +18,7 @@ export class Aide implements OnInit {
   private readonly cycleStore = inject(CycleStore);
   private readonly i18n = inject(TranslateService);
   private readonly lang = inject(LangStore);
+  private readonly tour = inject(TourService);
 
   private readonly params = signal<ParametresCycle | null>(null);
 
@@ -57,5 +59,9 @@ export class Aide implements OnInit {
       next: (p) => this.params.set(p),
       error: () => {},
     });
+  }
+
+  revoir(): void {
+    this.tour.demarrer();
   }
 }
