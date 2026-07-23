@@ -5,10 +5,9 @@ import { InputNumber } from 'primeng/inputnumber';
 import { Button } from 'primeng/button';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
+import { CycleStore } from '../../core/state/cycle-store';
 import { MOIS } from '../../core/domain/caisse.models';
 
-// Cycle pilote (dev). À remplacer par une vraie sélection de cycle plus tard.
-const CYCLE_ID = '8e7323b1-1277-47dd-b358-ee0354d52b3d';
 const NB_MOIS = 9;
 
 interface Ligne {
@@ -33,6 +32,7 @@ function versLigne(valeur: string): { montant: number | null; enregistre: boolea
 })
 export class Saisie implements OnInit {
   private readonly caisse = inject(CaisseService);
+  private readonly cycleStore = inject(CycleStore);
   private readonly toast = inject(MessageService);
 
   protected readonly vue = signal<'mois' | 'membre'>('mois');
@@ -105,7 +105,7 @@ export class Saisie implements OnInit {
     );
     if (!courant || courant.montant == null) return;
     this.caisse
-      .ajouterDepot(CYCLE_ID, courant.memberId, courant.moisIndex, courant.montant)
+      .ajouterDepot(this.cycleStore.cycleId(), courant.memberId, courant.moisIndex, courant.montant)
       .subscribe({
         next: () => {
           this.lignes.update((ls) =>
@@ -145,7 +145,7 @@ export class Saisie implements OnInit {
   private chargerMois(): void {
     this.chargement.set(true);
     const mois = this.moisIndex();
-    this.caisse.depotsMois(CYCLE_ID, mois).subscribe({
+    this.caisse.depotsMois(this.cycleStore.cycleId(), mois).subscribe({
       next: (rows) => {
         this.membres.set(rows.map((r) => ({ id: r.id, nom: r.nom })));
         this.lignes.set(
@@ -168,7 +168,7 @@ export class Saisie implements OnInit {
       return;
     }
     this.chargement.set(true);
-    this.caisse.depotsMembre(CYCLE_ID, membre.id).subscribe({
+    this.caisse.depotsMembre(this.cycleStore.cycleId(), membre.id).subscribe({
       next: (rows) => {
         this.lignes.set(
           rows.map((r) => {

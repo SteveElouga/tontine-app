@@ -53,6 +53,25 @@ def _membre(m: Member) -> "Membre":
 
 
 @strawberry.type
+class CycleInfo:
+    id: strawberry.ID
+    libelle: str
+    caisse_nom: str
+    statut: str
+
+
+@strawberry.type
+class Operation:
+    type: str  # "depot" | "pret"
+    date: str  # ISO du moment de saisie (pour tri et affichage)
+    membre_nom: str
+    montant: Decimal
+    mois: int  # mois du dépôt ou du prêt
+    rembourse: bool
+    mois_remboursement: Optional[int]
+
+
+@strawberry.type
 class DepotDetail:
     mois_index: int
     montant: Decimal
@@ -184,6 +203,54 @@ class Query:
         """Liste des membres actifs de la caisse du cycle."""
         cycle = Cycle.objects.select_related("caisse").get(id=cycle_id)
         return [_membre(m) for m in Member.objects.filter(caisse=cycle.caisse, actif=True)]
+
+    @strawberry.field
+    def cycles(self) -> List[CycleInfo]:
+        """Liste des cycles (toutes caisses) pour le sélecteur de cycle courant."""
+        return [
+            CycleInfo(
+                id=strawberry.ID(str(c.id)),
+                libelle=c.libelle,
+                caisse_nom=c.caisse.nom,
+                statut=c.statut,
+            )
+            for c in Cycle.objects.select_related("caisse").order_by("caisse__nom", "libelle")
+        ]
+
+    @strawberry.field
+    def historique(self, cycle_id: strawberry.ID) -> List[Operation]:
+        """Journal chronologique des opérations du cycle (dépôts + prêts)."""
+        from apps.savings.models import Deposit
+        from apps.loans.models import Loan
+
+        cycle = Cycle.objects.get(id=cycle_id)
+        ops: List[Operation] = []
+        for d in Deposit.objects.filter(cycle=cycle).select_related("member"):
+            ops.append(
+                Operation(
+                    type="depot",
+                    date=d.saisi_le.isoformat(),
+                    membre_nom=d.member.nom,
+                    montant=d.montant,
+                    mois=d.mois_index,
+                    rembourse=False,
+                    mois_remboursement=None,
+                )
+            )
+        for loan in Loan.objects.filter(cycle=cycle).select_related("member"):
+            ops.append(
+                Operation(
+                    type="pret",
+                    date=loan.cree_le.isoformat(),
+                    membre_nom=loan.member.nom,
+                    montant=loan.montant,
+                    mois=loan.mois_pret,
+                    rembourse=loan.mois_remboursement is not None,
+                    mois_remboursement=loan.mois_remboursement,
+                )
+            )
+        ops.sort(key=lambda o: o.date, reverse=True)
+        return ops
 
     @strawberry.field
     def fiche_membre(self, cycle_id: strawberry.ID, member_id: strawberry.ID) -> FicheMembre:

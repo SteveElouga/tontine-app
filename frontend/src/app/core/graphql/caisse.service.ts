@@ -7,6 +7,7 @@ import {
   Membre,
   MembreMontant,
   MontantMois,
+  Operation,
   Pret,
   RecapMembre,
 } from '../domain/caisse.models';
@@ -17,6 +18,7 @@ import {
   DEPOTS_MEMBRE,
   DEPOTS_MOIS,
   FICHE_MEMBRE,
+  HISTORIQUE,
   MEMBRES,
   PRETS_CYCLE,
   RECAP_CYCLE,
@@ -163,5 +165,16 @@ export class CaisseService {
         variables: { pretId, moisRemboursement },
       })
       .pipe(map((r) => r.data!.rembourserPret as Pret));
+  }
+
+  /** Journal chronologique des opérations du cycle (dépôts + prêts). */
+  historique(cycleId: string): Observable<Operation[]> {
+    return this.apollo
+      .query<{ historique: Operation[] }>({
+        query: HISTORIQUE,
+        variables: { cycleId },
+        fetchPolicy: 'network-only',
+      })
+      .pipe(map((r) => (r.data?.historique ?? []) as Operation[]));
   }
 }

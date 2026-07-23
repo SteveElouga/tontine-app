@@ -1,0 +1,45 @@
+<header class="entete">
+  <h1>Historique</h1>
+  <p class="sub">Journal des opérations du cycle · le plus récent en haut</p>
+</header>
+
+@if (chargement()) {
+  <p class="muted">Chargement…</p>
+} @else {
+  <ul class="journal">
+    @for (op of operations(); track $index) {
+      <li class="op">
+        <span class="ic" [class.depot]="op.type === 'depot'" [class.pret]="op.type === 'pret'">
+          <i
+            class="pi"
+            [class.pi-arrow-down-left]="op.type === 'depot'"
+            [class.pi-arrow-up-right]="op.type === 'pret'"
+          ></i>
+        </span>
+
+        <span class="txt">
+          <span class="l1">
+            <strong>{{ op.membreNom }}</strong>
+            {{ op.type === 'depot' ? 'a déposé' : 'a emprunté' }}
+          </span>
+          <span class="l2">
+            {{ MOIS[op.mois] }} · {{ date(op.date) }}
+            @if (op.type === 'pret') {
+              @if (op.rembourse) {
+                <span class="badge ok">Remboursé · {{ MOIS[op.moisRemboursement ?? 12] }}</span>
+              } @else {
+                <span class="badge attente">En cours</span>
+              }
+            }
+          </span>
+        </span>
+
+        <span class="montant" [class.vert]="op.type === 'depot'" [class.rouge]="op.type === 'pret'">
+          {{ op.type === 'depot' ? '+' : '' }}{{ fmt(op.montant) }}
+        </span>
+      </li>
+    } @empty {
+      <li class="vide muted">Aucune opération pour l'instant.</li>
+    }
+  </ul>
+}
