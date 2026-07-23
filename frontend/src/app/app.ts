@@ -42,6 +42,7 @@ export class App implements OnInit {
   ];
 
   protected readonly navBas: NavItem[] = [
+    { label: 'Aide', icon: 'pi pi-question-circle', route: '/aide' },
     { label: 'Paramètres', icon: 'pi pi-cog', soon: true },
     { label: 'Profil', icon: 'pi pi-user', soon: true },
   ];

@@ -52,7 +52,7 @@
     }
   </table>
   <p class="ligne-cle">
-    <span class="sub">Épargne + intérêts</span>
+    <span class="sub">Épargne et intérêts</span>
     <strong>{{ fmt(f.epargnePlusInterets) }} FCFA</strong>
   </p>
 
@@ -65,7 +65,7 @@
           <span>{{ fmt(p.montant) }}</span>
         </div>
         <div class="pl">
-          <span class="sub">Majoration (5 % × {{ p.moisDeDette }} mois)</span>
+          <span class="sub">Majoration ({{ p.moisDeDette }} mois à 5 %)</span>
           <span class="rouge">+{{ fmt(p.majoration) }}</span>
         </div>
         <div class="pl fort">

@@ -1,6 +1,6 @@
 <header class="entete">
   <h1>Prêts</h1>
-  <p class="sub">Caisse mutuelle (pilote) · 2025–2026</p>
+  <p class="sub">Caisse mutuelle, cycle 2025-2026.</p>
 </header>
 
 <div class="ajout">
@@ -67,7 +67,7 @@
           <td class="a">
             @if (p.rembourse) {
               <span class="badge ok">
-                <i class="pi pi-check-circle"></i> Remboursé · {{ MOIS[p.moisRemboursement ?? 12] }}
+                <i class="pi pi-check-circle"></i> Remboursé en {{ MOIS[p.moisRemboursement ?? 12] }}
               </span>
             } @else if (remboursementDe() === p.id) {
               <span class="remb">
@@ -117,8 +117,8 @@
   <div class="astuce">
     <i class="pi pi-info-circle"></i>
     <span>
-      La majoration est de 5 % du montant par mois de dette, jusqu'au remboursement (au plus tard
-      en août). Le calcul est automatique.
+      Chaque mois sans rembourser ajoute 5 % à payer, jusqu'au remboursement (au plus tard en
+      août). Le calcul se fait tout seul.
     </span>
   </div>
 }

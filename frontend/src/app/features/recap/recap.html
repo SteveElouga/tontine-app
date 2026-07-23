@@ -1,6 +1,6 @@
 <header class="entete">
   <h1>Récapitulatif</h1>
-  <p class="sub">Clôture 2025–2026 · touchez un nom pour voir d'où vient son montant</p>
+  <p class="sub">Ce que chaque membre reçoit à la fin de l'année. Cliquez sur un nom pour voir le détail.</p>
 </header>
 
 @if (chargement()) {
@@ -39,7 +39,7 @@
         />
         mois
         @if (infos(); as inf) {
-          <span class="sugg">· suggéré : {{ inf.reductionSuggeree }}</span>
+          <span class="sugg">conseillé : {{ inf.reductionSuggeree }}</span>
         }
       </span>
     }
