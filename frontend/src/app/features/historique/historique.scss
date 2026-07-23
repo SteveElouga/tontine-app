@@ -18,6 +18,34 @@
   }
 }
 
+.barre {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.recherche {
+  position: relative;
+  display: inline-block;
+
+  i {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--c-text-muted);
+    font-size: 14px;
+    pointer-events: none;
+  }
+
+  input {
+    padding-left: 32px;
+    min-width: 260px;
+  }
+}
+
 .journal {
   list-style: none;
   margin: 0;

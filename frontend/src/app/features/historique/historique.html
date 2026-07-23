@@ -6,8 +6,31 @@
 @if (chargement()) {
   <p class="muted">{{ 'commun.chargement' | translate }}</p>
 } @else {
+  @if (operations().length) {
+    <div class="barre">
+      <span class="recherche">
+        <i class="pi pi-search"></i>
+        <input
+          pInputText
+          type="search"
+          [ngModel]="recherche()"
+          (ngModelChange)="recherche.set($event)"
+          placeholder="{{ 'historique.recherche' | translate }}"
+        />
+      </span>
+      <p-selectbutton
+        [options]="optType()"
+        [ngModel]="typeFiltre()"
+        (ngModelChange)="typeFiltre.set($event)"
+        optionLabel="label"
+        optionValue="value"
+        [allowEmpty]="false"
+      />
+    </div>
+  }
+
   <ul class="journal">
-    @for (op of operations(); track $index) {
+    @for (op of operationsFiltrees(); track $index) {
       <li class="op">
         <span class="ic" [class.depot]="op.type === 'depot'" [class.pret]="op.type === 'pret'">
           <i
@@ -42,7 +65,9 @@
         </span>
       </li>
     } @empty {
-      <li class="vide muted">{{ 'historique.vide' | translate }}</li>
+      <li class="vide muted">
+        {{ (operations().length ? 'historique.aucunResultat' : 'historique.vide') | translate }}
+      </li>
     }
   </ul>
 }
