@@ -11,29 +11,29 @@ export class TourService {
 
   private construire() {
     const t = (k: string): string => this.i18n.instant(k);
+    const etape = (cle: string, sel?: string) => ({
+      ...(sel ? { element: sel } : {}),
+      popover: { title: t(`tour.${cle}Titre`), description: t(`tour.${cle}Texte`) },
+    });
     return driver({
       showProgress: true,
+      progressText: '{{current}} / {{total}}',
       nextBtnText: t('tour.suivant'),
       prevBtnText: t('tour.precedent'),
       doneBtnText: t('tour.terminer'),
       steps: [
-        { popover: { title: t('tour.bienvenueTitre'), description: t('tour.bienvenueTexte') } },
-        {
-          element: '[data-tour="cycle"]',
-          popover: { title: t('tour.cycleTitre'), description: t('tour.cycleTexte') },
-        },
-        {
-          element: '[data-tour="saisie"]',
-          popover: { title: t('tour.saisieTitre'), description: t('tour.saisieTexte') },
-        },
-        {
-          element: '[data-tour="recap"]',
-          popover: { title: t('tour.recapTitre'), description: t('tour.recapTexte') },
-        },
-        {
-          element: '[data-tour="aide"]',
-          popover: { title: t('tour.aideTitre'), description: t('tour.aideTexte') },
-        },
+        etape('bienvenue'),
+        etape('cycle', '[data-tour="cycle"]'),
+        etape('tableau', '[data-tour="tableau"]'),
+        etape('saisie', '[data-tour="saisie"]'),
+        etape('prets', '[data-tour="prets"]'),
+        etape('recap', '[data-tour="recap"]'),
+        etape('membres', '[data-tour="membres"]'),
+        etape('simulation', '[data-tour="simulation"]'),
+        etape('historique', '[data-tour="historique"]'),
+        etape('aide', '[data-tour="aide"]'),
+        etape('parametres', '[data-tour="parametres"]'),
+        etape('profil', '[data-tour="profil"]'),
       ],
     });
   }
