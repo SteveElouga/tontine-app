@@ -9,11 +9,12 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
 import { LangStore } from '../../core/state/lang-store';
-import { Membre, Pret } from '../../core/domain/caisse.models';
+import { MoisNomPipe } from '../../core/i18n/mois.pipe';
+import { Membre, Pret, moisCalendaire } from '../../core/domain/caisse.models';
 
 @Component({
   selector: 'app-prets',
-  imports: [FormsModule, InputNumber, Button, Select, TranslatePipe],
+  imports: [FormsModule, InputNumber, Button, Select, TranslatePipe, MoisNomPipe],
   templateUrl: './prets.html',
   styleUrl: './prets.scss',
 })
@@ -27,8 +28,9 @@ export class Prets implements OnInit {
   private readonly moisRembTous = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   protected readonly optMoisPret = computed(() => {
     this.lang.langue();
+    const debut = this.cycleStore.moisDebut();
     return [1, 2, 3, 4, 5, 6, 7, 8, 9].map((mi) => ({
-      label: this.i18n.instant('mois.' + mi),
+      label: this.i18n.instant('mois.' + moisCalendaire(mi, debut)),
       value: mi,
     }));
   });
@@ -111,9 +113,10 @@ export class Prets implements OnInit {
 
   /** Mois de remboursement possibles pour un prêt (≥ son mois du prêt). */
   optMoisRemb(moisPret: number): { label: string; value: number }[] {
+    const debut = this.cycleStore.moisDebut();
     return this.moisRembTous
       .filter((mi) => mi >= moisPret)
-      .map((mi) => ({ label: this.i18n.instant('mois.' + mi), value: mi }));
+      .map((mi) => ({ label: this.i18n.instant('mois.' + moisCalendaire(mi, debut)), value: mi }));
   }
 
   valider(p: Pret): void {
@@ -131,7 +134,7 @@ export class Prets implements OnInit {
           summary: this.i18n.instant('prets.okRemb'),
           detail: this.i18n.instant('prets.okRembDetail', {
             nom: maj.nom,
-            mois: this.i18n.instant('mois.' + mois),
+            mois: this.i18n.instant('mois.' + moisCalendaire(mois, this.cycleStore.moisDebut())),
           }),
           life: 2500,
         });

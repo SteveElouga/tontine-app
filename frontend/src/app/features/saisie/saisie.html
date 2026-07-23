@@ -48,7 +48,7 @@
   <div class="grille-membres">
     @for (ligne of lignes(); track ligne.memberId + '_' + ligne.moisIndex) {
       <div class="ligne">
-        <span class="nom">{{ vue() === 'membre' ? (('mois.' + ligne.moisIndex) | translate) : ligne.label }}</span>
+        <span class="nom">{{ vue() === 'membre' ? (ligne.moisIndex | moisNom) : ligne.label }}</span>
         <p-inputnumber
           [ngModel]="ligne.montant"
           (ngModelChange)="setMontant(ligne, $event)"

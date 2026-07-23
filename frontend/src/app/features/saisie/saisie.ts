@@ -8,7 +8,8 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
 import { LangStore } from '../../core/state/lang-store';
-import { MOIS } from '../../core/domain/caisse.models';
+import { MoisNomPipe } from '../../core/i18n/mois.pipe';
+import { moisCalendaire } from '../../core/domain/caisse.models';
 
 const NB_MOIS = 9;
 
@@ -28,7 +29,7 @@ function versLigne(valeur: string): { montant: number | null; enregistre: boolea
 
 @Component({
   selector: 'app-saisie',
-  imports: [FormsModule, InputNumber, Button, TranslatePipe],
+  imports: [FormsModule, InputNumber, Button, TranslatePipe, MoisNomPipe],
   templateUrl: './saisie.html',
   styleUrl: './saisie.scss',
 })
@@ -48,7 +49,7 @@ export class Saisie implements OnInit {
 
   protected readonly moisNom = computed(() => {
     this.lang.langue();
-    return this.i18n.instant('mois.' + this.moisIndex());
+    return this.i18n.instant('mois.' + moisCalendaire(this.moisIndex(), this.cycleStore.moisDebut()));
   });
   protected readonly membreCourant = computed(() => this.membres()[this.membreIndex()]);
   protected readonly taux = computed(() => 5 * (NB_MOIS - this.moisIndex() + 1));
@@ -128,7 +129,7 @@ export class Saisie implements OnInit {
             detail:
               this.vue() === 'mois'
                 ? `${courant.label}, ${this.moisNom()}`
-                : `${this.i18n.instant('mois.' + courant.moisIndex)}, ${this.membreCourant()?.nom}`,
+                : `${this.i18n.instant('mois.' + moisCalendaire(courant.moisIndex, this.cycleStore.moisDebut()))}, ${this.membreCourant()?.nom}`,
             life: 2500,
           });
         },
@@ -184,7 +185,7 @@ export class Saisie implements OnInit {
           rows.map((r) => {
             const { montant, enregistre } = versLigne(r.montant);
             return {
-              label: MOIS[r.moisIndex],
+              label: '',
               memberId: membre.id,
               moisIndex: r.moisIndex,
               montant,

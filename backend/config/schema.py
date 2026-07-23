@@ -58,6 +58,7 @@ class CycleInfo:
     libelle: str
     caisse_nom: str
     statut: str
+    mois_debut: int
 
 
 @strawberry.type
@@ -206,6 +207,7 @@ class ParametresCycle:
     libelle: str
     statut: str
     caisse_nom: str
+    mois_debut: int
     duree_depot: int
     mois_delai: int
     taux_epargne: Decimal
@@ -218,6 +220,7 @@ def _params_cycle(c: Cycle) -> "ParametresCycle":
         libelle=c.libelle,
         statut=c.statut,
         caisse_nom=c.caisse.nom,
+        mois_debut=c.mois_debut,
         duree_depot=c.duree_depot,
         mois_delai=c.mois_delai,
         taux_epargne=c.taux_epargne,
@@ -310,6 +313,7 @@ class Query:
                 libelle=c.libelle,
                 caisse_nom=c.caisse.nom,
                 statut=c.statut,
+                mois_debut=c.mois_debut,
             )
             for c in Cycle.objects.select_related("caisse").order_by("caisse__nom", "libelle")
         ]
@@ -517,23 +521,28 @@ class Mutation:
         self,
         cycle_id: strawberry.ID,
         libelle: str,
+        mois_debut: int,
         duree_depot: int,
         mois_delai: int,
         taux_epargne: Decimal,
         taux_majoration: Decimal,
     ) -> ParametresCycle:
         """Modifie les règles d'un cycle. Attention : recalcule les montants déjà saisis."""
+        if not 1 <= mois_debut <= 12:
+            raise ValueError("Le mois d'ouverture doit être entre 1 et 12.")
         if duree_depot < 1 or mois_delai < duree_depot:
             raise ValueError("Le délai doit être au moins égal à la durée des dépôts.")
         c = Cycle.objects.select_related("caisse").get(id=cycle_id)
         c.libelle = libelle
+        c.mois_debut = mois_debut
         c.duree_depot = duree_depot
         c.mois_delai = mois_delai
         c.taux_epargne = taux_epargne
         c.taux_majoration = taux_majoration
         c.save(
             update_fields=[
-                "libelle", "duree_depot", "mois_delai", "taux_epargne", "taux_majoration"
+                "libelle", "mois_debut", "duree_depot", "mois_delai",
+                "taux_epargne", "taux_majoration"
             ]
         )
         return _params_cycle(c)

@@ -5,12 +5,16 @@
  * utiliser Number(x) uniquement pour l'affichage.
  */
 
-export type MoisIndex = number; // 1 = septembre … 9 = mai … 12 = août
+export type MoisIndex = number; // position dans le cycle : 1 = 1er mois de dépôt … duree_depot = dernier
 
-export const MOIS: Record<number, string> = {
-  1: 'Septembre', 2: 'Octobre', 3: 'Novembre', 4: 'Décembre', 5: 'Janvier',
-  6: 'Février', 7: 'Mars', 8: 'Avril', 9: 'Mai', 10: 'Juin', 11: 'Juillet', 12: 'Août',
-};
+/**
+ * Convertit une position dans le cycle (1..12) en numéro de mois calendaire
+ * (1 = janvier … 12 = décembre), selon le mois d'ouverture du cycle.
+ * Ex. ouverture en septembre (moisDebut = 9) : position 1 → 9 (septembre), position 5 → 1 (janvier).
+ */
+export function moisCalendaire(position: number, moisDebut: number): number {
+  return ((moisDebut - 1 + (position - 1)) % 12) + 1;
+}
 
 /** Un cycle de caisse (pour le sélecteur de cycle courant). */
 export interface CycleInfo {
@@ -18,6 +22,7 @@ export interface CycleInfo {
   libelle: string;
   caisseNom: string;
   statut: string;
+  moisDebut: number;
 }
 
 /** Règles complètes d'un cycle (écran Paramètres). */
@@ -26,6 +31,7 @@ export interface ParametresCycle {
   libelle: string;
   statut: string;
   caisseNom: string;
+  moisDebut: number;
   dureeDepot: number;
   moisDelai: number;
   tauxEpargne: string;
