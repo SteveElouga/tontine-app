@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, tap } from 'rxjs';
+import { Observable, catchError, finalize, map, shareReplay, tap, throwError } from 'rxjs';
 
 /** Base de l'API REST (mêmes hôte/port que GraphQL). À sortir en environnement avant la prod. */
 const API_BASE = 'http://localhost:8000';
@@ -40,6 +40,18 @@ export class AuthStore {
     return t !== null && jetonValide(t);
   });
 
+  /** Vrai si un refresh token valide permet de rafraîchir silencieusement l'accès. */
+  readonly peutRafraichir = computed(() => {
+    const r = this.refreshToken();
+    return r !== null && jetonValide(r);
+  });
+
+  /** Session ouverte : accès valide OU rafraîchissable. Sert au shell et à la garde de route. */
+  readonly sessionActive = computed(() => this.connecte() || this.peutRafraichir());
+
+  /** Refresh partagé : si plusieurs requêtes tombent en 401 en même temps, un seul appel réseau. */
+  private rafraichissement: Observable<string> | null = null;
+
   /** Demande un jeton au backend et le conserve. */
   seConnecter(username: string, password: string): Observable<void> {
     return this.http
@@ -58,6 +70,36 @@ export class AuthStore {
         }),
         map(() => undefined),
       );
+  }
+
+  /**
+   * Rafraîchit silencieusement le jeton d'accès à partir du refresh token.
+   * Refresh absent/expiré ou refusé par le serveur → déconnexion.
+   * Les appels concurrents partagent la même requête (pas de rafale de refresh).
+   */
+  rafraichir(): Observable<string> {
+    if (this.rafraichissement) return this.rafraichissement;
+    const refresh = this.refreshToken();
+    if (!refresh || !jetonValide(refresh)) {
+      this.deconnecter();
+      return throwError(() => new Error('Refresh token absent ou expiré.'));
+    }
+    this.rafraichissement = this.http
+      .post<{ access: string }>(`${API_BASE}/api/auth/token/refresh/`, { refresh })
+      .pipe(
+        tap((r) => {
+          this.accessToken.set(r.access);
+          localStorage.setItem(CLE_ACCESS, r.access);
+        }),
+        map((r) => r.access),
+        catchError((err) => {
+          this.deconnecter(); // refresh refusé (expiré côté serveur, blacklisté…) → on sort
+          return throwError(() => err);
+        }),
+        finalize(() => (this.rafraichissement = null)),
+        shareReplay(1),
+      );
+    return this.rafraichissement;
   }
 
   /** Change le mot de passe de la trésorière connectée (jeton envoyé manuellement). */

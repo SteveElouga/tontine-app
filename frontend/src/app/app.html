@@ -1,5 +1,5 @@
 <div class="shell" [class.menu-ouvert]="layout.menuMobileOuvert()">
-  @if (auth.connecte()) {
+  @if (auth.sessionActive()) {
   <div class="backdrop" (click)="layout.fermerMobile()" aria-hidden="true"></div>
 
   <aside class="sidebar" [class.replie]="layout.replie()">
@@ -89,7 +89,7 @@
   }
 
   <main class="content">
-    @if (auth.connecte()) {
+    @if (auth.sessionActive()) {
       <header class="topbar">
         <button
           type="button"

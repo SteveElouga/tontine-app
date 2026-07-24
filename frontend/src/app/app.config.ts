@@ -11,10 +11,11 @@ import { routes } from './app.routes';
 import { ThemeStore } from './core/state/theme-store';
 import { LangStore } from './core/state/lang-store';
 import { AuthStore } from './core/state/auth-store';
+import { authRefreshInterceptor } from './core/auth/auth-refresh.interceptor';
 import { provideTranslateService, provideTranslateLoader } from '@ngx-translate/core';
 import { InlineTranslateLoader } from './core/i18n/translations';
 import { provideServiceWorker } from '@angular/service-worker';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideApollo } from 'apollo-angular';
 import { HttpLink } from 'apollo-angular/http';
 import { ApolloLink, InMemoryCache } from '@apollo/client';
@@ -66,12 +67,13 @@ export const appConfig: ApplicationConfig = {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000',
     }),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([authRefreshInterceptor])),
     provideApollo(() => {
       const httpLink = inject(HttpLink);
       const auth = inject(AuthStore);
 
       // Ajoute le jeton JWT (s'il existe) à l'en-tête de chaque requête GraphQL.
+      // Le rafraîchissement sur 401 est géré par l'intercepteur HTTP (auth-refresh).
       const authLink = new ApolloLink((operation, forward) => {
         const token = auth.accessToken();
         if (token) {

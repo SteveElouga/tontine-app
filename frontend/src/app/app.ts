@@ -37,7 +37,7 @@ export class App {
   constructor() {
     // Charge (ou recharge) les cycles dès que la trésorière est connectée.
     effect(() => {
-      if (this.auth.connecte()) this.cycles.charger();
+      if (this.auth.sessionActive()) this.cycles.charger();
     });
   }
 
