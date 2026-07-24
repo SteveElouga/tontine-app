@@ -16,6 +16,15 @@ export function moisCalendaire(position: number, moisDebut: number): number {
   return ((moisDebut - 1 + (position - 1)) % 12) + 1;
 }
 
+/**
+ * Année calendaire d'une position du cycle, selon le mois d'ouverture et l'année de début.
+ * Ex. cycle ouvert en septembre 2025 : position 1 → 2025, position 5 (janvier) → 2026,
+ * position 13 (septembre suivant) → 2026.
+ */
+export function anneeDe(position: number, moisDebut: number, anneeDebut: number): number {
+  return anneeDebut + Math.floor((moisDebut - 1 + (position - 1)) / 12);
+}
+
 /** Un cycle de caisse (pour le sélecteur de cycle courant). */
 export interface CycleInfo {
   id: string;
@@ -61,11 +70,13 @@ export interface MembreMontant {
   id: string;
   nom: string;
   montant: string;
+  date?: string | null; // ISO du jour de la saisie (null si aucun dépôt)
 }
 
 export interface MontantMois {
   moisIndex: number;
   montant: string;
+  date?: string | null; // ISO du jour de la saisie (null si aucun dépôt)
 }
 
 export interface Membre {

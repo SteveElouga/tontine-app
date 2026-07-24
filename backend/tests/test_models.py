@@ -14,7 +14,7 @@ def test_to_params_reprend_les_reglages_du_cycle():
 
     assert params.mois_debut == 9
     assert params.duree_depot == 9
-    assert params.mois_delai == 12
+    assert params.mois_delai == 13
     assert params.taux_epargne == Decimal("0.05")
     assert params.taux_majoration == Decimal("0.05")
 

@@ -6,6 +6,7 @@ Les mutations d'écriture (ajouter un dépôt, un prêt) sont amorcées et à co
 """
 from __future__ import annotations
 
+import datetime
 from decimal import Decimal
 from typing import List, Optional
 
@@ -32,12 +33,14 @@ class MembreMontant:
     id: strawberry.ID
     nom: str
     montant: Decimal
+    date: Optional[str] = None  # ISO du jour de la saisie (None si aucun dépôt)
 
 
 @strawberry.type
 class MontantMois:
     mois_index: int
     montant: Decimal
+    date: Optional[str] = None  # ISO du jour de la saisie (None si aucun dépôt)
 
 
 @strawberry.type
@@ -301,12 +304,17 @@ class Query:
 
         cycle = Cycle.objects.select_related("caisse").get(id=cycle_id)
         depots = {
-            d.member_id: d.montant
+            d.member_id: d
             for d in Deposit.objects.filter(cycle=cycle, mois_index=mois_index)
         }
         membres = Member.objects.filter(caisse=cycle.caisse, actif=True)
         return [
-            MembreMontant(id=strawberry.ID(str(m.id)), nom=m.nom, montant=depots.get(m.id, Decimal(0)))
+            MembreMontant(
+                id=strawberry.ID(str(m.id)),
+                nom=m.nom,
+                montant=depots[m.id].montant if m.id in depots else Decimal(0),
+                date=depots[m.id].date_operation.isoformat() if m.id in depots else None,
+            )
             for m in membres
         ]
 
@@ -317,12 +325,16 @@ class Query:
 
         cycle = Cycle.objects.get(id=cycle_id)
         depots = {
-            d.mois_index: d.montant
+            d.mois_index: d
             for d in Deposit.objects.filter(cycle=cycle, member_id=member_id)
         }
         return [
-            MontantMois(mois_index=m, montant=depots.get(m, Decimal(0)))
-            for m in range(1, cycle.duree_depot + 1)
+            MontantMois(
+                mois_index=m,
+                montant=depots[m].montant if m in depots else Decimal(0),
+                date=depots[m].date_operation.isoformat() if m in depots else None,
+            )
+            for m in range(1, cycle.duree_depot + 2)  # +1 : inclut juin (dépôt à 0 %)
         ]
 
     @strawberry.field
@@ -496,16 +508,22 @@ class Query:
 class Mutation:
     @strawberry.mutation
     def ajouter_depot(
-        self, cycle_id: strawberry.ID, member_id: strawberry.ID, mois_index: int, montant: Decimal
+        self,
+        cycle_id: strawberry.ID,
+        member_id: strawberry.ID,
+        mois_index: int,
+        montant: Decimal,
+        date: Optional[str] = None,
     ) -> RecapMembre:
-        """Enregistre un dépôt puis renvoie le récap à jour du membre. (À sécuriser : auth/rôles.)"""
+        """Enregistre un dépôt (daté du jour, ou de la date fournie) puis renvoie le récap du membre."""
         from apps.savings.models import Deposit
 
         cycle = Cycle.objects.get(id=cycle_id)
         member = Member.objects.get(id=member_id)
+        jour = datetime.date.fromisoformat(date) if date else datetime.date.today()
         Deposit.objects.update_or_create(
             cycle=cycle, member=member, mois_index=mois_index,
-            defaults={"montant": montant},
+            defaults={"montant": montant, "date_operation": jour},
         )
         return _recap_membre(member, cycle)
 

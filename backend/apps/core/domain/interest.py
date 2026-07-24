@@ -3,11 +3,12 @@
 Reproduit les règles vérifiées avec le porteur de projet et dans le classeur
 `Caisse-Mutuelle-Calculatrice.xlsx` :
 
-- Cycle : dépôts de septembre à mai (9 mois), remboursements jusqu'en août.
+- Cycle : dépôts de septembre à mai (barème dégressif) + juin à 0 % (mois de clôture des
+  intérêts) ; remboursements jusqu'en septembre (mois de la distribution).
 - Intérêt sur l'épargne : 5 % par mois restant jusqu'à la clôture, figé au mois du dépôt
-  (septembre 45 %, octobre 40 % … mai 5 %). Les dépôts se cumulent.
-- Majoration des prêts : 5 % du montant par mois de dette, jusqu'au remboursement
-  (délai = août si non remboursé).
+  (septembre 45 %, octobre 40 % … mai 5 %, juin 0 %). Les dépôts se cumulent.
+- Majoration des prêts : intérêts composés jusqu'à la clôture (juin), puis gelés ;
+  remboursements possibles sans intérêt jusqu'en septembre (délai).
 
 Les montants sont manipulés en `Decimal` (jamais de float pour de l'argent) et arrondis
 au FCFA entier (pas de centimes).
@@ -22,6 +23,7 @@ from typing import Iterable, Optional, Protocol
 MOIS = {
     1: "Septembre", 2: "Octobre", 3: "Novembre", 4: "Décembre", 5: "Janvier",
     6: "Février", 7: "Mars", 8: "Avril", 9: "Mai", 10: "Juin", 11: "Juillet", 12: "Août",
+    13: "Septembre",  # distribution du cycle suivant
 }
 
 
@@ -40,7 +42,7 @@ class Cycle:
     """Paramètres d'un cycle annuel de caisse. Tous paramétrables — jamais codés en dur."""
     mois_debut: int = 9          # 9 = septembre (informatif)
     duree_depot: int = 9         # nombre de mois de dépôt (septembre → mai)
-    mois_delai: int = 12         # délai de remboursement des prêts (12 = août)
+    mois_delai: int = 13         # délai de remboursement (13 = septembre, mois de la distribution)
     taux_epargne: Decimal = Decimal("0.05")     # par mois restant jusqu'à la clôture
     taux_majoration: Decimal = Decimal("0.05")  # par mois de dette
 
@@ -68,12 +70,16 @@ class Pret:
 # Épargne et intérêts
 # --------------------------------------------------------------------------- #
 def taux_a_la_cloture(mois_index: int, cycle: Cycle) -> Decimal:
-    """Taux dégressif appliqué à un dépôt selon son mois (septembre 45 %, … mai 5 %)."""
-    if not 1 <= mois_index <= cycle.duree_depot:
+    """Taux dégressif appliqué à un dépôt selon son mois (septembre 45 %, … mai 5 %).
+
+    Le mois de clôture (juin = durée + 1) accepte aussi un dépôt, mais à 0 % : l'argent est
+    versé au moment où les intérêts s'arrêtent ; il n'est distribué qu'à la réunion de septembre.
+    """
+    if not 1 <= mois_index <= cycle.duree_depot + 1:
         raise ValueError(
-            f"mois_index {mois_index} hors période de dépôt (1..{cycle.duree_depot})"
+            f"mois_index {mois_index} hors période de dépôt (1..{cycle.duree_depot + 1})"
         )
-    mois_restants = cycle.duree_depot - mois_index + 1
+    mois_restants = cycle.duree_depot - mois_index + 1  # juin (durée + 1) → 0
     return cycle.taux_epargne * mois_restants
 
 

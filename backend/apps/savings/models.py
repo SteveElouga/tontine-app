@@ -1,4 +1,5 @@
 import uuid
+from datetime import date
 from decimal import Decimal
 
 from django.db import models
@@ -16,6 +17,9 @@ class Deposit(models.Model):
     member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name="depots")
     mois_index = models.PositiveSmallIntegerField(help_text="1 = septembre … 9 = mai")
     montant = models.DecimalField(max_digits=12, decimal_places=0)
+    date_operation = models.DateField(
+        default=date.today, help_text="Jour de la saisie (par défaut aujourd'hui, modifiable)"
+    )
     saisi_le = models.DateTimeField(auto_now_add=True)
 
     class Meta:

@@ -10,8 +10,8 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
 import { LangStore } from '../../core/state/lang-store';
-import { MoisNomPipe } from '../../core/i18n/mois.pipe';
-import { Membre, Pret, moisCalendaire } from '../../core/domain/caisse.models';
+import { MoisNomPipe, moisAnnee } from '../../core/i18n/mois.pipe';
+import { Membre, Pret } from '../../core/domain/caisse.models';
 
 @Component({
   selector: 'app-prets',
@@ -30,9 +30,10 @@ export class Prets implements OnInit {
     this.lang.langue();
     const debut = this.cycleStore.moisDebut();
     const duree = this.cycleStore.dureeDepot();
+    const annee = this.cycleStore.anneeDebut();
     // Un prêt se contracte pendant les mois de dépôt : positions 1..duree_depot.
     return Array.from({ length: duree }, (_, i) => i + 1).map((mi) => ({
-      label: this.i18n.instant('mois.' + moisCalendaire(mi, debut)),
+      label: moisAnnee(this.i18n, mi, debut, annee),
       value: mi,
     }));
   });
@@ -40,8 +41,11 @@ export class Prets implements OnInit {
   /** Nom calendaire du dernier mois de remboursement (délai) — pour l'astuce. */
   protected readonly delaiNom = computed(() => {
     this.lang.langue();
-    return this.i18n.instant(
-      'mois.' + moisCalendaire(this.cycleStore.moisDelai(), this.cycleStore.moisDebut()),
+    return moisAnnee(
+      this.i18n,
+      this.cycleStore.moisDelai(),
+      this.cycleStore.moisDebut(),
+      this.cycleStore.anneeDebut(),
     );
   });
 
@@ -114,7 +118,7 @@ export class Prets implements OnInit {
   }
 
   ouvrirRemboursement(p: Pret): void {
-    // 1re réunion après le prêt, sans dépasser le délai de remboursement (août).
+    // 1re réunion après le prêt, sans dépasser le délai de remboursement (septembre).
     this.rembReunion.set(Math.min(p.moisPret + 1, this.cycleStore.moisDelai()));
     this.rembMontant.set(null);
     this.remboursementDe.set(p.id);
@@ -125,15 +129,16 @@ export class Prets implements OnInit {
   }
 
   /**
-   * Réunions possibles pour un remboursement : du mois suivant le prêt jusqu'au délai (août).
-   * L'intérêt s'arrête à la clôture (juin) ; juillet et août restent ouverts au remboursement.
+   * Réunions possibles pour un remboursement : du mois suivant le prêt jusqu'au délai (septembre).
+   * L'intérêt s'arrête à la clôture (juin) ; de juillet à septembre restent ouverts au remboursement.
    */
   optReunions(moisPret: number): { label: string; value: number }[] {
     const debut = this.cycleStore.moisDebut();
+    const annee = this.cycleStore.anneeDebut();
     const fin = this.cycleStore.moisDelai();
     const r: { label: string; value: number }[] = [];
     for (let mi = moisPret + 1; mi <= fin; mi++) {
-      r.push({ label: this.i18n.instant('mois.' + moisCalendaire(mi, debut)), value: mi });
+      r.push({ label: moisAnnee(this.i18n, mi, debut, annee), value: mi });
     }
     return r;
   }

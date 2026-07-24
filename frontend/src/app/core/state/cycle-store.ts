@@ -40,6 +40,13 @@ export class CycleStore {
     return cur?.moisDelai ?? 12;
   });
 
+  /** Année d'ouverture du cycle (lue dans le libellé « 2025-2026 ») ; défaut = année courante. */
+  readonly anneeDebut = computed(() => {
+    const cur = this.cycles().find((c) => c.id === this.cycleId());
+    const m = cur?.libelle?.match(/\d{4}/);
+    return m ? Number(m[0]) : new Date().getFullYear();
+  });
+
   /** Charge la liste des cycles ; garde la sélection valide. */
   charger(): void {
     this.apollo

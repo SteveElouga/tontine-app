@@ -6,7 +6,7 @@ par `tests_interest.py`) mais de vérifier le **câblage** résolveur ↔ base �
 les bons montants, le bon filtrage (membres actifs), le bon format de fil (camelCase,
 Decimal en chaîne).
 
-Barème par défaut (mois_debut=9, duree_depot=9, mois_delai=12, taux 5 %) :
+Barème par défaut (mois_debut=9, duree_depot=9, mois_delai=13, taux 5 %) :
   - Awa : dépôt 10000 au mois 1 (taux 45 % → 4500) + 10000 au mois 9 (5 % → 500) = 5000 d'intérêts,
           épargne+intérêts = 25000 ; prêt 30000 au mois 2 non remboursé → dette composée 44323,7
           (8 mois jusqu'à juin) ; position nette = 25000 − 44323,7 = −19323,7.

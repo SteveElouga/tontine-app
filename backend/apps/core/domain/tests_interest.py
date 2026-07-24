@@ -27,10 +27,16 @@ CYCLE = Cycle()  # cycle standard : 9 mois de dépôt, délai août, taux 5 %
 
 
 def test_taux_degressif():
-    # Septembre (1) = 45 %, Mai (9) = 5 %
+    # Septembre (1) = 45 %, Mai (9) = 5 %, Juin (10) = 0 % (mois de clôture des intérêts)
     assert taux_a_la_cloture(1, CYCLE) == Decimal("0.45")
     assert taux_a_la_cloture(2, CYCLE) == Decimal("0.40")
     assert taux_a_la_cloture(9, CYCLE) == Decimal("0.05")
+    assert taux_a_la_cloture(10, CYCLE) == Decimal("0")  # juin : dépôt possible, 0 %
+    try:
+        taux_a_la_cloture(11, CYCLE)  # au-delà de juin : hors période de dépôt
+        assert False, "mois 11 aurait dû lever ValueError"
+    except ValueError:
+        pass
 
 
 def test_interet_depot_septembre():
@@ -59,10 +65,10 @@ def test_majoration_pret_rembourse():
 
 
 def test_pret_non_rembourse_utilise_le_delai():
-    # Prêt en avril (8) non remboursé → délai août (12) → 4 mois → 15 000
+    # Prêt en avril (8) non remboursé → délai septembre (13) → 5 mois → 18 750
     pret = Pret(Decimal("75000"), mois_pret=8, mois_remboursement=None)
-    assert mois_de_dette(pret, CYCLE) == 4
-    assert majoration_pret(pret, CYCLE) == Decimal("15000")
+    assert mois_de_dette(pret, CYCLE) == 5
+    assert majoration_pret(pret, CYCLE) == Decimal("18750")
 
 
 def test_position_nette():

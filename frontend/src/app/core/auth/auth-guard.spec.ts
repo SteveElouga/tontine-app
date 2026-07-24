@@ -12,14 +12,14 @@ function executer() {
 describe('authGuard', () => {
   it('laisse passer si connectée', () => {
     TestBed.configureTestingModule({
-      providers: [provideRouter([]), { provide: AuthStore, useValue: { connecte: signal(true) } }],
+      providers: [provideRouter([]), { provide: AuthStore, useValue: { sessionActive: signal(true) } }],
     });
     expect(executer()).toBe(true);
   });
 
   it('redirige vers /login si non connectée', () => {
     TestBed.configureTestingModule({
-      providers: [provideRouter([]), { provide: AuthStore, useValue: { connecte: signal(false) } }],
+      providers: [provideRouter([]), { provide: AuthStore, useValue: { sessionActive: signal(false) } }],
     });
     const resultat = executer();
     expect(resultat instanceof UrlTree).toBe(true);

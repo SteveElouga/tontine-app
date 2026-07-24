@@ -6,7 +6,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
 import { LangStore } from '../../core/state/lang-store';
-import { moisCalendaire } from '../../core/domain/caisse.models';
+import { moisAnnee } from '../../core/i18n/mois.pipe';
 
 /** Cahier de séance : une page de notes libre par réunion mensuelle du cycle. */
 @Component({
@@ -32,7 +32,12 @@ export class Notes implements OnInit {
 
   protected readonly seanceNom = computed(() => {
     this.lang.langue();
-    return this.i18n.instant('mois.' + moisCalendaire(this.seance(), this.cycleStore.moisDebut()));
+    return moisAnnee(
+      this.i18n,
+      this.seance(),
+      this.cycleStore.moisDebut(),
+      this.cycleStore.anneeDebut(),
+    );
   });
   /** Une année de tontine = 12 réunions mensuelles ; le cahier couvre tout le cycle. */
   protected readonly derniereSeance = 12;
