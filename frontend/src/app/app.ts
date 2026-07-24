@@ -7,6 +7,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 
 import { CycleStore } from './core/state/cycle-store';
 import { AuthStore } from './core/state/auth-store';
+import { LayoutStore } from './core/state/layout-store';
 
 interface NavItem {
   label: string;
@@ -25,6 +26,7 @@ interface NavItem {
 export class App {
   protected readonly cycles = inject(CycleStore);
   protected readonly auth = inject(AuthStore);
+  protected readonly layout = inject(LayoutStore);
   private readonly router = inject(Router);
 
   /** Options du menu : « libellé du cycle ». */
