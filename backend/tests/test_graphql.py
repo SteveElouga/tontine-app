@@ -65,8 +65,8 @@ def test_recap_cycle_complet(api_auth, donnees):
     assert awa["totalDepose"] == "20000"
     assert awa["interets"] == "5000"
     assert awa["epargnePlusInterets"] == "25000"
-    assert awa["dettes"] == "45000"
-    assert awa["positionNette"] == "-20000"
+    assert awa["dettes"] == "44323.7"        # dette composée v2 (30000@mois2, sans remboursement)
+    assert awa["positionNette"] == "-19323.7"
 
     assert bea["interets"] == "9000"
     assert bea["dettes"] == "0"
@@ -189,8 +189,8 @@ def test_fiche_membre(api_auth, donnees):
     assert fiche["nom"] == "Awa"
     assert fiche["totalDepose"] == "20000"
     assert fiche["interets"] == "5000"
-    assert fiche["dettes"] == "45000"
-    assert fiche["positionNette"] == "-20000"
+    assert fiche["dettes"] == "44323.7"      # dette composée v2
+    assert fiche["positionNette"] == "-19323.7"
 
     # Dépôts détaillés (ordonnés par mois) : intérêt figé au mois du dépôt.
     depots = {d["moisIndex"]: d for d in fiche["depots"]}
@@ -209,7 +209,7 @@ def test_infos_cloture(api_auth, donnees):
         id=str(donnees["cycle"].id),
     )
     infos = data["infosCloture"]
-    assert infos["gains"] == "15000"        # majorations encaissées (prêt Awa)
+    assert infos["gains"] == "14323.7"      # intérêts composés du prêt Awa (30000@mois2)
     assert infos["totalPromis"] == "14000"  # intérêts complets dus (Awa 5000 + Béa 9000)
     # Les gains (15000) couvrent déjà les intérêts promis (14000) → aucune réduction nécessaire.
     assert infos["reductionSuggeree"] == 0

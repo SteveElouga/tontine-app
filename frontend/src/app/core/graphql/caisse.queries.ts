@@ -237,6 +237,8 @@ export const PRETS_CYCLE = gql`
       majoration
       totalARembourser
       rembourse
+      solde
+      totalRembourse
     }
   }
 `;
@@ -255,6 +257,23 @@ export const AJOUTER_PRET = gql`
       majoration
       totalARembourser
       rembourse
+      solde
+      totalRembourse
+    }
+  }
+`;
+
+/** Enregistre un remboursement partiel d'un prêt (registre v2, intérêts composés). */
+export const AJOUTER_REMBOURSEMENT = gql`
+  mutation AjouterRemboursement($pretId: ID!, $mois: Int!, $montant: Decimal!) {
+    ajouterRemboursement(pretId: $pretId, mois: $mois, montant: $montant) {
+      id
+      membreId
+      nom
+      montant
+      moisPret
+      solde
+      totalRembourse
     }
   }
 `;

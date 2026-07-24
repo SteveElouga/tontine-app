@@ -26,7 +26,6 @@ export class Prets implements OnInit {
   private readonly i18n = inject(TranslateService);
   private readonly lang = inject(LangStore);
 
-  private readonly moisRembTous = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   protected readonly optMoisPret = computed(() => {
     this.lang.langue();
     const debut = this.cycleStore.moisDebut();
@@ -46,20 +45,21 @@ export class Prets implements OnInit {
   // Formulaire « nouveau prêt »
   protected readonly nMembre = signal('');
   protected readonly nMontant = signal<number | null>(null);
-  protected readonly nMois = signal<number | null>(null); // choisi consciemment ; conservé d'un prêt au suivant
+  protected readonly nMois = signal<number | null>(null); // conservé d'un prêt au suivant
 
-  // Remboursement en ligne (id du prêt en cours d'édition)
+  // Remboursement partiel en ligne (id du prêt en cours)
   protected readonly remboursementDe = signal<string | null>(null);
-  protected readonly moisRemb = signal(11); // Juillet par défaut
+  protected readonly rembReunion = signal<number | null>(null);
+  protected readonly rembMontant = signal<number | null>(null);
 
   protected readonly totalPrete = computed(() =>
     this.prets().reduce((s, p) => s + Number(p.montant), 0),
   );
-  protected readonly totalMajoration = computed(() =>
-    this.prets().reduce((s, p) => s + Number(p.majoration), 0),
+  protected readonly totalRembourse = computed(() =>
+    this.prets().reduce((s, p) => s + Number(p.totalRembourse), 0),
   );
-  protected readonly totalRembourser = computed(() =>
-    this.prets().reduce((s, p) => s + Number(p.totalARembourser), 0),
+  protected readonly totalSolde = computed(() =>
+    this.prets().reduce((s, p) => s + Number(p.solde), 0),
   );
 
   ngOnInit(): void {
@@ -104,7 +104,8 @@ export class Prets implements OnInit {
   }
 
   ouvrirRemboursement(p: Pret): void {
-    this.moisRemb.set(Math.max(p.moisPret, 11));
+    this.rembReunion.set(Math.min(p.moisPret + 1, 10)); // 1re réunion après le prêt (max juin)
+    this.rembMontant.set(null);
     this.remboursementDe.set(p.id);
   }
 
@@ -112,31 +113,31 @@ export class Prets implements OnInit {
     this.remboursementDe.set(null);
   }
 
-  /** Mois de remboursement possibles pour un prêt (≥ son mois du prêt). */
-  optMoisRemb(moisPret: number): { label: string; value: number }[] {
+  /** Réunions possibles pour un remboursement : du mois suivant le prêt jusqu'à juin (10). */
+  optReunions(moisPret: number): { label: string; value: number }[] {
     const debut = this.cycleStore.moisDebut();
-    return this.moisRembTous
-      .filter((mi) => mi >= moisPret)
-      .map((mi) => ({ label: this.i18n.instant('mois.' + moisCalendaire(mi, debut)), value: mi }));
+    const r: { label: string; value: number }[] = [];
+    for (let mi = moisPret + 1; mi <= 10; mi++) {
+      r.push({ label: this.i18n.instant('mois.' + moisCalendaire(mi, debut)), value: mi });
+    }
+    return r;
   }
 
   valider(p: Pret): void {
-    const mois = this.moisRemb();
-    if (mois < p.moisPret) {
-      this.erreur(this.i18n.instant('prets.errAvantPret'));
+    const mois = this.rembReunion();
+    const montant = this.rembMontant();
+    if (mois == null || !montant || montant <= 0) {
+      this.erreur(this.i18n.instant('prets.errRembChamps'));
       return;
     }
-    this.caisse.rembourserPret(p.id, mois).subscribe({
+    this.caisse.ajouterRemboursement(p.id, mois, montant).subscribe({
       next: (maj) => {
         this.prets.update((l) => l.map((x) => (x.id === maj.id ? maj : x)));
         this.remboursementDe.set(null);
         this.toast.add({
           severity: 'success',
           summary: this.i18n.instant('prets.okRemb'),
-          detail: this.i18n.instant('prets.okRembDetail', {
-            nom: maj.nom,
-            mois: this.i18n.instant('mois.' + moisCalendaire(mois, this.cycleStore.moisDebut())),
-          }),
+          detail: `${maj.nom}, ${this.format(montant)} FCFA`,
           life: 2500,
         });
       },
@@ -148,5 +149,6 @@ export class Prets implements OnInit {
     this.toast.add({ severity: 'error', summary: this.i18n.instant('prets.errTitre'), detail });
   }
 
+  protected readonly n = (v: string | number): number => Number(v);
   protected readonly format = (v: string | number): string => Number(v).toLocaleString('fr-FR');
 }

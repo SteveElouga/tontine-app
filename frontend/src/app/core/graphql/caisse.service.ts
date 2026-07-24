@@ -33,6 +33,7 @@ import {
   PRETS_CYCLE,
   RECAP_CYCLE,
   REMBOURSER_PRET,
+  AJOUTER_REMBOURSEMENT,
   RENOMMER_MEMBRE,
   RETIRER_MEMBRE,
   SIMULER_EPARGNE,
@@ -189,6 +190,16 @@ export class CaisseService {
         variables: { pretId, moisRemboursement },
       })
       .pipe(map((r) => r.data!.rembourserPret as Pret));
+  }
+
+  /** Enregistre un remboursement partiel d'un prêt (registre composé v2). */
+  ajouterRemboursement(pretId: string, mois: number, montant: number): Observable<Pret> {
+    return this.apollo
+      .mutate<{ ajouterRemboursement: Pret }>({
+        mutation: AJOUTER_REMBOURSEMENT,
+        variables: { pretId, mois, montant },
+      })
+      .pipe(map((r) => r.data!.ajouterRemboursement as Pret));
   }
 
   /** Journal chronologique des opérations du cycle (dépôts + prêts). */
