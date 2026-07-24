@@ -8,6 +8,11 @@ zero="0000000000000000000000000000000000000000"
 # git fournit sur stdin : <local_ref> <local_sha> <remote_ref> <remote_sha>
 while read -r local_ref local_sha remote_ref remote_sha; do
   [ -z "${remote_ref:-}" ] && continue
+
+  # Les tags (releases sur main) ne sont pas des branches : les règles R2/R5/R7 ne s'y
+  # appliquent pas. Le contenu est déjà validé par la PR de release ; on les laisse passer.
+  case "$remote_ref" in refs/tags/*) continue ;; esac
+
   target="${remote_ref#refs/heads/}"
 
   # R2 — jamais de push direct sur main/develop (les fusions passent par une PR),
