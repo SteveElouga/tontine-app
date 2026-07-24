@@ -20,6 +20,9 @@ export const FR = {
     profil: 'Profil',
     cycle: 'Cycle',
     deconnexion: 'Déconnexion',
+    replier: 'Replier le menu',
+    deplier: 'Déplier le menu',
+    menu: 'Ouvrir le menu',
   },
   param: {
     langue: 'Langue',
@@ -346,6 +349,9 @@ export const EN = {
     profil: 'Profile',
     cycle: 'Cycle',
     deconnexion: 'Sign out',
+    replier: 'Collapse menu',
+    deplier: 'Expand menu',
+    menu: 'Open menu',
   },
   param: {
     langue: 'Language',
