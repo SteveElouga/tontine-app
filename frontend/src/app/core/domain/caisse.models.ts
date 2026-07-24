@@ -122,6 +122,13 @@ export interface FicheMembre {
   positionNette: string;
 }
 
+/** Un remboursement individuel d'un prêt (pour la suppression ciblée). */
+export interface RemboursementDetail {
+  id: string;
+  mois: number;
+  montant: string;
+}
+
 /** Une ligne de prêt du cycle (vue « Prêts »). */
 export interface Pret {
   id: string;
@@ -131,6 +138,7 @@ export interface Pret {
   moisPret: number;
   solde: string; // dette composée restante (v2)
   totalRembourse: string;
+  remboursements: RemboursementDetail[];
 }
 
 /** Une opération du journal (dépôt ou prêt). */

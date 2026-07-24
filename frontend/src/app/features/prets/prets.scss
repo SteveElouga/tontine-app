@@ -34,64 +34,184 @@
   }
 }
 
-.table-wrap {
-  overflow-x: auto;
+/* Une carte par prêt. */
+.cartes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 14px;
 }
 
-.prets {
-  width: 100%;
-  min-width: 640px;
-  border-collapse: collapse;
-  font-size: 15px;
+.carte {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  padding: 16px;
 
-  th {
-    text-align: left;
-    font-size: 13px;
-    color: var(--c-text-muted);
-    font-weight: 500;
-    padding: 0 12px 10px;
-    border-bottom: 1px solid var(--c-border);
+  &.soldee {
+    background: var(--c-surface-1);
   }
+}
 
-  td {
-    padding: 12px;
-    border-bottom: 1px solid var(--c-border);
-  }
+.c-tete {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 
-  .g {
-    text-align: left;
-  }
-
-  .c {
-    text-align: center;
-  }
-
-  .d {
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .a {
-    text-align: right;
-  }
-
-  .fort {
+  .c-nom {
+    flex: 1;
+    min-width: 0;
+    font-size: 17px;
     font-weight: 600;
   }
 
-  .rouge {
-    color: #b23b3b;
-  }
+  .c-suppr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    min-height: 40px;
+    border: 0;
+    background: transparent;
+    color: var(--c-text-muted);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
 
-  tfoot td {
-    border-top: 2px solid var(--c-border-strong);
-    border-bottom: none;
-    padding-top: 14px;
+    &:active {
+      transform: scale(0.9);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        color: #b23b3b;
+        background: var(--c-surface-1);
+      }
+    }
   }
 }
 
-.centre {
-  text-align: center;
+.c-lignes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.c-l {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+
+  .c-lbl {
+    font-size: 13px;
+    color: var(--c-text-muted);
+  }
+
+  .c-val {
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+
+    small {
+      font-size: 12px;
+      color: var(--c-text-muted);
+    }
+
+    &.fort {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    &.rouge {
+      color: #b23b3b;
+    }
+  }
+}
+
+/* Remboursements du prêt, en lignes propres. */
+.c-rembs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--c-border);
+
+  .c-rembs-titre {
+    margin-bottom: 2px;
+    font-size: 13px;
+    color: var(--c-text-muted);
+  }
+
+  .c-remb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+
+    .mois {
+      flex: 1;
+      color: var(--c-text-2);
+    }
+
+    .mnt {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .c-remb-x {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 32px;
+      min-height: 32px;
+      border: 0;
+      background: transparent;
+      color: var(--c-text-muted);
+      border-radius: 6px;
+      cursor: pointer;
+
+      i {
+        font-size: 12px;
+      }
+
+      &:active {
+        transform: scale(0.9);
+      }
+
+      @media (hover: hover) and (pointer: fine) {
+        &:hover {
+          color: #b23b3b;
+        }
+      }
+    }
+  }
+}
+
+.c-pied {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.c-remb-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  /* L'éditeur inline entre en fondu. */
+  animation: remb-apparait 0.15s var(--ease-out) both;
+}
+
+@keyframes remb-apparait {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .badge {
@@ -108,16 +228,22 @@
 .lien {
   display: inline-flex;
   align-items: center;
-  min-height: 40px;
+  gap: 6px;
+  min-height: 44px;
   border: 1px solid var(--c-border-strong);
   background: var(--c-surface);
   color: var(--c-accent);
   cursor: pointer;
-  font-size: 13px;
-  padding: 6px 12px;
+  font-size: 15px;
+  padding: 8px 14px;
   border-radius: 8px;
   font-family: inherit;
   transition: transform var(--dur-fast) var(--ease-out), background 0.12s ease, border-color 0.12s ease;
+
+  &.plein {
+    width: 100%;
+    justify-content: center;
+  }
 
   @media (hover: hover) and (pointer: fine) {
     &:hover {
@@ -127,25 +253,7 @@
   }
 
   &:active {
-    transform: scale(0.97);
-  }
-}
-
-.remb {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  justify-content: flex-end;
-  /* L'éditeur inline entre en fondu (opacity seule : sûr dans une cellule). */
-  animation: remb-apparait 0.15s var(--ease-out) both;
-}
-
-@keyframes remb-apparait {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
+    transform: scale(0.98);
   }
 }
 
@@ -153,8 +261,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 40px;
-  min-height: 40px;
+  min-width: 44px;
+  min-height: 44px;
   border: 1px solid var(--c-border-strong);
   background: var(--c-surface);
   cursor: pointer;
@@ -164,7 +272,7 @@
   transition: transform var(--dur-fast) var(--ease-out), border-color 0.12s ease, color 0.12s ease;
 
   i {
-    font-size: 14px;
+    font-size: 15px;
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -184,6 +292,31 @@
   }
 }
 
+/* Totaux sous les cartes. */
+.totaux {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 28px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 2px solid var(--c-border-strong);
+
+  div {
+    display: flex;
+    flex-direction: column;
+
+    span {
+      font-size: 13px;
+      color: var(--c-text-muted);
+    }
+
+    strong {
+      font-size: 16px;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+}
+
 .astuce {
   display: flex;
   align-items: center;
@@ -200,6 +333,11 @@
   }
 }
 
-.muted {
+.muted,
+.vide {
   color: var(--c-text-muted);
+}
+
+.vide {
+  padding: 24px 0;
 }

@@ -250,6 +250,11 @@ export const PRETS_CYCLE = gql`
       moisPret
       solde
       totalRembourse
+      remboursements {
+        id
+        mois
+        montant
+      }
     }
   }
 `;
@@ -265,6 +270,11 @@ export const AJOUTER_PRET = gql`
       moisPret
       solde
       totalRembourse
+      remboursements {
+        id
+        mois
+        montant
+      }
     }
   }
 `;
@@ -280,6 +290,52 @@ export const AJOUTER_REMBOURSEMENT = gql`
       moisPret
       solde
       totalRembourse
+      remboursements {
+        id
+        mois
+        montant
+      }
+    }
+  }
+`;
+
+/** Supprime le dépôt d'un membre pour un mois (annuler / effacer) ; renvoie le récap à jour. */
+export const SUPPRIMER_DEPOT = gql`
+  mutation SupprimerDepot($cycleId: ID!, $memberId: ID!, $moisIndex: Int!) {
+    supprimerDepot(cycleId: $cycleId, memberId: $memberId, moisIndex: $moisIndex) {
+      id
+      nom
+      totalDepose
+      interets
+      epargnePlusInterets
+      positionNette
+    }
+  }
+`;
+
+/** Supprime un prêt (et ses remboursements, en cascade). */
+export const SUPPRIMER_PRET = gql`
+  mutation SupprimerPret($pretId: ID!) {
+    supprimerPret(pretId: $pretId)
+  }
+`;
+
+/** Supprime un remboursement ; renvoie le prêt à jour. */
+export const SUPPRIMER_REMBOURSEMENT = gql`
+  mutation SupprimerRemboursement($remboursementId: ID!) {
+    supprimerRemboursement(remboursementId: $remboursementId) {
+      id
+      membreId
+      nom
+      montant
+      moisPret
+      solde
+      totalRembourse
+      remboursements {
+        id
+        mois
+        montant
+      }
     }
   }
 `;

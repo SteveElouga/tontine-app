@@ -36,6 +36,9 @@ import {
   PRETS_CYCLE,
   RECAP_CYCLE,
   AJOUTER_REMBOURSEMENT,
+  SUPPRIMER_DEPOT,
+  SUPPRIMER_PRET,
+  SUPPRIMER_REMBOURSEMENT,
   RENOMMER_MEMBRE,
   RETIRER_MEMBRE,
   SIMULER_EPARGNE,
@@ -193,6 +196,34 @@ export class CaisseService {
         variables: { pretId, mois, montant },
       })
       .pipe(map((r) => r.data!.ajouterRemboursement as Pret));
+  }
+
+  /** Supprime le dépôt d'un membre pour un mois (annuler / effacer). */
+  supprimerDepot(cycleId: string, memberId: string, moisIndex: number): Observable<RecapMembre> {
+    return this.apollo
+      .mutate<{ supprimerDepot: RecapMembre }>({
+        mutation: SUPPRIMER_DEPOT,
+        variables: { cycleId, memberId, moisIndex },
+        refetchQueries: [{ query: RECAP_CYCLE, variables: { cycleId } }],
+      })
+      .pipe(map((r) => r.data!.supprimerDepot as RecapMembre));
+  }
+
+  /** Supprime un prêt (et ses remboursements). */
+  supprimerPret(pretId: string): Observable<boolean> {
+    return this.apollo
+      .mutate<{ supprimerPret: boolean }>({ mutation: SUPPRIMER_PRET, variables: { pretId } })
+      .pipe(map((r) => Boolean(r.data?.supprimerPret)));
+  }
+
+  /** Supprime un remboursement ; renvoie le prêt à jour. */
+  supprimerRemboursement(remboursementId: string): Observable<Pret> {
+    return this.apollo
+      .mutate<{ supprimerRemboursement: Pret }>({
+        mutation: SUPPRIMER_REMBOURSEMENT,
+        variables: { remboursementId },
+      })
+      .pipe(map((r) => r.data!.supprimerRemboursement as Pret));
   }
 
   /** Journal chronologique des opérations du cycle (dépôts + prêts). */

@@ -8,6 +8,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { CycleStore } from './core/state/cycle-store';
 import { AuthStore } from './core/state/auth-store';
 import { LayoutStore } from './core/state/layout-store';
+import { UndoBanner } from './shared/undo-banner/undo-banner';
 
 interface NavItem {
   label: string;
@@ -19,7 +20,7 @@ interface NavItem {
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Toast, FormsModule, Select, TranslatePipe],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Toast, FormsModule, Select, TranslatePipe, UndoBanner],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
