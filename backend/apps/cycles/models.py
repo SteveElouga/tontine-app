@@ -53,3 +53,26 @@ class Cycle(models.Model):
             taux_epargne=self.taux_epargne,
             taux_majoration=self.taux_majoration,
         )
+
+
+class NoteSeance(models.Model):
+    """Cahier de séance : une note libre éditable par (cycle, mois de réunion).
+
+    Le carnet de la trésorière — absences, décisions, incidents d'une séance.
+    Une seule page par séance ; on la réécrit à volonté.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    cycle = models.ForeignKey(Cycle, on_delete=models.CASCADE, related_name="notes")
+    mois = models.PositiveSmallIntegerField(help_text="Séance concernée (1 = 1er mois du cycle)")
+    texte = models.TextField(blank=True)
+    modifie_le = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["mois"]
+        constraints = [
+            models.UniqueConstraint(fields=["cycle", "mois"], name="note_unique_par_seance")
+        ]
+
+    def __str__(self) -> str:
+        return f"note séance {self.mois} — {self.cycle.libelle}"

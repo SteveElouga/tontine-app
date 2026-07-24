@@ -1,0 +1,39 @@
+<header class="entete">
+  <h1>{{ 'notes.titre' | translate }}</h1>
+  <p class="sub">{{ 'notes.sous' | translate }}</p>
+</header>
+
+<div class="stepper">
+  <button class="step-btn" (click)="seancePrecedente()" [attr.aria-label]="'notes.seancePrec' | translate">
+    <i class="pi pi-chevron-left"></i>
+  </button>
+  <div class="step-mois">
+    <span class="mois">{{ seanceNom() }}</span>
+    <span class="sous">{{ 'notes.seanceSur' | translate: { i: seance(), n: derniereSeance } }}</span>
+  </div>
+  <button class="step-btn" (click)="seanceSuivante()" [attr.aria-label]="'notes.seanceSuiv' | translate">
+    <i class="pi pi-chevron-right"></i>
+  </button>
+</div>
+
+@if (chargement()) {
+  <p class="muted">{{ 'commun.chargement' | translate }}</p>
+} @else {
+  <textarea
+    class="zone"
+    rows="12"
+    [ngModel]="texte()"
+    (ngModelChange)="texte.set($event)"
+    (blur)="enregistrer()"
+    [placeholder]="'notes.placeholder' | translate"
+  ></textarea>
+  <p class="etat">
+    @if (enregistreLe()) {
+      <i class="pi pi-check-circle ok"></i>
+      <span>{{ 'notes.enregistreLe' | translate: { date: dateFr(enregistreLe()) } }}</span>
+    } @else {
+      <i class="pi pi-info-circle"></i>
+      <span>{{ 'notes.videAstuce' | translate }}</span>
+    }
+  </p>
+}

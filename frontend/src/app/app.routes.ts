@@ -11,6 +11,7 @@ import { Parametres } from './features/parametres/parametres';
 import { FicheMembrePage } from './features/fiche-membre/fiche-membre';
 import { Login } from './features/login/login';
 import { Profil } from './features/profil/profil';
+import { Notes } from './features/notes/notes';
 import { authGuard } from './core/auth/auth-guard';
 
 export const routes: Routes = [
@@ -22,6 +23,7 @@ export const routes: Routes = [
   { path: 'membres', component: Membres, canActivate: [authGuard] },
   { path: 'recapitulatif', component: Recap, canActivate: [authGuard] },
   { path: 'historique', component: Historique, canActivate: [authGuard] },
+  { path: 'notes', component: Notes, canActivate: [authGuard] },
   { path: 'simulation', component: Simulation, canActivate: [authGuard] },
   { path: 'aide', component: Aide, canActivate: [authGuard] },
   { path: 'parametres', component: Parametres, canActivate: [authGuard] },

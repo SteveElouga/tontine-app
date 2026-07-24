@@ -131,6 +131,13 @@ export interface Operation {
   mois: number;
 }
 
+/** Une note de séance (cahier de la trésorière). */
+export interface NoteSeance {
+  mois: number;
+  texte: string;
+  modifieLe: string;
+}
+
 /** Résultat d'une simulation d'épargne. */
 export interface SimEpargne {
   taux: string;

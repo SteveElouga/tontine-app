@@ -73,6 +73,14 @@ class Operation:
 
 
 @strawberry.type
+class NoteSeance:
+    """Une note libre de séance (cahier de la trésorière)."""
+    mois: int
+    texte: str
+    modifie_le: str  # ISO du dernier enregistrement
+
+
+@strawberry.type
 class SimEpargne:
     taux: Decimal
     interet: Decimal
@@ -473,6 +481,16 @@ class Query:
         )
         return [_pret(loan) for loan in loans]
 
+    @strawberry.field
+    def notes_seance(self, cycle_id: strawberry.ID) -> List[NoteSeance]:
+        """Toutes les notes de séance déjà saisies pour un cycle (cahier de séance)."""
+        from apps.cycles.models import NoteSeance as NoteSeanceModel
+
+        return [
+            NoteSeance(mois=n.mois, texte=n.texte, modifie_le=n.modifie_le.isoformat())
+            for n in NoteSeanceModel.objects.filter(cycle_id=cycle_id).order_by("mois")
+        ]
+
 
 @strawberry.type
 class Mutation:
@@ -538,6 +556,19 @@ class Mutation:
         loan = Loan.objects.select_related("member", "cycle").get(id=pret_id)
         Remboursement.objects.create(loan=loan, mois=mois, montant=montant)
         return _pret(loan)
+
+    @strawberry.mutation
+    def enregistrer_note_seance(
+        self, cycle_id: strawberry.ID, mois: int, texte: str
+    ) -> NoteSeance:
+        """Enregistre (ou remplace) la note d'une séance — le cahier de la trésorière."""
+        from apps.cycles.models import NoteSeance as NoteSeanceModel
+
+        cycle = Cycle.objects.get(id=cycle_id)
+        note, _ = NoteSeanceModel.objects.update_or_create(
+            cycle=cycle, mois=mois, defaults={"texte": texte}
+        )
+        return NoteSeance(mois=note.mois, texte=note.texte, modifie_le=note.modifie_le.isoformat())
 
     @strawberry.mutation
     def modifier_cycle(

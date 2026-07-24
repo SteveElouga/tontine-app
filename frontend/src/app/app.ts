@@ -54,6 +54,7 @@ export class App {
     { label: 'nav.membres', icon: 'pi pi-users', route: '/membres', tour: 'membres' },
     { label: 'nav.simulation', icon: 'pi pi-calculator', route: '/simulation', tour: 'simulation' },
     { label: 'nav.historique', icon: 'pi pi-history', route: '/historique', tour: 'historique' },
+    { label: 'nav.notes', icon: 'pi pi-book', route: '/notes' },
   ];
 
   protected readonly navBas: NavItem[] = [
