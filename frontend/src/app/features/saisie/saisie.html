@@ -40,12 +40,23 @@
     <small class="date-aide">{{ 'saisie.dateAide' | translate }}</small>
   </div>
 } @else {
-  <div class="stepper">
+  <div class="stepper stepper-membre">
     <button class="step-btn" (click)="membrePrecedent()" [attr.aria-label]="'saisie.membrePrec' | translate">
       <i class="pi pi-chevron-left"></i>
     </button>
-    <div class="step-mois">
-      <span class="mois">{{ membreCourant()?.nom }}</span>
+    <div class="membre-choix">
+      <p-select
+        [options]="optMembres()"
+        [ngModel]="membreCourant()?.id"
+        (ngModelChange)="choisirMembre($event)"
+        optionLabel="label"
+        optionValue="value"
+        [filter]="true"
+        filterBy="label"
+        [placeholder]="'saisie.chercherMembre' | translate"
+        [emptyFilterMessage]="'saisie.aucunMembre' | translate"
+        appendTo="body"
+      />
       <span class="sous">{{ 'saisie.membreSur' | translate: { i: membreIndex() + 1, n: membres().length } }}</span>
     </div>
     <button class="step-btn" (click)="membreSuivant()" [attr.aria-label]="'saisie.membreSuiv' | translate">
