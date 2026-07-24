@@ -80,17 +80,6 @@
           [style]="{ width: '100%' }"
         />
       </label>
-      <label>
-        <span>{{ 'simulation.remboursement' | translate }}</span>
-        <p-select
-          [options]="optMoisRemb()"
-          [ngModel]="prRemb()"
-          (ngModelChange)="prRemb.set($event); calculerPret()"
-          optionLabel="label"
-          optionValue="value"
-          [style]="{ width: '100%' }"
-        />
-      </label>
     </div>
     @if (prResultat(); as r) {
       <div class="res">

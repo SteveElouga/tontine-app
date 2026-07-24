@@ -225,16 +225,11 @@ export class CaisseService {
   }
 
   /** Simule un prêt hypothétique (mois de dette, majoration, total à rembourser). */
-  simulerPret(
-    cycleId: string,
-    montant: number,
-    moisPret: number,
-    moisRemboursement: number | null,
-  ): Observable<SimPret> {
+  simulerPret(cycleId: string, montant: number, moisPret: number): Observable<SimPret> {
     return this.apollo
       .query<{ simulerPret: SimPret }>({
         query: SIMULER_PRET,
-        variables: { cycleId, montant, moisPret, moisRemboursement },
+        variables: { cycleId, montant, moisPret },
         fetchPolicy: 'network-only',
       })
       .pipe(map((r) => r.data!.simulerPret as SimPret));

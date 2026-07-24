@@ -80,13 +80,21 @@ export interface DepotDetail {
   interet: string;
 }
 
+/** Une réunion dans la vie d'un prêt composé (échéancier de la fiche). */
+export interface LigneEcheance {
+  mois: number;
+  interet: string;
+  paiement: string;
+  solde: string;
+}
+
 export interface PretDetail {
   montant: string;
   moisPret: number;
-  moisRemboursement: number | null;
-  moisDeDette: number;
-  majoration: string;
-  totalARembourser: string;
+  solde: string;
+  totalRembourse: string;
+  totalInterets: string;
+  echeancier: LigneEcheance[];
 }
 
 export interface FicheMembre {

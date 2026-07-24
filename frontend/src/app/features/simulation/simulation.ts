@@ -30,8 +30,6 @@ export class Simulation {
       value: mi,
     }));
   });
-  private readonly moisTous = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-
   // Volet Épargne
   protected readonly epMontant = signal<number | null>(null);
   protected readonly epMois = signal(1);
@@ -40,16 +38,7 @@ export class Simulation {
   // Volet Prêt
   protected readonly prMontant = signal<number | null>(null);
   protected readonly prMois = signal(1);
-  protected readonly prRemb = signal(12);
   protected readonly prResultat = signal<SimPret | null>(null);
-
-  /** Mois de remboursement possibles (après le mois du prêt). */
-  protected optMoisRemb(): { label: string; value: number }[] {
-    const debut = this.cycleStore.moisDebut();
-    return this.moisTous
-      .filter((mi) => mi > this.prMois())
-      .map((mi) => ({ label: this.i18n.instant('mois.' + moisCalendaire(mi, debut)), value: mi }));
-  }
 
   calculerEpargne(): void {
     const m = this.epMontant();
@@ -69,10 +58,7 @@ export class Simulation {
       this.prResultat.set(null);
       return;
     }
-    if (this.prRemb() <= this.prMois()) {
-      this.prRemb.set(this.prMois() + 1);
-    }
-    this.caisse.simulerPret(this.cycleStore.cycleId(), m, this.prMois(), this.prRemb()).subscribe({
+    this.caisse.simulerPret(this.cycleStore.cycleId(), m, this.prMois()).subscribe({
       next: (r) => this.prResultat.set(r),
       error: () => this.prResultat.set(null),
     });
