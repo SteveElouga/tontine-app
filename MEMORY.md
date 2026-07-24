@@ -78,6 +78,7 @@ gitGraph
 
 | Date | Auteur | Résumé de ce qui a été fait | Branches / PR |
 |------|--------|-----------------------------|---------------|
+| 2026-07-24 | Steve + agent | **Responsivité des écrans** : les grilles passent en `minmax(min(100%, N), 1fr)` (fini le débordement horizontal sous ~360 px) — tableau de bord, saisie, simulation, paramètres, aide, profil ; les **tableaux larges** (récap 6 col., prêts 7 col.) deviennent **défilables horizontalement** (`overflow-x` + largeur minimale) au lieu de se comprimer ; padding du contenu réduit sur téléphone (topbar ajustée) ; recherche du récap fluide (pleine largeur, plafond 320 px). Aucun changement visuel sur ordinateur. SCSS 14/14 OK, AOT `ngc` 0. | feat/responsive |
 | 2026-07-24 | Steve + agent | **Icône de l'app (PWA)** : nouveau logo « cercle de membres » (6 membres autour d'une pièce ₣, blanc sur le bleu #1d5fa5). Source vectorielle `icon.svg` + `favicon.svg` ; PNG 72→512 régénérés, versions **maskable** dédiées (192/512, zone de sécurité), `apple-touch-icon` 180, `favicon.ico` (16/32/48). Manifeste corrigé (nom « Tontine — Caisse mutuelle », `theme_color`/`background_color`/`description`, `purpose` any/maskable séparés) et `index.html` (lang fr, titre, theme-color clair/sombre, liens favicon + apple-touch). | feat/app-icon |
 | 2026-07-24 | Steve + agent | **Animations UX douces** : fondu d'entrée à chaque changement d'écran (`.content > router-outlet + *`), apparition en cascade des cartes du tableau de bord (`monte-doux`), micro-interactions sur les raccourcis (élévation au survol, retour à l'appui, flèche qui avance) et transitions douces sur la navigation / le repli. Subtil et court ; **`prefers-reduced-motion` respecté** (tout est coupé si l'utilisateur le demande). Pas de compteur animé sur les montants (confiance dans une appli d'argent). SCSS compilé OK (`sass`). | feat/animations-ux |
 | 2026-07-24 | Steve + agent | **Barre latérale rétractable** : sur ordinateur, bouton de repli en **rail d'icônes** (64 px, libellés masqués, info-bulle au survol, choix mémorisé) ; sur petit écran, la barre devient un **tiroir en superposition** (hamburger dans une barre supérieure + voile, ne pousse pas le contenu). `LayoutStore` (signal `replie` persisté dans `localStorage` + `menuMobileOuvert`) + son spec (couverture `core/**`). i18n `nav.replier/deplier/menu` (blocs nav 15/15 FR=EN). Choix pour le public 45‑60 ans : défaut = barre complète, repli réversible, navigation toujours visible. AOT `ngc` exit 0. | feat/sidebar-retractable |
@@ -168,6 +169,7 @@ gitGraph
 | 34 | Barre latérale rétractable (rail d'icônes ordinateur + tiroir mobile) | fait | feat/sidebar-retractable |
 | 35 | Animations UX douces (fondu d'écran, micro-interactions, prefers-reduced-motion) | fait | feat/animations-ux |
 | 36 | Icône de l'app + favicon + manifeste PWA (cercle de membres) | fait | feat/app-icon |
+| 37 | Responsivité : grilles min(), tableaux défilables, espacement mobile | fait | feat/responsive |
 
 ## 9. Stack & conventions du projet
 - **Frontend** : Angular (PWA), TypeScript, Apollo GraphQL. Web d'abord ; mobile plus tard.
