@@ -8,10 +8,10 @@ Decimal en chaîne).
 
 Barème par défaut (mois_debut=9, duree_depot=9, mois_delai=12, taux 5 %) :
   - Awa : dépôt 10000 au mois 1 (taux 45 % → 4500) + 10000 au mois 9 (5 % → 500) = 5000 d'intérêts,
-          épargne+intérêts = 25000 ; prêt 30000 au mois 2 non remboursé → 10 mois de dette,
-          majoration 15000, total 45000 ; position nette = 25000 − 45000 = −20000.
+          épargne+intérêts = 25000 ; prêt 30000 au mois 2 non remboursé → dette composée 44323,7
+          (8 mois jusqu'à juin) ; position nette = 25000 − 44323,7 = −19323,7.
   - Béa : dépôt 20000 au mois 1 (45 % → 9000) ; épargne+intérêts = 29000 ; pas de prêt.
-  - Gains de la caisse (majorations encaissées) = 15000.
+  - Gains de la caisse (intérêts composés v2) = 14323,7.
 """
 from collections import Counter
 
@@ -175,7 +175,7 @@ def test_fiche_membre(api_auth, donnees):
         "query($id: ID!, $mid: ID!){ ficheMembre(cycleId: $id, memberId: $mid){"
         " nom totalDepose interets dettes positionNette"
         " depots{ moisIndex montant interet }"
-        " prets{ montant moisDeDette majoration totalARembourser } } }",
+        " prets{ montant moisPret solde totalRembourse } } }",
         id=str(donnees["cycle"].id), mid=str(donnees["awa"].id),
     )
     fiche = data["ficheMembre"]
@@ -191,7 +191,7 @@ def test_fiche_membre(api_auth, donnees):
     assert depots[9]["interet"] == "500"    # mai : 5 %
 
     assert len(fiche["prets"]) == 1
-    assert fiche["prets"][0]["majoration"] == "15000"
+    assert fiche["prets"][0]["solde"] == "44323.7"  # dette composée du prêt (30000@mois2)
 
 
 @pytest.mark.django_db
