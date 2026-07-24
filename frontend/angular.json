@@ -75,7 +75,15 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
-            "setupFiles": ["src/test-setup.ts"]
+            "setupFiles": ["src/test-setup.ts"],
+            "coverageInclude": ["src/app/core/**/*.ts"],
+            "coverageExclude": ["src/**/*.spec.ts", "src/test-setup.ts", "src/testing/**"],
+            "coverageThresholds": {
+              "statements": 90,
+              "branches": 65,
+              "functions": 90,
+              "lines": 90
+            }
           }
         }
       }
