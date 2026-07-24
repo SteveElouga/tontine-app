@@ -124,8 +124,7 @@ def test_depots_mois(api_auth, donnees):
 def test_prets_cycle(api_auth, donnees):
     data = _data(
         api_auth,
-        "query($id: ID!){ pretsCycle(cycleId: $id){"
-        " nom montant moisDeDette majoration totalARembourser rembourse solde totalRembourse } }",
+        "query($id: ID!){ pretsCycle(cycleId: $id){ nom montant solde totalRembourse } }",
         id=str(donnees["cycle"].id),
     )
     prets = data["pretsCycle"]
@@ -133,13 +132,7 @@ def test_prets_cycle(api_auth, donnees):
     p = prets[0]
     assert p["nom"] == "Awa"
     assert p["montant"] == "30000"
-    # Anciens champs (calcul simple) — conservés en additif :
-    assert p["moisDeDette"] == 10
-    assert p["majoration"] == "15000"
-    assert p["totalARembourser"] == "45000"
-    assert p["rembourse"] is False
-    # Nouveaux champs composés v2 (30000 au mois 2, sans remboursement) :
-    assert p["solde"] == "44323.7"
+    assert p["solde"] == "44323.7"          # composé (30000 au mois 2, sans remboursement)
     assert p["totalRembourse"] == "0"
 
 

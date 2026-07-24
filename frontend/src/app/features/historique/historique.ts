@@ -10,7 +10,7 @@ import { LangStore } from '../../core/state/lang-store';
 import { MoisNomPipe } from '../../core/i18n/mois.pipe';
 import { Operation } from '../../core/domain/caisse.models';
 
-type FiltreType = 'tout' | 'depot' | 'pret';
+type FiltreType = 'tout' | 'depot' | 'pret' | 'remboursement';
 
 @Component({
   selector: 'app-historique',
@@ -37,6 +37,10 @@ export class Historique implements OnInit {
       { label: this.i18n.instant('historique.tout'), value: 'tout' as FiltreType },
       { label: this.i18n.instant('historique.filtreDepots'), value: 'depot' as FiltreType },
       { label: this.i18n.instant('historique.filtrePrets'), value: 'pret' as FiltreType },
+      {
+        label: this.i18n.instant('historique.filtreRemboursements'),
+        value: 'remboursement' as FiltreType,
+      },
     ];
   });
 

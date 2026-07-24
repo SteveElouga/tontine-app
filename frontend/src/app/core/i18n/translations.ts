@@ -285,6 +285,7 @@ export const FR = {
     sous: 'Tout ce qui a été fait dans la caisse, du plus récent au plus ancien.',
     aDepose: 'a déposé',
     aEmprunte: 'a emprunté',
+    aRembourse: 'a remboursé',
     saisiLe: 'saisi le {{date}}',
     rembourseEn: 'Remboursé en {{mois}}',
     enCours: 'En cours',
@@ -293,6 +294,7 @@ export const FR = {
     tout: 'Tout',
     filtreDepots: 'Dépôts',
     filtrePrets: 'Prêts',
+    filtreRemboursements: 'Remb.',
     aucunResultat: 'Aucun résultat.',
   },
   fiche: {
@@ -629,6 +631,7 @@ export const EN = {
     sous: 'Everything done in the fund, newest first.',
     aDepose: 'deposited',
     aEmprunte: 'borrowed',
+    aRembourse: 'repaid',
     saisiLe: 'entered on {{date}}',
     rembourseEn: 'Repaid in {{mois}}',
     enCours: 'Ongoing',
@@ -637,6 +640,7 @@ export const EN = {
     tout: 'All',
     filtreDepots: 'Deposits',
     filtrePrets: 'Loans',
+    filtreRemboursements: 'Repay.',
     aucunResultat: 'No results.',
   },
   fiche: {
