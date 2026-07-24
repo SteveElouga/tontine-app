@@ -1,0 +1,8 @@
+# Configuration GitGuardian (scan de secrets).
+# Les fixtures de test contiennent des mots de passe FACTICES (comptes créés dans les tests) :
+# ce ne sont pas de vrais secrets. On les exclut pour éviter les faux positifs à chaque PR.
+version: 2
+secret:
+  ignored-paths:
+    - "backend/conftest.py"
+    - "backend/tests/**"
