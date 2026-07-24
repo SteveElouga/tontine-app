@@ -32,36 +32,40 @@
   <ul class="journal">
     @for (op of operationsFiltrees(); track $index) {
       <li class="op">
-        <span class="ic" [class.depot]="op.type === 'depot'" [class.pret]="op.type === 'pret'">
+        <span
+          class="ic"
+          [class.depot]="op.type === 'depot'"
+          [class.pret]="op.type === 'pret'"
+          [class.remb]="op.type === 'remboursement'"
+        >
           <i
             class="pi"
             [class.pi-arrow-down-left]="op.type === 'depot'"
             [class.pi-arrow-up-right]="op.type === 'pret'"
+            [class.pi-replay]="op.type === 'remboursement'"
           ></i>
         </span>
 
         <span class="txt">
           <span class="l1">
             <strong>{{ op.membreNom }}</strong>
-            {{ (op.type === 'depot' ? 'historique.aDepose' : 'historique.aEmprunte') | translate }}
+            {{
+              (op.type === 'depot'
+                ? 'historique.aDepose'
+                : op.type === 'pret'
+                  ? 'historique.aEmprunte'
+                  : 'historique.aRembourse'
+              ) | translate
+            }}
           </span>
           <span class="l2">
             {{ op.mois | moisNom }},
             {{ 'historique.saisiLe' | translate: { date: date(op.date) } }}
-            @if (op.type === 'pret') {
-              @if (op.rembourse) {
-                <span class="badge ok">
-                  {{ 'historique.rembourseEn' | translate: { mois: ((op.moisRemboursement ?? 12) | moisNom) } }}
-                </span>
-              } @else {
-                <span class="badge attente">{{ 'historique.enCours' | translate }}</span>
-              }
-            }
           </span>
         </span>
 
-        <span class="montant" [class.vert]="op.type === 'depot'" [class.rouge]="op.type === 'pret'">
-          {{ op.type === 'depot' ? '+' : '' }}{{ fmt(op.montant) }}
+        <span class="montant" [class.vert]="op.type !== 'pret'" [class.rouge]="op.type === 'pret'">
+          {{ op.type === 'pret' ? '' : '+' }}{{ fmt(op.montant) }}
         </span>
       </li>
     } @empty {

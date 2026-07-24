@@ -63,13 +63,11 @@ class CycleInfo:
 
 @strawberry.type
 class Operation:
-    type: str  # "depot" | "pret"
+    type: str  # "depot" | "pret" | "remboursement"
     date: str  # ISO du moment de saisie (pour tri et affichage)
     membre_nom: str
     montant: Decimal
-    mois: int  # mois du dépôt ou du prêt
-    rembourse: bool
-    mois_remboursement: Optional[int]
+    mois: int  # mois du dépôt, du prêt ou du remboursement
 
 
 @strawberry.type
@@ -107,11 +105,6 @@ class LigneEcheance:
 class PretDetail:
     montant: Decimal
     mois_pret: int
-    mois_remboursement: Optional[int]
-    mois_de_dette: int
-    majoration: Decimal
-    total_a_rembourser: Decimal
-    # Modèle composé v2 (additif) :
     solde: Decimal
     total_interets: Decimal
     total_rembourse: Decimal
@@ -185,12 +178,6 @@ class Pret:
     nom: str
     montant: Decimal
     mois_pret: int
-    mois_remboursement: Optional[int]
-    mois_de_dette: int
-    majoration: Decimal
-    total_a_rembourser: Decimal
-    rembourse: bool
-    # Modèle composé v2 (additif) :
     solde: Decimal
     total_interets: Decimal
     total_rembourse: Decimal
@@ -211,11 +198,6 @@ def _pret(loan) -> "Pret":
         nom=loan.member.nom,
         montant=loan.montant,
         mois_pret=loan.mois_pret,
-        mois_remboursement=loan.mois_remboursement,
-        mois_de_dette=loan.mois_de_dette,
-        majoration=loan.majoration,
-        total_a_rembourser=loan.total_a_rembourser,
-        rembourse=loan.mois_remboursement is not None,
         solde=loan.dette,
         total_interets=loan.total_interets_composes,
         total_rembourse=loan.total_rembourse,
@@ -362,7 +344,7 @@ class Query:
     def historique(self, cycle_id: strawberry.ID) -> List[Operation]:
         """Journal chronologique des opérations du cycle (dépôts + prêts)."""
         from apps.savings.models import Deposit
-        from apps.loans.models import Loan
+        from apps.loans.models import Loan, Remboursement
 
         cycle = Cycle.objects.get(id=cycle_id)
         ops: List[Operation] = []
@@ -374,8 +356,6 @@ class Query:
                     membre_nom=d.member.nom,
                     montant=d.montant,
                     mois=d.mois_index,
-                    rembourse=False,
-                    mois_remboursement=None,
                 )
             )
         for loan in Loan.objects.filter(cycle=cycle).select_related("member"):
@@ -386,8 +366,16 @@ class Query:
                     membre_nom=loan.member.nom,
                     montant=loan.montant,
                     mois=loan.mois_pret,
-                    rembourse=loan.mois_remboursement is not None,
-                    mois_remboursement=loan.mois_remboursement,
+                )
+            )
+        for r in Remboursement.objects.filter(loan__cycle=cycle).select_related("loan__member"):
+            ops.append(
+                Operation(
+                    type="remboursement",
+                    date=r.cree_le.isoformat(),
+                    membre_nom=r.loan.member.nom,
+                    montant=r.montant,
+                    mois=r.mois,
                 )
             )
         ops.sort(key=lambda o: o.date, reverse=True)
@@ -441,10 +429,6 @@ class Query:
             PretDetail(
                 montant=loan.montant,
                 mois_pret=loan.mois_pret,
-                mois_remboursement=loan.mois_remboursement,
-                mois_de_dette=loan.mois_de_dette,
-                majoration=loan.majoration,
-                total_a_rembourser=loan.total_a_rembourser,
                 solde=loan.dette,
                 total_interets=loan.total_interets_composes,
                 total_rembourse=loan.total_rembourse,
@@ -538,18 +522,6 @@ class Mutation:
         loan = Loan.objects.create(cycle=cycle, member=member, montant=montant, mois_pret=mois_pret)
         loan.cycle = cycle
         loan.member = member
-        return _pret(loan)
-
-    @strawberry.mutation
-    def rembourser_pret(
-        self, pret_id: strawberry.ID, mois_remboursement: Optional[int] = None
-    ) -> Pret:
-        """Marque un prêt remboursé (mois indiqué ; vide = au délai d'août)."""
-        from apps.loans.models import Loan
-
-        loan = Loan.objects.select_related("member", "cycle").get(id=pret_id)
-        loan.mois_remboursement = mois_remboursement
-        loan.save(update_fields=["mois_remboursement"])
         return _pret(loan)
 
     @strawberry.mutation

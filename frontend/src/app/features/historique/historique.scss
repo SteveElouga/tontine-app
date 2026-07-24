@@ -88,6 +88,14 @@
       color: #b23b3b;
     }
   }
+
+  &.remb {
+    background: #e7f4ee;
+
+    i {
+      color: var(--c-success);
+    }
+  }
 }
 
 .txt {
