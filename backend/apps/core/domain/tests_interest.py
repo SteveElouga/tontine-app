@@ -27,14 +27,16 @@ CYCLE = Cycle()  # cycle standard : 9 mois de dépôt, délai août, taux 5 %
 
 
 def test_taux_degressif():
-    # Septembre (1) = 45 %, Mai (9) = 5 %, Juin (10) = 0 % (mois de clôture des intérêts)
+    # Septembre (1) = 45 %, Mai (9) = 5 % ; de juin au délai (sept.) le dépôt reste possible à 0 %.
     assert taux_a_la_cloture(1, CYCLE) == Decimal("0.45")
     assert taux_a_la_cloture(2, CYCLE) == Decimal("0.40")
     assert taux_a_la_cloture(9, CYCLE) == Decimal("0.05")
-    assert taux_a_la_cloture(10, CYCLE) == Decimal("0")  # juin : dépôt possible, 0 %
+    assert taux_a_la_cloture(10, CYCLE) == Decimal("0")   # juin : 0 %
+    assert taux_a_la_cloture(11, CYCLE) == Decimal("0")   # juillet : 0 %
+    assert taux_a_la_cloture(13, CYCLE) == Decimal("0")   # septembre (délai) : 0 %
     try:
-        taux_a_la_cloture(11, CYCLE)  # au-delà de juin : hors période de dépôt
-        assert False, "mois 11 aurait dû lever ValueError"
+        taux_a_la_cloture(14, CYCLE)  # au-delà du délai : hors période
+        assert False, "mois 14 aurait dû lever ValueError"
     except ValueError:
         pass
 

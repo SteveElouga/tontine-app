@@ -67,6 +67,7 @@
     font-weight: 600;
   }
 
+  .c-modif,
   .c-suppr {
     display: inline-flex;
     align-items: center;
@@ -83,12 +84,17 @@
     &:active {
       transform: scale(0.9);
     }
+  }
 
-    @media (hover: hover) and (pointer: fine) {
-      &:hover {
-        color: #b23b3b;
-        background: var(--c-surface-1);
-      }
+  @media (hover: hover) and (pointer: fine) {
+    .c-modif:hover {
+      color: var(--c-accent);
+      background: var(--c-surface-1);
+    }
+
+    .c-suppr:hover {
+      color: #b23b3b;
+      background: var(--c-surface-1);
     }
   }
 }
@@ -97,6 +103,31 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+/* Formulaire d'édition d'un prêt (dans la carte). */
+.c-edition {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: remb-apparait 0.15s var(--ease-out) both;
+
+  .c-champ {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    span {
+      font-size: 13px;
+      color: var(--c-text-muted);
+    }
+  }
+
+  .c-edition-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 2px;
+  }
 }
 
 .c-l {
@@ -126,6 +157,10 @@
 
     &.rouge {
       color: #b23b3b;
+    }
+
+    &.majo {
+      color: #b26a00; /* la majoration = coût ajouté, distinct du capital */
     }
   }
 }

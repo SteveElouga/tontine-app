@@ -43,6 +43,15 @@ export class Recap implements OnInit {
   protected readonly totalDettes = computed(() =>
     this.membresFiltres().reduce((s, m) => s + Number(m.dettes), 0),
   );
+  protected readonly totalCapitalEmprunte = computed(() =>
+    this.membresFiltres().reduce((s, m) => s + Number(m.capitalEmprunte), 0),
+  );
+  protected readonly totalMajoration = computed(() =>
+    this.membresFiltres().reduce((s, m) => s + Number(m.majoration), 0),
+  );
+  protected readonly totalRembourse = computed(() =>
+    this.membresFiltres().reduce((s, m) => s + Number(m.totalRembourse), 0),
+  );
   protected readonly totalRecevoir = computed(() =>
     this.membresFiltres().reduce((s, m) => s + Number(m.positionNette), 0),
   );
