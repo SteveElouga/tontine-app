@@ -10,8 +10,9 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
 import { LangStore } from '../../core/state/lang-store';
+import { UndoStore } from '../../core/state/undo-store';
 import { MoisNomPipe, moisAnnee } from '../../core/i18n/mois.pipe';
-import { Membre, Pret } from '../../core/domain/caisse.models';
+import { Membre, Pret, RemboursementDetail } from '../../core/domain/caisse.models';
 
 @Component({
   selector: 'app-prets',
@@ -25,6 +26,7 @@ export class Prets implements OnInit {
   private readonly toast = inject(MessageService);
   private readonly i18n = inject(TranslateService);
   private readonly lang = inject(LangStore);
+  private readonly undo = inject(UndoStore);
 
   protected readonly optMoisPret = computed(() => {
     this.lang.langue();
@@ -106,14 +108,56 @@ export class Prets implements OnInit {
         this.prets.update((l) => [...l, p].sort((a, b) => a.nom.localeCompare(b.nom, 'fr')));
         this.nMembre.set('');
         this.nMontant.set(null);
-        this.toast.add({
-          severity: 'success',
-          summary: this.i18n.instant('prets.okPret'),
-          detail: `${p.nom}, ${this.format(p.montant)} FCFA`,
-          life: 2500,
-        });
+        this.undo.proposer(
+          this.i18n.instant('prets.undoPret', { nom: p.nom, montant: this.format(p.montant) }),
+          () => this.retirerPret(p.id),
+        );
       },
       error: () => this.erreur(this.i18n.instant('prets.errAjout')),
+    });
+  }
+
+  /** Supprime un prêt après confirmation (correction à tout moment). */
+  supprimer(p: Pret): void {
+    const msg = this.i18n.instant('prets.confirmSuppr', {
+      nom: p.nom,
+      montant: this.format(p.montant),
+    });
+    if (!confirm(msg)) return;
+    this.caisse.supprimerPret(p.id).subscribe({
+      next: () => {
+        this.prets.update((l) => l.filter((x) => x.id !== p.id));
+        this.toast.add({
+          severity: 'success',
+          summary: this.i18n.instant('prets.okSuppr'),
+          detail: p.nom,
+          life: 2000,
+        });
+      },
+      error: () => this.erreur(this.i18n.instant('prets.errSuppr')),
+    });
+  }
+
+  /** Retire un prêt de la liste (utilisé par l'annulation d'un ajout). */
+  private retirerPret(pretId: string): void {
+    this.caisse.supprimerPret(pretId).subscribe({
+      next: () => this.prets.update((l) => l.filter((x) => x.id !== pretId)),
+      error: () => this.erreur(this.i18n.instant('prets.errSuppr')),
+    });
+  }
+
+  /** Supprime un remboursement après confirmation ; met le prêt à jour. */
+  supprimerUnRemboursement(remb: RemboursementDetail): void {
+    if (!confirm(this.i18n.instant('prets.confirmSupprRemb', { montant: this.format(remb.montant) })))
+      return;
+    this.annulerRemboursement(remb.id);
+  }
+
+  /** Supprime un remboursement (sans confirmation) ; sert aussi à l'annulation. */
+  private annulerRemboursement(remboursementId: string): void {
+    this.caisse.supprimerRemboursement(remboursementId).subscribe({
+      next: (maj) => this.prets.update((l) => l.map((x) => (x.id === maj.id ? maj : x))),
+      error: () => this.erreur(this.i18n.instant('prets.errRemb')),
     });
   }
 
@@ -150,16 +194,18 @@ export class Prets implements OnInit {
       this.erreur(this.i18n.instant('prets.errRembChamps'));
       return;
     }
+    const avantIds = new Set(p.remboursements.map((r) => r.id));
     this.caisse.ajouterRemboursement(p.id, mois, montant).subscribe({
       next: (maj) => {
         this.prets.update((l) => l.map((x) => (x.id === maj.id ? maj : x)));
         this.remboursementDe.set(null);
-        this.toast.add({
-          severity: 'success',
-          summary: this.i18n.instant('prets.okRemb'),
-          detail: `${maj.nom}, ${this.format(montant)} FCFA`,
-          life: 2500,
-        });
+        const nouveau = maj.remboursements.find((r) => !avantIds.has(r.id));
+        this.undo.proposer(
+          this.i18n.instant('prets.undoRemb', { nom: maj.nom, montant: this.format(montant) }),
+          () => {
+            if (nouveau) this.annulerRemboursement(nouveau.id);
+          },
+        );
       },
       error: () => this.erreur(this.i18n.instant('prets.errRemb')),
     });

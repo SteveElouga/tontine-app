@@ -1,0 +1,17 @@
+@if (undo.action(); as a) {
+  <div class="undo-banner" role="status" aria-live="polite">
+    <i class="pi pi-check-circle etat"></i>
+    <span class="txt">{{ a.label }}</span>
+    <button type="button" class="annuler" (click)="undo.annuler()">
+      <i class="pi pi-undo"></i> {{ 'commun.annuler' | translate }}
+    </button>
+    <button
+      type="button"
+      class="fermer"
+      (click)="undo.ignorer()"
+      [attr.aria-label]="'commun.fermer' | translate"
+    >
+      <i class="pi pi-times"></i>
+    </button>
+  </div>
+}

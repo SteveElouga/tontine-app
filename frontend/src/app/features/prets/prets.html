@@ -42,89 +42,113 @@
 
 @if (chargement()) {
   <p class="muted">{{ 'commun.chargement' | translate }}</p>
+} @else if (!prets().length) {
+  <p class="vide">{{ 'prets.vide' | translate }}</p>
 } @else {
-  <div class="table-wrap">
-    <table class="prets">
-      <thead>
-        <tr>
-          <th class="g">{{ 'prets.colMembre' | translate }}</th>
-          <th class="d">{{ 'prets.colMontant' | translate }}</th>
-          <th class="c">{{ 'prets.colPret' | translate }}</th>
-          <th class="d">{{ 'prets.colRembourse' | translate }}</th>
-          <th class="d">
-            {{ 'prets.colSolde' | translate }}
-            <i class="pi pi-info-circle tip" [pTooltip]="'prets.tipSolde' | translate" tooltipPosition="top"></i>
-          </th>
-          <th class="a">{{ 'prets.colAction' | translate }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (p of prets(); track p.id) {
-          <tr>
-            <td class="g">{{ p.nom }}</td>
-            <td class="d">{{ format(p.montant) }}</td>
-            <td class="c">{{ p.moisPret | moisNom }}</td>
-            <td class="d">{{ format(p.totalRembourse) }}</td>
-            <td class="d fort" [class.rouge]="n(p.solde) > 0">{{ format(p.solde) }}</td>
-            <td class="a">
-              @if (n(p.solde) === 0) {
-                <span class="badge ok">
-                  <i class="pi pi-check-circle"></i>
-                  {{ 'prets.soldeTag' | translate }}
-                </span>
-              } @else if (remboursementDe() === p.id) {
-                <span class="remb">
-                  <p-select
-                    [options]="optReunions(p.moisPret)"
-                    [ngModel]="rembReunion()"
-                    (ngModelChange)="rembReunion.set($event)"
-                    optionLabel="label"
-                    optionValue="value"
-                    appendTo="body"
-                    [style]="{ 'min-width': '130px' }"
-                  />
-                  <p-inputnumber
-                    [ngModel]="rembMontant()"
-                    (ngModelChange)="rembMontant.set($event)"
-                    [maxFractionDigits]="0"
-                    [useGrouping]="true"
-                    locale="fr-FR"
-                    [placeholder]="'prets.montantRemb' | translate"
-                    [inputStyle]="{ width: '110px', 'text-align': 'right' }"
-                  />
-                  <button type="button" class="mini-btn ok" (click)="valider(p)" [attr.aria-label]="'prets.valider' | translate">
-                    <i class="pi pi-check"></i>
-                  </button>
-                  <button type="button" class="mini-btn" (click)="annuler()" [attr.aria-label]="'prets.annuler' | translate">
-                    <i class="pi pi-times"></i>
-                  </button>
-                </span>
-              } @else {
-                <button type="button" class="lien" (click)="ouvrirRemboursement(p)">
-                  {{ 'prets.rembourser' | translate }}
+  <div class="cartes">
+    @for (p of prets(); track p.id) {
+      <article class="carte" [class.soldee]="n(p.solde) === 0">
+        <header class="c-tete">
+          <span class="c-nom">{{ p.nom }}</span>
+          @if (n(p.solde) === 0) {
+            <span class="badge ok"><i class="pi pi-check-circle"></i> {{ 'prets.soldeTag' | translate }}</span>
+          }
+          <button
+            type="button"
+            class="c-suppr"
+            (click)="supprimer(p)"
+            [attr.aria-label]="'prets.supprimer' | translate"
+            [pTooltip]="'prets.supprimer' | translate"
+            tooltipPosition="left"
+          >
+            <i class="pi pi-trash"></i>
+          </button>
+        </header>
+
+        <div class="c-lignes">
+          <div class="c-l">
+            <span class="c-lbl">{{ 'prets.colMontant' | translate }}</span>
+            <span class="c-val">{{ format(p.montant) }} <small>FCFA</small></span>
+          </div>
+          <div class="c-l">
+            <span class="c-lbl">{{ 'prets.colPret' | translate }}</span>
+            <span class="c-val">{{ p.moisPret | moisNom }}</span>
+          </div>
+          <div class="c-l">
+            <span class="c-lbl">
+              {{ 'prets.colSolde' | translate }}
+              <i class="pi pi-info-circle tip" [pTooltip]="'prets.tipSolde' | translate" tooltipPosition="top"></i>
+            </span>
+            <span class="c-val fort" [class.rouge]="n(p.solde) > 0">{{ format(p.solde) }} <small>FCFA</small></span>
+          </div>
+        </div>
+
+        @if (p.remboursements.length) {
+          <div class="c-rembs">
+            <span class="c-rembs-titre">
+              {{ 'prets.colRembourse' | translate }} · {{ format(p.totalRembourse) }} FCFA
+            </span>
+            @for (r of p.remboursements; track r.id) {
+              <div class="c-remb">
+                <span class="mois">{{ r.mois | moisNom }}</span>
+                <span class="mnt">{{ format(r.montant) }} FCFA</span>
+                <button
+                  type="button"
+                  class="c-remb-x"
+                  (click)="supprimerUnRemboursement(r)"
+                  [attr.aria-label]="'prets.supprimerRemb' | translate"
+                >
+                  <i class="pi pi-times"></i>
                 </button>
-              }
-            </td>
-          </tr>
-        } @empty {
-          <tr>
-            <td colspan="6" class="muted centre">{{ 'prets.vide' | translate }}</td>
-          </tr>
+              </div>
+            }
+          </div>
         }
-      </tbody>
-      @if (prets().length) {
-        <tfoot>
-          <tr>
-            <td class="g fort">{{ 'prets.total' | translate }}</td>
-            <td class="d fort">{{ format(totalPrete()) }}</td>
-            <td class="c"></td>
-            <td class="d fort">{{ format(totalRembourse()) }}</td>
-            <td class="d fort">{{ format(totalSolde()) }}</td>
-            <td class="a"></td>
-          </tr>
-        </tfoot>
-      }
-    </table>
+
+        @if (remboursementDe() === p.id) {
+          <footer class="c-pied">
+            <div class="c-remb-form">
+              <p-select
+                [options]="optReunions(p.moisPret)"
+                [ngModel]="rembReunion()"
+                (ngModelChange)="rembReunion.set($event)"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"
+                [style]="{ 'min-width': '150px' }"
+              />
+              <p-inputnumber
+                [ngModel]="rembMontant()"
+                (ngModelChange)="rembMontant.set($event)"
+                [maxFractionDigits]="0"
+                [useGrouping]="true"
+                locale="fr-FR"
+                [placeholder]="'prets.montantRemb' | translate"
+                [inputStyle]="{ width: '120px', 'text-align': 'right' }"
+              />
+              <button type="button" class="mini-btn ok" (click)="valider(p)" [attr.aria-label]="'prets.valider' | translate">
+                <i class="pi pi-check"></i>
+              </button>
+              <button type="button" class="mini-btn" (click)="annuler()" [attr.aria-label]="'prets.annuler' | translate">
+                <i class="pi pi-times"></i>
+              </button>
+            </div>
+          </footer>
+        } @else if (n(p.solde) > 0) {
+          <footer class="c-pied">
+            <button type="button" class="lien plein" (click)="ouvrirRemboursement(p)">
+              <i class="pi pi-plus"></i> {{ 'prets.rembourser' | translate }}
+            </button>
+          </footer>
+        }
+      </article>
+    }
+  </div>
+
+  <div class="totaux">
+    <div><span>{{ 'prets.total' | translate }}</span><strong>{{ format(totalPrete()) }} FCFA</strong></div>
+    <div><span>{{ 'prets.colRembourse' | translate }}</span><strong>{{ format(totalRembourse()) }} FCFA</strong></div>
+    <div><span>{{ 'prets.colSolde' | translate }}</span><strong>{{ format(totalSolde()) }} FCFA</strong></div>
   </div>
 
   <div class="astuce">

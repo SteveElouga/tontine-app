@@ -185,6 +185,13 @@ def _recap_membre(member: Member, cycle: Cycle, strategie=None) -> RecapMembre:
 
 
 @strawberry.type
+class RemboursementDetail:
+    id: strawberry.ID
+    mois: int
+    montant: Decimal
+
+
+@strawberry.type
 class Pret:
     id: strawberry.ID
     membre_id: strawberry.ID
@@ -194,6 +201,7 @@ class Pret:
     solde: Decimal
     total_interets: Decimal
     total_rembourse: Decimal
+    remboursements: List["RemboursementDetail"]
 
 
 def _echeancier(loan) -> "List[LigneEcheance]":
@@ -214,6 +222,10 @@ def _pret(loan) -> "Pret":
         solde=loan.dette,
         total_interets=loan.total_interets_composes,
         total_rembourse=loan.total_rembourse,
+        remboursements=[
+            RemboursementDetail(id=strawberry.ID(str(r.id)), mois=r.mois, montant=r.montant)
+            for r in loan.remboursements.order_by("mois", "cree_le")
+        ],
     )
 
 
@@ -489,6 +501,7 @@ class Query:
         loans = (
             Loan.objects.filter(cycle_id=cycle_id)
             .select_related("member", "cycle")
+            .prefetch_related("remboursements")
             .order_by("member__nom", "mois_pret")
         )
         return [_pret(loan) for loan in loans]
@@ -573,6 +586,38 @@ class Mutation:
 
         loan = Loan.objects.select_related("member", "cycle").get(id=pret_id)
         Remboursement.objects.create(loan=loan, mois=mois, montant=montant)
+        return _pret(loan)
+
+    @strawberry.mutation
+    def supprimer_depot(
+        self, cycle_id: strawberry.ID, member_id: strawberry.ID, mois_index: int
+    ) -> RecapMembre:
+        """Supprime le dépôt d'un membre pour un mois donné ; renvoie le récap à jour."""
+        from apps.savings.models import Deposit
+
+        cycle = Cycle.objects.get(id=cycle_id)
+        member = Member.objects.get(id=member_id)
+        Deposit.objects.filter(cycle=cycle, member=member, mois_index=mois_index).delete()
+        return _recap_membre(member, cycle)
+
+    @strawberry.mutation
+    def supprimer_pret(self, pret_id: strawberry.ID) -> bool:
+        """Supprime un prêt et, en cascade, tous ses remboursements."""
+        from apps.loans.models import Loan
+
+        Loan.objects.filter(id=pret_id).delete()
+        return True
+
+    @strawberry.mutation
+    def supprimer_remboursement(self, remboursement_id: strawberry.ID) -> Pret:
+        """Supprime un remboursement ; renvoie le prêt à jour."""
+        from apps.loans.models import Remboursement
+
+        r = Remboursement.objects.select_related("loan__member", "loan__cycle").get(
+            id=remboursement_id
+        )
+        loan = r.loan
+        r.delete()
         return _pret(loan)
 
     @strawberry.mutation

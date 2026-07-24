@@ -1,0 +1,94 @@
+:host {
+  display: contents;
+}
+
+/* Barre d'annulation flottante, aux couleurs de l'app (thème clair/sombre). */
+.undo-banner {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100vw - 28px);
+  background: var(--c-surface);
+  color: var(--c-text);
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  padding: 8px 8px 8px 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.16);
+  animation: undo-monte var(--dur-base, 180ms) var(--ease-out, ease-out) both;
+
+  .etat {
+    color: var(--c-success);
+    font-size: 18px;
+  }
+
+  .txt {
+    font-size: 14px;
+  }
+
+  .annuler {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 40px;
+    background: var(--c-accent-bg);
+    border: 1px solid transparent;
+    color: var(--c-accent);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+
+    &:active {
+      transform: scale(0.97);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        background: var(--c-accent);
+        color: #fff;
+      }
+    }
+  }
+
+  .fermer {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    min-height: 40px;
+    background: transparent;
+    border: 0;
+    color: var(--c-text-muted);
+    border-radius: 8px;
+    cursor: pointer;
+
+    &:active {
+      transform: scale(0.9);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        color: var(--c-text-2);
+        background: var(--c-surface-1);
+      }
+    }
+  }
+}
+
+@keyframes undo-monte {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}

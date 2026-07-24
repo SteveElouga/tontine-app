@@ -9,13 +9,15 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
 import { LangStore } from '../../core/state/lang-store';
+import { UndoStore } from '../../core/state/undo-store';
 import { MoisNomPipe, moisAnnee } from '../../core/i18n/mois.pipe';
 
 interface Ligne {
   label: string;
   memberId: string;
   moisIndex: number;
-  montant: number | null;
+  montant: number | null; // valeur affichée dans le champ
+  montantEnregistre: number | null; // valeur réellement persistée (pour annuler / effacer)
   enregistre: boolean;
   date: string | null; // ISO du jour de la saisie (null si pas encore enregistré)
 }
@@ -38,6 +40,7 @@ export class Saisie implements OnInit {
   private readonly toast = inject(MessageService);
   private readonly i18n = inject(TranslateService);
   private readonly lang = inject(LangStore);
+  private readonly undo = inject(UndoStore);
 
   protected readonly vue = signal<'mois' | 'membre'>('mois');
   protected readonly moisIndex = signal(2); // Octobre
@@ -134,42 +137,78 @@ export class Saisie implements OnInit {
     const courant = this.lignes().find(
       (l) => l.memberId === ligne.memberId && l.moisIndex === ligne.moisIndex,
     );
-    if (!courant || courant.montant == null) return;
+    if (!courant) return;
+    const avant = courant.montantEnregistre; // état persistant AVANT l'action
+    const apres = courant.montant && courant.montant > 0 ? courant.montant : null;
+    if (apres === avant) return; // rien n'a changé
     const jour = this.vue() === 'mois' ? this.dateSaisie() : (courant.date ?? this.aujourdhui());
-    this.caisse
-      .ajouterDepot(
-        this.cycleStore.cycleId(),
-        courant.memberId,
-        courant.moisIndex,
-        courant.montant,
-        jour,
-      )
-      .subscribe({
+    const cid = this.cycleStore.cycleId();
+
+    if (apres != null) {
+      // Enregistrement (ou modification) du dépôt.
+      this.caisse.ajouterDepot(cid, courant.memberId, courant.moisIndex, apres, jour).subscribe({
         next: () => {
-          this.lignes.update((ls) =>
-            ls.map((l) =>
-              l.memberId === courant.memberId && l.moisIndex === courant.moisIndex
-                ? { ...l, enregistre: true, date: jour }
-                : l,
-            ),
+          this.majLigne(courant, apres, jour);
+          this.undo.proposer(
+            this.i18n.instant('saisie.undoEnregistre', { montant: this.format(apres) }),
+            () => this.restaurer(courant, avant, jour),
           );
-          this.toast.add({
-            severity: 'success',
-            summary: this.i18n.instant('saisie.okTitre'),
-            detail:
-              this.vue() === 'mois'
-                ? `${courant.label} — ${this.jourCourt(jour)}`
-                : `${moisAnnee(this.i18n, courant.moisIndex, this.cycleStore.moisDebut(), this.cycleStore.anneeDebut())}, ${this.membreCourant()?.nom}`,
-            life: 2500,
-          });
         },
-        error: () =>
-          this.toast.add({
-            severity: 'error',
-            summary: this.i18n.instant('saisie.errTitre'),
-            detail: this.i18n.instant('saisie.reessayez'),
-          }),
+        error: () => this.erreurEnregistrement(),
       });
+    } else {
+      // Champ vidé alors qu'un dépôt existait → suppression.
+      this.caisse.supprimerDepot(cid, courant.memberId, courant.moisIndex).subscribe({
+        next: () => {
+          this.majLigne(courant, null, null);
+          this.undo.proposer(this.i18n.instant('saisie.undoSupprime'), () =>
+            this.restaurer(courant, avant, jour),
+          );
+        },
+        error: () => this.erreurEnregistrement(),
+      });
+    }
+  }
+
+  /** Met à jour l'état persistant d'une ligne après un aller-retour serveur. */
+  private majLigne(ref: Ligne, valeur: number | null, jour: string | null): void {
+    this.lignes.update((ls) =>
+      ls.map((l) =>
+        l.memberId === ref.memberId && l.moisIndex === ref.moisIndex
+          ? {
+              ...l,
+              montant: valeur,
+              montantEnregistre: valeur,
+              enregistre: valeur != null,
+              date: valeur != null ? jour : null,
+            }
+          : l,
+      ),
+    );
+  }
+
+  /** Annulation : restaure la ligne à sa valeur persistée précédente. */
+  private restaurer(ref: Ligne, valeur: number | null, jour: string): void {
+    const cid = this.cycleStore.cycleId();
+    if (valeur != null) {
+      this.caisse.ajouterDepot(cid, ref.memberId, ref.moisIndex, valeur, jour).subscribe({
+        next: () => this.majLigne(ref, valeur, jour),
+        error: () => this.erreurEnregistrement(),
+      });
+    } else {
+      this.caisse.supprimerDepot(cid, ref.memberId, ref.moisIndex).subscribe({
+        next: () => this.majLigne(ref, null, null),
+        error: () => this.erreurEnregistrement(),
+      });
+    }
+  }
+
+  private erreurEnregistrement(): void {
+    this.toast.add({
+      severity: 'error',
+      summary: this.i18n.instant('saisie.errTitre'),
+      detail: this.i18n.instant('saisie.reessayez'),
+    });
   }
 
   terminer(): void {
@@ -192,7 +231,15 @@ export class Saisie implements OnInit {
         this.lignes.set(
           rows.map((r) => {
             const { montant, enregistre } = versLigne(r.montant);
-            return { label: r.nom, memberId: r.id, moisIndex: mois, montant, enregistre, date: r.date ?? null };
+            return {
+              label: r.nom,
+              memberId: r.id,
+              moisIndex: mois,
+              montant,
+              montantEnregistre: montant,
+              enregistre,
+              date: r.date ?? null,
+            };
           }),
         );
         // Pré-remplit le sélecteur avec la date de la réunion du mois, sinon aujourd'hui.
@@ -221,6 +268,7 @@ export class Saisie implements OnInit {
               memberId: membre.id,
               moisIndex: r.moisIndex,
               montant,
+              montantEnregistre: montant,
               enregistre,
               date: r.date ?? null,
             };
