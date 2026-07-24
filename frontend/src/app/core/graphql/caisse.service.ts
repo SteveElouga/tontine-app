@@ -8,6 +8,7 @@ import {
   Membre,
   MembreMontant,
   MontantMois,
+  NoteSeance,
   Operation,
   ParametresCycle,
   Pret,
@@ -24,11 +25,13 @@ import {
   RENOMMER_CAISSE,
   DEPOTS_MEMBRE,
   DEPOTS_MOIS,
+  ENREGISTRER_NOTE_SEANCE,
   FICHE_MEMBRE,
   HISTORIQUE,
   INFOS_CLOTURE,
   MEMBRES,
   MODIFIER_CYCLE,
+  NOTES_SEANCE,
   PARAMETRES_CYCLE,
   PRETS_CYCLE,
   RECAP_CYCLE,
@@ -281,5 +284,26 @@ export class CaisseService {
         variables: { cycleId, nom },
       })
       .pipe(map((r) => r.data!.renommerCaisse as ParametresCycle));
+  }
+
+  /** Notes de séance déjà saisies pour un cycle (cahier de séance). */
+  notesSeance(cycleId: string): Observable<NoteSeance[]> {
+    return this.apollo
+      .query<{ notesSeance: NoteSeance[] }>({
+        query: NOTES_SEANCE,
+        variables: { cycleId },
+        fetchPolicy: 'network-only',
+      })
+      .pipe(map((r) => (r.data?.notesSeance ?? []) as NoteSeance[]));
+  }
+
+  /** Enregistre (remplace) la note d'une séance. */
+  enregistrerNoteSeance(cycleId: string, mois: number, texte: string): Observable<NoteSeance> {
+    return this.apollo
+      .mutate<{ enregistrerNoteSeance: NoteSeance }>({
+        mutation: ENREGISTRER_NOTE_SEANCE,
+        variables: { cycleId, mois, texte },
+      })
+      .pipe(map((r) => r.data!.enregistrerNoteSeance as NoteSeance));
   }
 }

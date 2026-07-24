@@ -307,3 +307,25 @@ export const SIMULER_PRET = gql`
     }
   }
 `;
+
+/** Notes de séance d'un cycle (cahier de séance). */
+export const NOTES_SEANCE = gql`
+  query NotesSeance($cycleId: ID!) {
+    notesSeance(cycleId: $cycleId) {
+      mois
+      texte
+      modifieLe
+    }
+  }
+`;
+
+/** Enregistre (remplace) la note d'une séance. */
+export const ENREGISTRER_NOTE_SEANCE = gql`
+  mutation EnregistrerNoteSeance($cycleId: ID!, $mois: Int!, $texte: String!) {
+    enregistrerNoteSeance(cycleId: $cycleId, mois: $mois, texte: $texte) {
+      mois
+      texte
+      modifieLe
+    }
+  }
+`;

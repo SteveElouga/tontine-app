@@ -1,0 +1,116 @@
+:host {
+  display: block;
+}
+
+.entete {
+  margin-bottom: 18px;
+
+  h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .sub {
+    margin: 2px 0 0;
+    color: var(--c-text-2);
+    font-size: 14px;
+  }
+}
+
+/* Sélecteur de séance — même esprit que l'écran Saisie. */
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  padding: 10px 16px;
+  max-width: 440px;
+  margin-bottom: 14px;
+}
+
+.step-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 6px;
+  color: var(--c-text-2);
+  transition: transform 0.12s ease, color 0.12s ease;
+
+  i {
+    font-size: 22px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      color: var(--c-accent);
+    }
+  }
+
+  /* Retour tactile au tap (mobile et souris). */
+  &:active {
+    transform: scale(0.9);
+  }
+}
+
+.step-mois {
+  text-align: center;
+
+  .mois {
+    display: block;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .sous {
+    display: block;
+    font-size: 12px;
+    color: var(--c-text-muted);
+  }
+}
+
+.zone {
+  width: 100%;
+  max-width: 720px;
+  box-sizing: border-box;
+  border: 1px solid var(--c-border-strong);
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--c-text);
+  background: var(--c-surface);
+  resize: vertical;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--c-accent);
+    box-shadow: 0 0 0 2px var(--c-accent-bg);
+  }
+}
+
+.etat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--c-text-2);
+  max-width: 720px;
+
+  i {
+    color: var(--c-accent);
+
+    &.ok {
+      color: var(--c-success);
+    }
+  }
+}
+
+.muted {
+  color: var(--c-text-muted);
+}
