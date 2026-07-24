@@ -65,13 +65,35 @@
           <span>{{ fmt(p.montant) }}</span>
         </div>
         <div class="pl">
-          <span class="sub">{{ 'fiche.majoration' | translate: { n: p.moisDeDette } }}</span>
-          <span class="rouge">+{{ fmt(p.majoration) }}</span>
+          <span class="sub">{{ 'fiche.dejaRembourse' | translate }}</span>
+          <span class="vert">{{ fmt(p.totalRembourse) }}</span>
         </div>
         <div class="pl fort">
-          <span>{{ 'fiche.aRembourser' | translate }}</span>
-          <span class="rouge">{{ fmt(p.totalARembourser) }}</span>
+          <span>{{ 'fiche.soldeRestant' | translate }}</span>
+          <span class="rouge">{{ fmt(p.solde) }}</span>
         </div>
+        @if (p.echeancier.length) {
+          <table class="echeancier">
+            <thead>
+              <tr>
+                <th>{{ 'fiche.echMois' | translate }}</th>
+                <th class="num">{{ 'fiche.echInteret' | translate }}</th>
+                <th class="num">{{ 'fiche.echPaiement' | translate }}</th>
+                <th class="num">{{ 'fiche.echSolde' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (l of p.echeancier; track l.mois) {
+                <tr>
+                  <td>{{ l.mois | moisNom }}</td>
+                  <td class="num rouge">+{{ fmt(l.interet) }}</td>
+                  <td class="num vert">{{ n(l.paiement) > 0 ? '−' + fmt(l.paiement) : '—' }}</td>
+                  <td class="num">{{ fmt(l.solde) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
       </div>
     }
   }

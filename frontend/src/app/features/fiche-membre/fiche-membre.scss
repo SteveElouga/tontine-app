@@ -186,3 +186,31 @@
 .muted {
   color: var(--c-text-muted);
 }
+
+/* Échéancier composé du prêt (réunion par réunion). */
+.echeancier {
+  width: calc(100% - 28px);
+  margin: 4px 14px 14px;
+  border-collapse: collapse;
+  font-size: 13px;
+
+  th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--c-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    padding: 0 6px 6px;
+  }
+
+  td {
+    padding: 6px;
+    border-top: 1px solid var(--c-border);
+  }
+
+  .num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+}

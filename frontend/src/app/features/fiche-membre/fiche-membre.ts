@@ -49,6 +49,10 @@ export class FicheMembrePage implements OnInit {
 
   /** Montant serveur « 135000 » → affichage « 135 000 ». */
   protected fmt(v: string | number): string {
-    return Number(v).toLocaleString('fr-FR');
+    return Number(v).toLocaleString('fr-FR', { maximumFractionDigits: 1 });
+  }
+
+  protected n(v: string | number): number {
+    return Number(v);
   }
 }

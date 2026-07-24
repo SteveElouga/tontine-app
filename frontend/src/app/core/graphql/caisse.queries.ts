@@ -209,10 +209,15 @@ export const FICHE_MEMBRE = gql`
       prets {
         montant
         moisPret
-        moisRemboursement
-        moisDeDette
-        majoration
-        totalARembourser
+        solde
+        totalRembourse
+        totalInterets
+        echeancier {
+          mois
+          interet
+          paiement
+          solde
+        }
       }
       totalDepose
       interets
@@ -324,13 +329,8 @@ export const SIMULER_EPARGNE = gql`
 
 /** Simulation d'un prêt hypothétique. */
 export const SIMULER_PRET = gql`
-  query SimulerPret($cycleId: ID!, $montant: Decimal!, $moisPret: Int!, $moisRemboursement: Int) {
-    simulerPret(
-      cycleId: $cycleId
-      montant: $montant
-      moisPret: $moisPret
-      moisRemboursement: $moisRemboursement
-    ) {
+  query SimulerPret($cycleId: ID!, $montant: Decimal!, $moisPret: Int!) {
+    simulerPret(cycleId: $cycleId, montant: $montant, moisPret: $moisPret) {
       moisDeDette
       majoration
       total

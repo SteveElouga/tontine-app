@@ -405,19 +405,14 @@ class Query:
 
     @strawberry.field
     def simuler_pret(
-        self,
-        cycle_id: strawberry.ID,
-        montant: Decimal,
-        mois_pret: int,
-        mois_remboursement: Optional[int] = None,
+        self, cycle_id: strawberry.ID, montant: Decimal, mois_pret: int
     ) -> SimPret:
-        """Projection d'un prêt hypothétique (majoration, total à rembourser)."""
+        """Projection d'un prêt hypothétique NON remboursé : intérêts composés jusqu'à juin."""
         params = Cycle.objects.get(id=cycle_id).to_params()
-        pret = interest.Pret(montant, mois_pret, mois_remboursement)
         return SimPret(
-            mois_de_dette=interest.mois_de_dette(pret, params),
-            majoration=interest.majoration_pret(pret, params),
-            total=interest.total_a_rembourser(pret, params),
+            mois_de_dette=interest.cloture(params) - mois_pret,
+            majoration=interest.total_interets_pret(montant, mois_pret, None, params),
+            total=interest.dette_finale(montant, mois_pret, None, params),
         )
 
     @strawberry.field
