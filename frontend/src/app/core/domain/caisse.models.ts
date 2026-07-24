@@ -23,6 +23,8 @@ export interface CycleInfo {
   caisseNom: string;
   statut: string;
   moisDebut: number;
+  dureeDepot: number;
+  moisDelai: number;
 }
 
 /** Règles complètes d'un cycle (écran Paramètres). */
