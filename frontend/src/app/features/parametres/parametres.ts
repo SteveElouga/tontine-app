@@ -76,6 +76,12 @@ export class Parametres implements OnInit {
     }));
   });
 
+  /** Mois de clôture = durée + 1 mois après l'ouverture (réactif aux champs saisis). */
+  protected readonly moisClotureNom = computed(() => {
+    this.lang.langue();
+    return this.i18n.instant('mois.' + moisCalendaire(this.dureeDepot() + 1, this.moisDebut()));
+  });
+
   ngOnInit(): void {
     this.charger();
   }

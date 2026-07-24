@@ -35,9 +35,11 @@ export class Aide implements OnInit {
     return {
       taux: tauxE,
       tauxMajo: tauxM,
+      duree,
       premier: nom(1),
       deuxieme: nom(2),
       dernier: nom(duree),
+      cloture: nom(duree + 1),
       delai: nom(delai),
       tauxPremier: tauxE * duree,
       tauxDeuxieme: tauxE * (duree - 1),

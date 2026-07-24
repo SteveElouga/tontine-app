@@ -8,7 +8,7 @@
   <div class="cartes">
     <div class="carte">
       <h3><i class="pi pi-calendar"></i> {{ 'aide.cycleTitre' | translate }}</h3>
-      <p>{{ 'aide.cycleTexte' | translate: { premier: infos().premier, dernier: infos().dernier, delai: infos().delai } }}</p>
+      <p>{{ 'aide.cycleTexte' | translate: { premier: infos().premier, dernier: infos().dernier, cloture: infos().cloture, duree: infos().duree, delai: infos().delai } }}</p>
     </div>
     <div class="carte">
       <h3><i class="pi pi-wallet"></i> {{ 'aide.epargneTitre' | translate }}</h3>
@@ -33,7 +33,7 @@
     </div>
     <div class="carte">
       <h3><i class="pi pi-flag"></i> {{ 'aide.finTitre' | translate }}</h3>
-      <p>{{ 'aide.finTexte' | translate }}</p>
+      <p>{{ 'aide.finTexte' | translate: { cloture: infos().cloture, duree: infos().duree } }}</p>
     </div>
   </div>
 </section>
