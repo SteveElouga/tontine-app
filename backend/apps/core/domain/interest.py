@@ -15,7 +15,7 @@ au FCFA entier (pas de centimes).
 from __future__ import annotations
 
 from dataclasses import dataclass
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal, ROUND_HALF_UP, localcontext
 from typing import Iterable, Optional, Protocol
 
 # Indices de mois depuis le début du cycle : 1 = septembre … 9 = mai … 12 = août.
@@ -232,3 +232,108 @@ def suggerer_reduction_mois(
         if InteretsReductionMois(n).interets(tous_depots, cycle) <= gains:
             return n
     return cycle.duree_depot
+
+
+# --------------------------------------------------------------------------- #
+# Prêts — intérêts COMPOSÉS sur solde dégressif (modèle v2).
+#
+# Réf. docs/03-modele-prets-composes.md. Règles tranchées avec la trésorière :
+#   - 5 % par mois (taux_majoration) COMPOSÉ sur le solde restant ;
+#   - l'intérêt du 1er mois est engagé dès le prêt (au moins un mois) ;
+#   - remboursements partiels à chaque réunion (paient l'intérêt d'abord, puis le capital) ;
+#   - les prêts s'arrêtent à la clôture (juin = durée de dépôt + 1) ;
+#   - AUCUN arrondi : tous les montants sont EXACTS (Decimal pleine précision) ;
+#   - plusieurs prêts d'un membre : on rembourse le plus ancien d'abord.
+# --------------------------------------------------------------------------- #
+_PREC_EXACTE = 50  # précision suffisante pour garder l'exactitude des puissances de 1,05
+_ARRONDI_FINAL = Decimal("0.1")  # le montant final est arrondi à une décimale (choix trésorière)
+
+
+def arrondi_final(montant) -> Decimal:
+    """Arrondit un montant FINAL à une décimale (ROUND_HALF_UP).
+
+    Le calcul reste exact en interne ; on n'arrondit qu'à la sortie (dette de juin, total, excédent).
+    """
+    return _money(montant).quantize(_ARRONDI_FINAL, rounding=ROUND_HALF_UP)
+
+
+def cloture(cycle: Cycle) -> int:
+    """Position de la réunion de clôture (juin) = durée de dépôt + 1 ; les prêts s'y arrêtent."""
+    return cycle.duree_depot + 1
+
+
+@dataclass(frozen=True)
+class LigneEcheance:
+    """Une réunion dans la vie d'un prêt. Montants exacts, non arrondis."""
+    mois: int          # position de la réunion (mois_pret+1 … clôture)
+    interet: Decimal   # intérêt du mois = solde d'ouverture × taux
+    paiement: Decimal  # part du versement imputée au prêt
+    excedent: Decimal  # part du versement au-delà du solde (→ épargne)
+    solde: Decimal     # solde restant après cette réunion
+
+
+def echeancier_pret(montant, mois_pret: int, remboursements=None, cycle: Optional[Cycle] = None):
+    """Déroule un prêt réunion par réunion, du mois suivant le prêt jusqu'à la clôture (juin).
+
+    `remboursements` : dict {position_reunion: montant versé}. Un versement paie d'abord
+    l'intérêt du mois puis le capital ; ce qui dépasse le solde devient un excédent (→ épargne).
+    Aucun arrondi : tout est exact. Renvoie la liste des `LigneEcheance`.
+    """
+    cycle = cycle or Cycle()
+    fin = cloture(cycle)
+    if not 1 <= mois_pret < fin:
+        raise ValueError(f"mois_pret {mois_pret} hors période de prêt (1..{fin - 1})")
+    versements = {int(m): _money(v) for m, v in (remboursements or {}).items()}
+    lignes = []
+    with localcontext() as ctx:
+        ctx.prec = _PREC_EXACTE
+        solde = _money(montant)
+        for m in range(mois_pret + 1, fin + 1):
+            interet = solde * cycle.taux_majoration
+            solde = solde + interet
+            verse = versements.get(m, Decimal(0))
+            impute = verse if verse < solde else solde
+            excedent = verse - impute
+            solde = solde - impute
+            lignes.append(LigneEcheance(m, interet, impute, excedent, solde))
+    return lignes
+
+
+def dette_finale(montant, mois_pret: int, remboursements=None, cycle: Optional[Cycle] = None) -> Decimal:
+    """Solde restant à la clôture (juin) : la dette finale d'un prêt, exacte."""
+    lignes = echeancier_pret(montant, mois_pret, remboursements, cycle)
+    return arrondi_final(lignes[-1].solde if lignes else _money(montant))
+
+
+def total_interets_pret(montant, mois_pret: int, remboursements=None, cycle: Optional[Cycle] = None) -> Decimal:
+    """Somme exacte des intérêts composés facturés sur la vie du prêt."""
+    lignes = echeancier_pret(montant, mois_pret, remboursements, cycle)
+    with localcontext() as ctx:
+        ctx.prec = _PREC_EXACTE
+        return arrondi_final(sum((l.interet for l in lignes), Decimal(0)))
+
+
+def total_excedent(montant, mois_pret: int, remboursements=None, cycle: Optional[Cycle] = None) -> Decimal:
+    """Somme exacte des excédents de versement (au-delà du solde) → à reverser en épargne."""
+    lignes = echeancier_pret(montant, mois_pret, remboursements, cycle)
+    with localcontext() as ctx:
+        ctx.prec = _PREC_EXACTE
+        return arrondi_final(sum((l.excedent for l in lignes), Decimal(0)))
+
+
+def repartir_paiement(montant, soldes):
+    """Répartit un versement sur des prêts, du plus ancien au plus récent (décision trésorière).
+
+    `soldes` : soldes courants des prêts, ordonnés (plus ancien d'abord).
+    Renvoie (liste des montants imputés à chaque prêt, reste). Le reste (tous soldés) va en épargne.
+    """
+    with localcontext() as ctx:
+        ctx.prec = _PREC_EXACTE
+        reste = _money(montant)
+        imputes = []
+        for s in soldes:
+            s = _money(s)
+            a = s if s < reste else reste
+            imputes.append(a)
+            reste = reste - a
+        return imputes, reste
