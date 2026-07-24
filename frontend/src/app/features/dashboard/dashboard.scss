@@ -79,15 +79,20 @@
   color: var(--c-text);
   transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 
-  /* Survol : légère élévation ; appui : retour à plat (retour tactile). */
-  &:hover {
-    border-color: var(--c-accent);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+  /* Survol réservé aux vrais pointeurs (souris) : sur écran tactile, un
+     :hover resterait « collé » après le tap. */
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      border-color: var(--c-accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+    }
   }
 
+  /* Retour tactile : l'appui enfonce légèrement la carte (mobile ET souris).
+     Placé après le survol pour l'emporter au moment de l'appui. */
   &:active {
-    transform: translateY(0);
+    transform: scale(0.98);
     box-shadow: none;
   }
 
@@ -117,9 +122,11 @@
     transition: transform 0.15s ease;
   }
 
-  /* La flèche avance d'un cran au survol : invite à cliquer. */
-  &:hover .fl {
-    transform: translateX(3px);
+  /* La flèche avance d'un cran au survol (souris uniquement) : invite à cliquer. */
+  @media (hover: hover) and (pointer: fine) {
+    &:hover .fl {
+      transform: translateX(3px);
+    }
   }
 
   &.primaire {
@@ -133,4 +140,8 @@
       color: var(--c-accent);
     }
   }
+}
+
+.muted {
+  color: var(--c-text-muted);
 }

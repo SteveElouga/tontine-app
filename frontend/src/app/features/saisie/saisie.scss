@@ -38,6 +38,7 @@
     border-radius: 999px;
     font-size: 14px;
     color: var(--c-text-2);
+    transition: transform 0.12s ease;
 
     i {
       font-size: 16px;
@@ -47,6 +48,11 @@
       background: var(--c-accent-bg);
       color: var(--c-accent);
       font-weight: 500;
+    }
+
+    /* Retour tactile à l'appui (mobile et souris). */
+    &:active {
+      transform: scale(0.97);
     }
   }
 }
@@ -69,13 +75,21 @@
   cursor: pointer;
   padding: 6px;
   color: var(--c-text-2);
+  transition: transform 0.12s ease, color 0.12s ease;
 
   i {
     font-size: 22px;
   }
 
-  &:hover {
-    color: var(--c-accent);
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      color: var(--c-accent);
+    }
+  }
+
+  /* Enfoncement net au tap : ces flèches sont pressées en série. */
+  &:active {
+    transform: scale(0.9);
   }
 }
 
@@ -130,12 +144,25 @@
 .etat {
   font-size: 20px;
 
+  /* Le ✓ « enregistré » entre en douceur : confirme la sauvegarde à l'utilisateur. */
   &.ok {
     color: var(--c-success);
+    animation: etat-ok-apparait 0.12s ease-out both;
   }
 
   &.attente {
     color: var(--c-text-muted);
+  }
+}
+
+@keyframes etat-ok-apparait {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
