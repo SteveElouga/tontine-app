@@ -54,14 +54,20 @@ jobs:
     name: Tests backend
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Moteur de calcul (domaine pur, sans dépendances)
-        run: python backend/apps/core/domain/tests_interest.py
-      # TODO: quand les dépendances seront figées → pip install -r backend/requirements.txt && python backend/manage.py test
+          cache: pip
+          cache-dependency-path: backend/requirements-dev.txt
+      - name: Installer les dépendances (prod + tests)
+        run: pip install -r requirements-dev.txt
+      - name: Tests pytest (moteur, auth, modèles, résolveurs GraphQL) — SQLite
+        run: pytest -q
 
   ci-ok:
     name: CI OK
