@@ -57,6 +57,59 @@
   }
 }
 
+/* Vue « Par membre » : le nom devient un sélecteur cherchable, entre les flèches. */
+.stepper-membre {
+  gap: 8px;
+
+  .membre-choix {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+  }
+
+  .sous {
+    display: block;
+    font-size: 13px;
+    color: var(--c-text-muted);
+    margin-top: 2px;
+  }
+
+  ::ng-deep .p-select {
+    width: 100%;
+    max-width: 320px;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    border-radius: 8px;
+    transition: background 0.12s ease;
+  }
+
+  ::ng-deep .p-select .p-select-label {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--c-text);
+    padding: 4px 6px;
+  }
+
+  ::ng-deep .p-select .p-select-dropdown {
+    width: 1.4rem;
+    color: var(--c-text-muted);
+  }
+
+  ::ng-deep .p-select.p-focus {
+    border: none;
+    box-shadow: none;
+    background: var(--c-surface-1);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    ::ng-deep .p-select:hover {
+      background: var(--c-surface-1);
+    }
+  }
+}
+
 /* Sélecteur de mois */
 .stepper {
   display: flex;
@@ -70,12 +123,17 @@
 }
 
 .step-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
   border: none;
   background: transparent;
   cursor: pointer;
   padding: 6px;
   color: var(--c-text-2);
-  transition: transform 0.12s ease, color 0.12s ease;
+  transition: transform var(--dur-fast) var(--ease-out), color 0.12s ease;
 
   i {
     font-size: 22px;
@@ -104,7 +162,7 @@
 
   .sous {
     display: block;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--c-text-muted);
   }
 }
@@ -147,7 +205,7 @@
 
   .date-aide {
     flex-basis: 100%;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--c-text-muted);
   }
 }
@@ -173,12 +231,12 @@
   }
 
   .unite {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--c-text-muted);
   }
 
   .ligne-date {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--c-text-muted);
     white-space: nowrap;
   }
@@ -190,7 +248,7 @@
   /* Le ✓ « enregistré » entre en douceur : confirme la sauvegarde à l'utilisateur. */
   &.ok {
     color: var(--c-success);
-    animation: etat-ok-apparait 0.12s ease-out both;
+    animation: etat-ok-apparait var(--dur-fast) var(--ease-out) both;
   }
 
   &.attente {

@@ -30,7 +30,7 @@
   border: 1px solid var(--c-border);
   border-radius: 12px;
   padding: 18px;
-  animation: monte-doux 0.28s ease both;
+  animation: monte-doux 0.28s var(--ease-out) both;
 
   /* Léger décalage pour une entrée « en cascade ». */
   &:nth-child(2) {
@@ -55,7 +55,7 @@
   }
 
   .unit {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--c-text-muted);
     margin-top: 2px;
   }

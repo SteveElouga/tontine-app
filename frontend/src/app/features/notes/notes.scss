@@ -32,12 +32,17 @@
 }
 
 .step-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
   border: none;
   background: transparent;
   cursor: pointer;
   padding: 6px;
   color: var(--c-text-2);
-  transition: transform 0.12s ease, color 0.12s ease;
+  transition: transform var(--dur-fast) var(--ease-out), color 0.12s ease;
 
   i {
     font-size: 22px;
@@ -66,7 +71,7 @@
 
   .sous {
     display: block;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--c-text-muted);
   }
 }
