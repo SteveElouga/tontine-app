@@ -9,6 +9,8 @@ export const CYCLES = gql`
       caisseNom
       statut
       moisDebut
+      dureeDepot
+      moisDelai
     }
   }
 `;

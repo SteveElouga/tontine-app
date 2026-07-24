@@ -28,6 +28,18 @@ export class CycleStore {
     return cur?.moisDebut ?? 9;
   });
 
+  /** Nombre de mois de dépôt ; 9 par défaut (dernier mois où un prêt peut être contracté). */
+  readonly dureeDepot = computed(() => {
+    const cur = this.cycles().find((c) => c.id === this.cycleId());
+    return cur?.dureeDepot ?? 9;
+  });
+
+  /** Dernière réunion de remboursement (position dans le cycle) ; 12 = août par défaut. */
+  readonly moisDelai = computed(() => {
+    const cur = this.cycles().find((c) => c.id === this.cycleId());
+    return cur?.moisDelai ?? 12;
+  });
+
   /** Charge la liste des cycles ; garde la sélection valide. */
   charger(): void {
     this.apollo
