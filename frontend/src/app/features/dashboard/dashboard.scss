@@ -30,6 +30,18 @@
   border: 1px solid var(--c-border);
   border-radius: 12px;
   padding: 18px;
+  animation: monte-doux 0.28s ease both;
+
+  /* Léger décalage pour une entrée « en cascade ». */
+  &:nth-child(2) {
+    animation-delay: 0.05s;
+  }
+  &:nth-child(3) {
+    animation-delay: 0.1s;
+  }
+  &:nth-child(4) {
+    animation-delay: 0.15s;
+  }
 
   .lbl {
     font-size: 13px;
@@ -65,9 +77,18 @@
   background: var(--c-surface);
   text-decoration: none;
   color: var(--c-text);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 
+  /* Survol : légère élévation ; appui : retour à plat (retour tactile). */
   &:hover {
     border-color: var(--c-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: none;
   }
 
   > i:first-child {
@@ -93,6 +114,12 @@
 
   .fl {
     color: var(--c-text-muted);
+    transition: transform 0.15s ease;
+  }
+
+  /* La flèche avance d'un cran au survol : invite à cliquer. */
+  &:hover .fl {
+    transform: translateX(3px);
   }
 
   &.primaire {
