@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Tontine — caisse mutuelle">
+  <rect width="512" height="512" rx="102" fill="#1d5fa5"/>
+  <g fill="#ffffff">
+    <circle cx="256" cy="102" r="34"/>
+    <circle cx="389" cy="179" r="34"/>
+    <circle cx="389" cy="333" r="34"/>
+    <circle cx="256" cy="410" r="34"/>
+    <circle cx="123" cy="333" r="34"/>
+    <circle cx="123" cy="179" r="34"/>
+    <circle cx="256" cy="256" r="77"/>
+  </g>
+  <g fill="#1d5fa5">
+    <rect x="240" y="214" width="15" height="84" rx="5"/>
+    <rect x="240" y="214" width="52" height="15" rx="5"/>
+    <rect x="240" y="252" width="45" height="15" rx="5"/>
+    <rect x="230" y="276" width="48" height="15" rx="5"/>
+  </g>
+</svg>
