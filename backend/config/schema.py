@@ -140,11 +140,10 @@ def _strategie_cloture(cycle: Cycle, mode: str, n_mois: int):
         from apps.savings.models import Deposit
         from apps.loans.models import Loan
 
-        prets = [
-            interest.Pret(l.montant, l.mois_pret, l.mois_remboursement)
-            for l in Loan.objects.filter(cycle=cycle)
-        ]
-        gains = interest.total_majorations(prets, params)
+        gains = Decimal(0)
+        for loan in Loan.objects.filter(cycle=cycle):
+            loan.cycle = cycle
+            gains += loan.total_interets_composes
         if mode == "prorata":
             total = sum((d.montant for d in Deposit.objects.filter(cycle=cycle)), Decimal(0))
             return interest.InteretsEquitableProrata(gains, total)
@@ -159,11 +158,11 @@ def _recap_membre(member: Member, cycle: Cycle, strategie=None) -> RecapMembre:
         interest.Depot(d.mois_index, d.montant)
         for d in member.depots.filter(cycle=cycle)
     ]
-    prets = [
-        interest.Pret(p.montant, p.mois_pret, p.mois_remboursement)
-        for p in member.prets.filter(cycle=cycle)
-    ]
-    dettes = sum((interest.total_a_rembourser(p, params) for p in prets), Decimal(0))
+    # Dette v2 : somme des soldes composés (à partir du registre de remboursements).
+    dettes = Decimal(0)
+    for loan in member.prets.filter(cycle=cycle):
+        loan.cycle = cycle
+        dettes += loan.dette
     strategie = strategie or interest.InteretsComplets()
     interets = strategie.interets(depots, params)
     total_depose = interest.total_depose(depots)
@@ -286,14 +285,21 @@ class Query:
         cycle = Cycle.objects.get(id=cycle_id)
         params = cycle.to_params()
         depots = [interest.Depot(d.mois_index, d.montant) for d in Deposit.objects.filter(cycle=cycle)]
-        prets = [
-            interest.Pret(l.montant, l.mois_pret, l.mois_remboursement)
-            for l in Loan.objects.filter(cycle=cycle)
-        ]
+        # Gains v2 = intérêts composés réellement facturés sur les prêts.
+        gains = Decimal(0)
+        for loan in Loan.objects.filter(cycle=cycle):
+            loan.cycle = cycle
+            gains += loan.total_interets_composes
+        # Plus petit N tel que les intérêts (réduits de N mois) tiennent dans les gains.
+        reduction = params.duree_depot
+        for k in range(0, params.duree_depot + 1):
+            if interest.InteretsReductionMois(k).interets(depots, params) <= gains:
+                reduction = k
+                break
         return InfosCloture(
-            gains=interest.total_majorations(prets, params),
+            gains=gains,
             total_promis=interest.interets_membre(depots, params),
-            reduction_suggeree=interest.suggerer_reduction_mois(depots, prets, params),
+            reduction_suggeree=reduction,
         )
 
     @strawberry.field
@@ -453,10 +459,12 @@ class Query:
         ]
 
         depots_domain = [interest.Depot(d.mois_index, d.montant) for d in deposits]
-        prets_domain = [
-            interest.Pret(loan.montant, loan.mois_pret, loan.mois_remboursement) for loan in loans
-        ]
-        dettes = sum((interest.total_a_rembourser(p, params) for p in prets_domain), Decimal(0))
+        epi = interest.epargne_plus_interets(depots_domain, params)
+        # Dette v2 : somme des soldes composés.
+        dettes = Decimal(0)
+        for loan in loans:
+            loan.cycle = cycle
+            dettes += loan.dette
 
         return FicheMembre(
             id=strawberry.ID(str(member.id)),
@@ -465,9 +473,9 @@ class Query:
             prets=prets_detail,
             total_depose=interest.total_depose(depots_domain),
             interets=interest.interets_membre(depots_domain, params),
-            epargne_plus_interets=interest.epargne_plus_interets(depots_domain, params),
+            epargne_plus_interets=epi,
             dettes=dettes,
-            position_nette=interest.position_nette(depots_domain, prets_domain, params),
+            position_nette=epi - dettes,
         )
 
     @strawberry.field
