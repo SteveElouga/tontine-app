@@ -95,6 +95,15 @@ class DepotDetail:
 
 
 @strawberry.type
+class LigneEcheance:
+    """Une réunion dans la vie d'un prêt composé (montants exacts, réf. docs/03)."""
+    mois: int
+    interet: Decimal
+    paiement: Decimal
+    solde: Decimal
+
+
+@strawberry.type
 class PretDetail:
     montant: Decimal
     mois_pret: int
@@ -102,6 +111,11 @@ class PretDetail:
     mois_de_dette: int
     majoration: Decimal
     total_a_rembourser: Decimal
+    # Modèle composé v2 (additif) :
+    solde: Decimal
+    total_interets: Decimal
+    total_rembourse: Decimal
+    echeancier: List[LigneEcheance]
 
 
 @strawberry.type
@@ -177,6 +191,18 @@ class Pret:
     majoration: Decimal
     total_a_rembourser: Decimal
     rembourse: bool
+    # Modèle composé v2 (additif) :
+    solde: Decimal
+    total_interets: Decimal
+    total_rembourse: Decimal
+
+
+def _echeancier(loan) -> "List[LigneEcheance]":
+    """Déroulé composé d'un prêt (une ligne par réunion)."""
+    return [
+        LigneEcheance(mois=l.mois, interet=l.interet, paiement=l.paiement, solde=l.solde)
+        for l in loan.echeancier_compose()
+    ]
 
 
 def _pret(loan) -> "Pret":
@@ -191,6 +217,9 @@ def _pret(loan) -> "Pret":
         majoration=loan.majoration,
         total_a_rembourser=loan.total_a_rembourser,
         rembourse=loan.mois_remboursement is not None,
+        solde=loan.dette,
+        total_interets=loan.total_interets_composes,
+        total_rembourse=loan.total_rembourse,
     )
 
 
@@ -415,6 +444,10 @@ class Query:
                 mois_de_dette=loan.mois_de_dette,
                 majoration=loan.majoration,
                 total_a_rembourser=loan.total_a_rembourser,
+                solde=loan.dette,
+                total_interets=loan.total_interets_composes,
+                total_rembourse=loan.total_rembourse,
+                echeancier=_echeancier(loan),
             )
             for loan in loans
         ]
@@ -514,6 +547,17 @@ class Mutation:
         loan = Loan.objects.select_related("member", "cycle").get(id=pret_id)
         loan.mois_remboursement = mois_remboursement
         loan.save(update_fields=["mois_remboursement"])
+        return _pret(loan)
+
+    @strawberry.mutation
+    def ajouter_remboursement(
+        self, pret_id: strawberry.ID, mois: int, montant: Decimal
+    ) -> Pret:
+        """Enregistre un remboursement partiel d'un prêt (modèle composé v2, réf. docs/03)."""
+        from apps.loans.models import Loan, Remboursement
+
+        loan = Loan.objects.select_related("member", "cycle").get(id=pret_id)
+        Remboursement.objects.create(loan=loan, mois=mois, montant=montant)
         return _pret(loan)
 
     @strawberry.mutation
