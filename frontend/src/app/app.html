@@ -1,7 +1,26 @@
-<div class="shell">
+<div class="shell" [class.menu-ouvert]="layout.menuMobileOuvert()">
   @if (auth.connecte()) {
-  <aside class="sidebar">
-    <div class="brand"><i class="pi pi-users"></i><span>Tontine</span></div>
+  <div class="backdrop" (click)="layout.fermerMobile()" aria-hidden="true"></div>
+
+  <aside class="sidebar" [class.replie]="layout.replie()">
+    <div class="brand">
+      <i class="pi pi-users brand-logo"></i>
+      <span class="brand-nom">Tontine</span>
+      <button
+        type="button"
+        class="toggle"
+        (click)="layout.basculerReplie()"
+        [attr.aria-expanded]="!layout.replie()"
+        [attr.aria-label]="(layout.replie() ? 'nav.deplier' : 'nav.replier') | translate"
+        [attr.title]="(layout.replie() ? 'nav.deplier' : 'nav.replier') | translate"
+      >
+        <i
+          class="pi"
+          [class.pi-angle-double-left]="!layout.replie()"
+          [class.pi-angle-double-right]="layout.replie()"
+        ></i>
+      </button>
+    </div>
 
     <div class="cycle" data-tour="cycle">
       <label>{{ 'nav.cycle' | translate }}</label>
@@ -20,12 +39,19 @@
     <nav>
       @for (item of nav; track item.label) {
         @if (item.route) {
-          <a class="nav-item" [routerLink]="item.route" routerLinkActive="active" [attr.data-tour]="item.tour">
-            <i [class]="item.icon"></i>{{ item.label | translate }}
+          <a
+            class="nav-item"
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            [attr.data-tour]="item.tour"
+            [attr.title]="layout.replie() ? (item.label | translate) : null"
+            (click)="layout.fermerMobile()"
+          >
+            <i [class]="item.icon"></i><span class="libelle">{{ item.label | translate }}</span>
           </a>
         } @else {
           <span class="nav-item todo">
-            <i [class]="item.icon"></i>{{ item.label | translate }}
+            <i [class]="item.icon"></i><span class="libelle">{{ item.label | translate }}</span>
           </span>
         }
       }
@@ -33,23 +59,49 @@
     <div class="sidebar-bottom">
       @for (item of navBas; track item.label) {
         @if (item.route) {
-          <a class="nav-item" [routerLink]="item.route" routerLinkActive="active" [attr.data-tour]="item.tour">
-            <i [class]="item.icon"></i>{{ item.label | translate }}
+          <a
+            class="nav-item"
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            [attr.data-tour]="item.tour"
+            [attr.title]="layout.replie() ? (item.label | translate) : null"
+            (click)="layout.fermerMobile()"
+          >
+            <i [class]="item.icon"></i><span class="libelle">{{ item.label | translate }}</span>
           </a>
         } @else {
           <span class="nav-item todo">
-            <i [class]="item.icon"></i>{{ item.label | translate }}<span class="soon-tag">bientôt</span>
+            <i [class]="item.icon"></i><span class="libelle">{{ item.label | translate }}</span
+            ><span class="soon-tag">bientôt</span>
           </span>
         }
       }
-      <button type="button" class="nav-item deconnexion" (click)="deconnecter()">
-        <i class="pi pi-sign-out"></i>{{ 'nav.deconnexion' | translate }}
+      <button
+        type="button"
+        class="nav-item deconnexion"
+        (click)="deconnecter()"
+        [attr.title]="layout.replie() ? ('nav.deconnexion' | translate) : null"
+      >
+        <i class="pi pi-sign-out"></i><span class="libelle">{{ 'nav.deconnexion' | translate }}</span>
       </button>
     </div>
   </aside>
   }
 
   <main class="content">
+    @if (auth.connecte()) {
+      <header class="topbar">
+        <button
+          type="button"
+          class="hamburger"
+          (click)="layout.ouvrirMobile()"
+          [attr.aria-label]="'nav.menu' | translate"
+        >
+          <i class="pi pi-bars"></i>
+        </button>
+        <span class="topbar-titre"><i class="pi pi-users"></i> Tontine</span>
+      </header>
+    }
     <router-outlet />
   </main>
 </div>
