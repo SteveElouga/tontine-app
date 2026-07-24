@@ -110,3 +110,46 @@ body {
 .driver-popover.tontine-tour .driver-popover-arrow {
   display: none;
 }
+
+/* --------------------------------------------------------------------------
+   Animations douces (UX). Discrètes et courtes ; entièrement désactivées si
+   l'utilisateur a demandé « moins d'animations » (prefers-reduced-motion).
+   -------------------------------------------------------------------------- */
+
+/* Fondu d'entrée à chaque changement d'écran : le composant routé est le
+   frère qui suit <router-outlet> dans la zone de contenu. */
+.content > router-outlet + * {
+  animation: page-fade 0.2s ease both;
+}
+
+@keyframes page-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Apparition douce avec une légère montée (cartes du tableau de bord). */
+@keyframes monte-doux {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
