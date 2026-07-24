@@ -121,4 +121,71 @@ describe('AuthStore', () => {
     const store = TestBed.inject(AuthStore);
     expect(store.connecte()).toBe(true);
   });
+
+  it('sessionActive reste vrai si le refresh est valide même avec un access expiré', () => {
+    localStorage.setItem('tontine.access', jwt(ilYaDixSecondes()));
+    localStorage.setItem('tontine.refresh', jwt(dansUneHeure()));
+    const store = TestBed.inject(AuthStore);
+    expect(store.connecte()).toBe(false);
+    expect(store.peutRafraichir()).toBe(true);
+    expect(store.sessionActive()).toBe(true);
+  });
+
+  it('rafraichir échange le refresh contre un nouvel access', () => {
+    const refresh = jwt(dansUneHeure());
+    localStorage.setItem('tontine.access', jwt(ilYaDixSecondes()));
+    localStorage.setItem('tontine.refresh', refresh);
+    const store = TestBed.inject(AuthStore);
+    const http = TestBed.inject(HttpTestingController);
+    const nouveau = jwt(dansUneHeure() + 100);
+
+    let recu: string | undefined;
+    store.rafraichir().subscribe((t) => (recu = t));
+
+    const req = http.expectOne('http://localhost:8000/api/auth/token/refresh/');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ refresh });
+    req.flush({ access: nouveau });
+
+    expect(recu).toBe(nouveau);
+    expect(store.accessToken()).toBe(nouveau);
+    expect(store.connecte()).toBe(true);
+    expect(localStorage.getItem('tontine.access')).toBe(nouveau);
+    http.verify();
+  });
+
+  it('rafraichir avec un refresh expiré déconnecte sans appel réseau', () => {
+    localStorage.setItem('tontine.access', jwt(ilYaDixSecondes()));
+    localStorage.setItem('tontine.refresh', jwt(ilYaDixSecondes()));
+    const store = TestBed.inject(AuthStore);
+    const http = TestBed.inject(HttpTestingController);
+    expect(store.peutRafraichir()).toBe(false);
+
+    let erreur = false;
+    store.rafraichir().subscribe({ error: () => (erreur = true) });
+
+    expect(erreur).toBe(true);
+    expect(store.accessToken()).toBeNull();
+    http.expectNone('http://localhost:8000/api/auth/token/refresh/');
+    http.verify();
+  });
+
+  it('rafraichir refusé par le serveur (401) déconnecte', () => {
+    const refresh = jwt(dansUneHeure());
+    localStorage.setItem('tontine.access', jwt(ilYaDixSecondes()));
+    localStorage.setItem('tontine.refresh', refresh);
+    const store = TestBed.inject(AuthStore);
+    const http = TestBed.inject(HttpTestingController);
+
+    let erreur = false;
+    store.rafraichir().subscribe({ error: () => (erreur = true) });
+
+    const req = http.expectOne('http://localhost:8000/api/auth/token/refresh/');
+    req.flush({ detail: 'invalide' }, { status: 401, statusText: 'Unauthorized' });
+
+    expect(erreur).toBe(true);
+    expect(store.accessToken()).toBeNull();
+    expect(store.connecte()).toBe(false);
+    http.verify();
+  });
 });
