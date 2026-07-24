@@ -19,7 +19,6 @@ import {
   PARAMETRES_CYCLE,
   PRETS_CYCLE,
   RECAP_CYCLE,
-  REMBOURSER_PRET,
   RENOMMER_MEMBRE,
   RETIRER_MEMBRE,
   SIMULER_EPARGNE,
@@ -172,14 +171,6 @@ describe('CaisseService', () => {
     let out: unknown;
     service.ajouterPret('c1', 'm1', 5000, 3).subscribe((r) => (out = r));
     ctrl.expectOne(AJOUTER_PRET).flush({ data: { ajouterPret: { __typename: 'Pret', id: 'p1' } } });
-    await tick();
-    expect(out).toBeDefined();
-  });
-
-  it('rembourserPret renvoie le prêt', async () => {
-    let out: unknown;
-    service.rembourserPret('p1', 11).subscribe((r) => (out = r));
-    ctrl.expectOne(REMBOURSER_PRET).flush({ data: { rembourserPret: { __typename: 'Pret', id: 'p1' } } });
     await tick();
     expect(out).toBeDefined();
   });

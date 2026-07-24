@@ -237,11 +237,6 @@ export const PRETS_CYCLE = gql`
       nom
       montant
       moisPret
-      moisRemboursement
-      moisDeDette
-      majoration
-      totalARembourser
-      rembourse
       solde
       totalRembourse
     }
@@ -257,11 +252,6 @@ export const AJOUTER_PRET = gql`
       nom
       montant
       moisPret
-      moisRemboursement
-      moisDeDette
-      majoration
-      totalARembourser
-      rembourse
       solde
       totalRembourse
     }
@@ -283,24 +273,6 @@ export const AJOUTER_REMBOURSEMENT = gql`
   }
 `;
 
-/** Marque un prêt remboursé (mois indiqué ; vide = au délai d'août). */
-export const REMBOURSER_PRET = gql`
-  mutation RembourserPret($pretId: ID!, $moisRemboursement: Int) {
-    rembourserPret(pretId: $pretId, moisRemboursement: $moisRemboursement) {
-      id
-      membreId
-      nom
-      montant
-      moisPret
-      moisRemboursement
-      moisDeDette
-      majoration
-      totalARembourser
-      rembourse
-    }
-  }
-`;
-
 /** Journal chronologique des opérations du cycle (dépôts + prêts). */
 export const HISTORIQUE = gql`
   query Historique($cycleId: ID!) {
@@ -310,8 +282,6 @@ export const HISTORIQUE = gql`
       membreNom
       montant
       mois
-      rembourse
-      moisRemboursement
     }
   }
 `;

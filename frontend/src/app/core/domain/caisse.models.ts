@@ -116,24 +116,17 @@ export interface Pret {
   nom: string;
   montant: string;
   moisPret: number;
-  moisRemboursement: number | null;
-  moisDeDette: number;
-  majoration: string;
-  totalARembourser: string;
-  rembourse: boolean;
   solde: string; // dette composée restante (v2)
   totalRembourse: string;
 }
 
 /** Une opération du journal (dépôt ou prêt). */
 export interface Operation {
-  type: 'depot' | 'pret';
+  type: 'depot' | 'pret' | 'remboursement';
   date: string;
   membreNom: string;
   montant: string;
   mois: number;
-  rembourse: boolean;
-  moisRemboursement: number | null;
 }
 
 /** Résultat d'une simulation d'épargne. */
