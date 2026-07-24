@@ -29,7 +29,7 @@
   border-radius: 12px;
 
   .unite {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--c-text-muted);
   }
 }
@@ -46,7 +46,7 @@
 
   th {
     text-align: left;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--c-text-muted);
     font-weight: 500;
     padding: 0 12px 10px;
@@ -106,6 +106,9 @@
 }
 
 .lien {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
   border: 1px solid var(--c-border-strong);
   background: var(--c-surface);
   color: var(--c-accent);
@@ -114,7 +117,7 @@
   padding: 6px 12px;
   border-radius: 8px;
   font-family: inherit;
-  transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+  transition: transform var(--dur-fast) var(--ease-out), background 0.12s ease, border-color 0.12s ease;
 
   @media (hover: hover) and (pointer: fine) {
     &:hover {
@@ -134,7 +137,7 @@
   gap: 6px;
   justify-content: flex-end;
   /* L'éditeur inline entre en fondu (opacity seule : sûr dans une cellule). */
-  animation: remb-apparait 0.15s ease-out both;
+  animation: remb-apparait 0.15s var(--ease-out) both;
 }
 
 @keyframes remb-apparait {
@@ -147,13 +150,18 @@
 }
 
 .mini-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  min-height: 40px;
   border: 1px solid var(--c-border-strong);
   background: var(--c-surface);
   cursor: pointer;
   border-radius: 8px;
   padding: 6px 9px;
   color: var(--c-text-2);
-  transition: transform 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+  transition: transform var(--dur-fast) var(--ease-out), border-color 0.12s ease, color 0.12s ease;
 
   i {
     font-size: 14px;

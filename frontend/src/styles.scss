@@ -8,10 +8,16 @@
   --c-border-strong: #cfd5de;
   --c-text: #1b2431;
   --c-text-2: #56606f;
-  --c-text-muted: #8a94a3;
+  --c-text-muted: #616a77;
   --c-accent: #1d5fa5;
   --c-accent-bg: #e8f1fb;
   --c-success: #1d7a52;
+
+  /* Mouvement — courbes & durées (réf. Emil/Apple), réutilisables partout. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --dur-fast: 120ms;
+  --dur-base: 180ms;
 }
 
 /* Thème sombre : mêmes variables, valeurs foncées. Activé par la classe .app-dark sur <html>. */
@@ -23,7 +29,7 @@
   --c-border-strong: #3a4a5b;
   --c-text: #e7edf3;
   --c-text-2: #aab6c2;
-  --c-text-muted: #6f7b89;
+  --c-text-muted: #8b96a4;
   --c-accent: #5c9cd8;
   --c-accent-bg: #17293c;
   --c-success: #3fae7c;
@@ -39,14 +45,21 @@ body {
   min-height: 100%;
   background: var(--c-bg);
   color: var(--c-text);
+  font-size: 16px;
+  line-height: 1.5;
   transition: background-color 0.2s ease, color 0.2s ease;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
+/* Titres : léger resserrement du tracking pour les gros caractères (lisibilité). */
+h1 {
+  letter-spacing: -0.01em;
+}
+
 /* Petite icône d'aide (ℹ) qui déclenche un tooltip au survol / au tap. */
 .tip {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--c-text-muted);
   cursor: help;
   margin-left: 4px;
@@ -76,7 +89,7 @@ body {
 }
 
 .driver-popover.tontine-tour .driver-popover-progress-text {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--c-text-muted);
 }
 
@@ -119,7 +132,7 @@ body {
 /* Fondu d'entrée à chaque changement d'écran : le composant routé est le
    frère qui suit <router-outlet> dans la zone de contenu. */
 .content > router-outlet + * {
-  animation: page-fade 0.2s ease both;
+  animation: page-fade var(--dur-base) var(--ease-out) both;
 }
 
 @keyframes page-fade {
@@ -151,5 +164,28 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* Contraste renforcé : bordures et textes plus tranchés (option système). */
+@media (prefers-contrast: more) {
+  :root {
+    --c-border: #b3bbc6;
+    --c-border-strong: #8a94a1;
+    --c-text-2: #3c4552;
+    --c-text-muted: #505a67;
+  }
+  .app-dark {
+    --c-border: #4a5a6b;
+    --c-border-strong: #647688;
+    --c-text-2: #cdd7e1;
+    --c-text-muted: #aab6c4;
+  }
+}
+
+/* Transparence réduite : pas de flou sur les surfaces translucides (option système). */
+@media (prefers-reduced-transparency: reduce) {
+  * {
+    backdrop-filter: none !important;
   }
 }
