@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { InputNumber } from 'primeng/inputnumber';
 import { Button } from 'primeng/button';
+import { Select } from 'primeng/select';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { CaisseService } from '../../core/graphql/caisse.service';
@@ -27,7 +28,7 @@ function versLigne(valeur: string): { montant: number | null; enregistre: boolea
 
 @Component({
   selector: 'app-saisie',
-  imports: [FormsModule, InputNumber, Button, TranslatePipe, MoisNomPipe],
+  imports: [FormsModule, InputNumber, Button, Select, TranslatePipe, MoisNomPipe],
   templateUrl: './saisie.html',
   styleUrl: './saisie.scss',
 })
@@ -57,6 +58,10 @@ export class Saisie implements OnInit {
     );
   });
   protected readonly membreCourant = computed(() => this.membres()[this.membreIndex()]);
+  /** Options du sélecteur de membre (vue « Par membre »), pour la recherche directe. */
+  protected readonly optMembres = computed(() =>
+    this.membres().map((m) => ({ label: m.nom, value: m.id })),
+  );
   /** Mois de dépôt possibles : septembre → juin (durée + 1 ; juin = dépôt à 0 %). */
   protected readonly nbMoisDepot = computed(() => this.cycleStore.dureeDepot() + 1);
   protected readonly taux = computed(() =>
@@ -102,6 +107,15 @@ export class Saisie implements OnInit {
   membreSuivant(): void {
     if (this.membreIndex() < this.membres().length - 1) {
       this.membreIndex.update((i) => i + 1);
+      this.chargerMembre();
+    }
+  }
+
+  /** Va directement au membre choisi dans la recherche. */
+  choisirMembre(id: string): void {
+    const i = this.membres().findIndex((m) => m.id === id);
+    if (i >= 0 && i !== this.membreIndex()) {
+      this.membreIndex.set(i);
       this.chargerMembre();
     }
   }
