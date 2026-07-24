@@ -72,14 +72,15 @@ class Pret:
 def taux_a_la_cloture(mois_index: int, cycle: Cycle) -> Decimal:
     """Taux dégressif appliqué à un dépôt selon son mois (septembre 45 %, … mai 5 %).
 
-    Le mois de clôture (juin = durée + 1) accepte aussi un dépôt, mais à 0 % : l'argent est
-    versé au moment où les intérêts s'arrêtent ; il n'est distribué qu'à la réunion de septembre.
+    Un dépôt est possible de septembre (1) jusqu'au délai (septembre suivant). À partir de la
+    clôture des intérêts (juin) et après — juillet, août, septembre — le dépôt reste accepté
+    mais à 0 % : l'argent entre dans l'épargne sans plus rien rapporter.
     """
-    if not 1 <= mois_index <= cycle.duree_depot + 1:
+    if not 1 <= mois_index <= cycle.mois_delai:
         raise ValueError(
-            f"mois_index {mois_index} hors période de dépôt (1..{cycle.duree_depot + 1})"
+            f"mois_index {mois_index} hors période de dépôt (1..{cycle.mois_delai})"
         )
-    mois_restants = cycle.duree_depot - mois_index + 1  # juin (durée + 1) → 0
+    mois_restants = max(0, cycle.duree_depot - mois_index + 1)  # juin et au-delà → 0
     return cycle.taux_epargne * mois_restants
 
 
@@ -339,6 +340,21 @@ def total_excedent(montant, mois_pret: int, remboursements=None, cycle: Optional
     with localcontext() as ctx:
         ctx.prec = _PREC_EXACTE
         return arrondi_final(sum((l.excedent for l in lignes), Decimal(0)))
+
+
+def solde_a_la_reunion(
+    montant, mois_pret: int, remboursements, m: int, cycle: Optional[Cycle] = None
+) -> Decimal:
+    """Solde exact qu'un prêt présente à un NOUVEAU versement au mois `m`, compte tenu des
+    remboursements déjà enregistrés (intérêt du mois inclus). Après la clôture (juin) la
+    dette est figée : renvoie alors le solde final. Sert à répartir un trop-perçu (docs/03).
+    """
+    cycle = cycle or Cycle()
+    lignes = echeancier_pret(montant, mois_pret, remboursements, cycle)
+    for l in lignes:
+        if l.mois == m:
+            return l.solde
+    return lignes[-1].solde if lignes else _money(montant)
 
 
 def repartir_paiement(montant, soldes):

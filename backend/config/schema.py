@@ -7,7 +7,7 @@ Les mutations d'écriture (ajouter un dépôt, un prêt) sont amorcées et à co
 from __future__ import annotations
 
 import datetime
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from typing import List, Optional
 
 import strawberry
@@ -24,7 +24,10 @@ class RecapMembre:
     total_depose: Decimal
     interets: Decimal
     epargne_plus_interets: Decimal
-    dettes: Decimal
+    dettes: Decimal              # reste dû (capital + majoration − remboursé)
+    capital_emprunte: Decimal    # total emprunté sur le cycle
+    majoration: Decimal          # majoration TOTALE facturée (intérêts, remboursés compris)
+    total_rembourse: Decimal     # total remboursé sur les prêts
     position_nette: Decimal
 
 
@@ -164,11 +167,18 @@ def _recap_membre(member: Member, cycle: Cycle, strategie=None) -> RecapMembre:
         interest.Depot(d.mois_index, d.montant)
         for d in member.depots.filter(cycle=cycle)
     ]
-    # Dette v2 : somme des soldes composés (à partir du registre de remboursements).
+    # Dette v2 (vue totaux) : capital emprunté, majoration TOTALE facturée, total remboursé,
+    # et reste dû = capital + majoration − remboursé (= somme des soldes composés).
     dettes = Decimal(0)
+    capital_emprunte = Decimal(0)
+    majoration_totale = Decimal(0)
+    total_rembourse_prets = Decimal(0)
     for loan in member.prets.filter(cycle=cycle):
         loan.cycle = cycle
         dettes += loan.dette
+        capital_emprunte += loan.montant
+        majoration_totale += loan.total_interets_composes
+        total_rembourse_prets += loan.total_rembourse
     strategie = strategie or interest.InteretsComplets()
     interets = strategie.interets(depots, params)
     total_depose = interest.total_depose(depots)
@@ -180,6 +190,9 @@ def _recap_membre(member: Member, cycle: Cycle, strategie=None) -> RecapMembre:
         interets=interets,
         epargne_plus_interets=epargne_plus_interets,
         dettes=dettes,
+        capital_emprunte=capital_emprunte,
+        majoration=majoration_totale,
+        total_rembourse=total_rembourse_prets,
         position_nette=epargne_plus_interets - dettes,
     )
 
@@ -227,6 +240,22 @@ def _pret(loan) -> "Pret":
             for r in loan.remboursements.order_by("mois", "cree_le")
         ],
     )
+
+
+@strawberry.type
+class PartRepartition:
+    """Une part d'un versement réparti : soit sur un prêt, soit en épargne."""
+    type: str                    # "pret" ou "epargne"
+    montant: Decimal
+    mois_cible: int              # mois du prêt ciblé (pret) ou mois de l'épargne (epargne)
+    remboursement_id: Optional[strawberry.ID] = None  # présent si type == "pret" (pour annuler)
+
+
+@strawberry.type
+class ResultatRemboursement:
+    """Résultat d'un versement : les prêts du membre à jour + la répartition effectuée."""
+    prets: List["Pret"]
+    repartition: List["PartRepartition"]
 
 
 @strawberry.type
@@ -346,7 +375,8 @@ class Query:
                 montant=depots[m].montant if m in depots else Decimal(0),
                 date=depots[m].date_operation.isoformat() if m in depots else None,
             )
-            for m in range(1, cycle.duree_depot + 2)  # +1 : inclut juin (dépôt à 0 %)
+            # Jusqu'au délai : juin → septembre acceptés en dépôt (à 0 %).
+            for m in range(1, cycle.mois_delai + 1)
         ]
 
     @strawberry.field
@@ -578,15 +608,113 @@ class Mutation:
         return _pret(loan)
 
     @strawberry.mutation
-    def ajouter_remboursement(
-        self, pret_id: strawberry.ID, mois: int, montant: Decimal
+    def modifier_pret(
+        self, pret_id: strawberry.ID, montant: Decimal, mois_pret: int
     ) -> Pret:
-        """Enregistre un remboursement partiel d'un prêt (modèle composé v2, réf. docs/03)."""
-        from apps.loans.models import Loan, Remboursement
+        """Corrige le montant et/ou le mois d'un prêt ; renvoie le prêt recalculé."""
+        from apps.loans.models import Loan
 
         loan = Loan.objects.select_related("member", "cycle").get(id=pret_id)
-        Remboursement.objects.create(loan=loan, mois=mois, montant=montant)
+        loan.montant = montant
+        loan.mois_pret = mois_pret
+        # Valide que l'échéancier reste calculable (remboursements cohérents) avant de sauvegarder.
+        _ = loan.dette
+        loan.save(update_fields=["montant", "mois_pret"])
         return _pret(loan)
+
+    @strawberry.mutation
+    def ajouter_remboursement(
+        self, pret_id: strawberry.ID, mois: int, montant: Decimal
+    ) -> ResultatRemboursement:
+        """Enregistre un versement. Si le montant dépasse le solde du prêt, le surplus cascade
+        sur les autres prêts du membre (le plus ancien d'abord), puis part en épargne (docs/03)."""
+        from apps.loans.models import Loan, Remboursement
+        from apps.savings.models import Deposit
+        from apps.core.domain import interest
+
+        loan = Loan.objects.select_related("member", "cycle").get(id=pret_id)
+        member = loan.member
+        cycle = loan.cycle
+        params = cycle.to_params()
+
+        # Ordre d'imputation : le prêt choisi d'abord, puis les autres du membre (plus ancien d'abord).
+        autres = list(
+            Loan.objects.filter(cycle=cycle, member=member)
+            .exclude(id=loan.id)
+            .order_by("mois_pret", "cree_le")
+        )
+        repartition: List[PartRepartition] = []
+        pool = interest._money(montant)
+
+        for pr in [loan, *autres]:
+            if pool <= 0:
+                break
+            # Un prêt est un prêt : on l'impute toujours. Si le versement est daté avant que ce
+            # prêt n'existe, le surplus l'atteint à sa 1re réunion possible (mois_pret + 1).
+            m_app = mois if mois > pr.mois_pret else pr.mois_pret + 1
+            solde = interest.solde_a_la_reunion(
+                pr.montant, pr.mois_pret, pr.remboursements_par_mois(), m_app, params
+            )
+            if solde <= 0:
+                continue
+            a = (pool if pool < solde else solde).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+            if a <= 0:
+                continue
+            r = Remboursement.objects.create(loan=pr, mois=m_app, montant=a)
+            repartition.append(
+                PartRepartition(
+                    type="pret",
+                    montant=a,
+                    mois_cible=pr.mois_pret,
+                    remboursement_id=strawberry.ID(str(r.id)),
+                )
+            )
+            pool -= a
+
+        # Ce qui reste (aucune dette où aller) → épargne, au mois du versement (plafonné à juin → 0 %).
+        if pool > 0:
+            reste = pool.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+            mois_ep = min(mois, interest.cloture(params))
+            depot, cree = Deposit.objects.get_or_create(
+                cycle=cycle,
+                member=member,
+                mois_index=mois_ep,
+                defaults={"montant": reste, "date_operation": datetime.date.today()},
+            )
+            if not cree:
+                depot.montant = depot.montant + reste
+                depot.save(update_fields=["montant"])
+            repartition.append(
+                PartRepartition(type="epargne", montant=reste, mois_cible=mois_ep)
+            )
+
+        prets_maj = [
+            _pret(x)
+            for x in Loan.objects.filter(cycle=cycle, member=member)
+            .select_related("member", "cycle")
+            .prefetch_related("remboursements")
+            .order_by("member__nom", "mois_pret")
+        ]
+        return ResultatRemboursement(prets=prets_maj, repartition=repartition)
+
+    @strawberry.mutation
+    def retirer_epargne(
+        self, cycle_id: strawberry.ID, member_id: strawberry.ID, mois_index: int, montant: Decimal
+    ) -> bool:
+        """Retire un montant de l'épargne d'un membre (annulation d'un surplus) ;
+        supprime le dépôt s'il tombe à zéro."""
+        from apps.savings.models import Deposit
+
+        depot = Deposit.objects.filter(
+            cycle_id=cycle_id, member_id=member_id, mois_index=mois_index
+        ).first()
+        if depot:
+            depot.montant = depot.montant - Decimal(str(montant))
+            if depot.montant <= 0:
+                depot.delete()
+            else:
+                depot.save(update_fields=["montant"])
+        return True
 
     @strawberry.mutation
     def supprimer_depot(
@@ -610,14 +738,14 @@ class Mutation:
 
     @strawberry.mutation
     def supprimer_remboursement(self, remboursement_id: strawberry.ID) -> Pret:
-        """Supprime un remboursement ; renvoie le prêt à jour."""
-        from apps.loans.models import Remboursement
+        """Supprime un remboursement ; renvoie le prêt recalculé (rechargé après suppression)."""
+        from apps.loans.models import Loan, Remboursement
 
-        r = Remboursement.objects.select_related("loan__member", "loan__cycle").get(
-            id=remboursement_id
-        )
-        loan = r.loan
+        r = Remboursement.objects.get(id=remboursement_id)
+        loan_id = r.loan_id
         r.delete()
+        # On recharge le prêt APRÈS la suppression : aucun état de relation figé, solde exact.
+        loan = Loan.objects.select_related("member", "cycle").get(id=loan_id)
         return _pret(loan)
 
     @strawberry.mutation

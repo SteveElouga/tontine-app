@@ -55,7 +55,10 @@ export interface RecapMembre {
   totalDepose: string;
   interets: string;
   epargnePlusInterets: string;
-  dettes: string;
+  dettes: string; // reste à payer (capital + majoration − remboursé)
+  capitalEmprunte: string; // total emprunté sur le cycle
+  majoration: string; // majoration totale facturée (intérêts)
+  totalRembourse: string; // total remboursé sur les prêts
   positionNette: string;
 }
 
@@ -137,8 +140,23 @@ export interface Pret {
   montant: string;
   moisPret: number;
   solde: string; // dette composée restante (v2)
+  totalInterets: string; // majoration (intérêts composés) — séparée du capital
   totalRembourse: string;
   remboursements: RemboursementDetail[];
+}
+
+/** Une part d'un versement réparti : sur un prêt, ou en épargne. */
+export interface PartRepartition {
+  type: 'pret' | 'epargne';
+  montant: string;
+  moisCible: number;
+  remboursementId?: string | null;
+}
+
+/** Résultat d'un versement : les prêts du membre à jour + la répartition effectuée. */
+export interface ResultatRemboursement {
+  prets: Pret[];
+  repartition: PartRepartition[];
 }
 
 /** Une opération du journal (dépôt ou prêt). */

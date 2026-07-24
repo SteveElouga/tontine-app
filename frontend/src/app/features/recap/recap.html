@@ -64,8 +64,20 @@
             <i class="pi pi-info-circle tip" [pTooltip]="'recap.tipInterets' | translate" tooltipPosition="top"></i>
           </th>
           <th class="d">
-            {{ 'recap.colDette' | translate }}
-            <i class="pi pi-info-circle tip" [pTooltip]="'recap.tipDette' | translate" tooltipPosition="top"></i>
+            {{ 'recap.colCapital' | translate }}
+            <i class="pi pi-info-circle tip" [pTooltip]="'recap.tipCapital' | translate" tooltipPosition="top"></i>
+          </th>
+          <th class="d">
+            {{ 'recap.colMajoration' | translate }}
+            <i class="pi pi-info-circle tip" [pTooltip]="'recap.tipMajoration' | translate" tooltipPosition="top"></i>
+          </th>
+          <th class="d">
+            {{ 'recap.colRembourse' | translate }}
+            <i class="pi pi-info-circle tip" [pTooltip]="'recap.tipRembourse' | translate" tooltipPosition="top"></i>
+          </th>
+          <th class="d">
+            {{ 'recap.colResteAPayer' | translate }}
+            <i class="pi pi-info-circle tip" [pTooltip]="'recap.tipReste' | translate" tooltipPosition="top"></i>
           </th>
           <th class="d">
             {{ 'recap.colRecevoir' | translate }}
@@ -80,6 +92,27 @@
             <td class="g">{{ m.nom }}</td>
             <td class="d muted2">{{ format(m.totalDepose) }}</td>
             <td class="d vert">{{ format(m.interets) }}</td>
+            <td class="d">
+              @if (n(m.capitalEmprunte) > 0) {
+                {{ format(m.capitalEmprunte) }}
+              } @else {
+                <span class="tiret">—</span>
+              }
+            </td>
+            <td class="d">
+              @if (n(m.majoration) > 0) {
+                <span class="majo">{{ format(m.majoration) }}</span>
+              } @else {
+                <span class="tiret">—</span>
+              }
+            </td>
+            <td class="d">
+              @if (n(m.totalRembourse) > 0) {
+                {{ format(m.totalRembourse) }}
+              } @else {
+                <span class="tiret">—</span>
+              }
+            </td>
             <td class="d">
               @if (n(m.dettes) > 0) {
                 <span class="dette">−{{ format(m.dettes) }}</span>
@@ -98,7 +131,7 @@
           </tr>
         } @empty {
           <tr>
-            <td colspan="6" class="muted centre">{{ 'recap.vide' | translate }}</td>
+            <td colspan="9" class="muted centre">{{ 'recap.vide' | translate }}</td>
           </tr>
         }
       </tbody>
@@ -107,6 +140,27 @@
           <td class="g fort">{{ 'recap.total' | translate }}</td>
           <td class="d muted2">{{ format(totalDepose()) }}</td>
           <td class="d vert">{{ format(totalInterets()) }}</td>
+          <td class="d">
+            @if (totalCapitalEmprunte() > 0) {
+              {{ format(totalCapitalEmprunte()) }}
+            } @else {
+              <span class="tiret">—</span>
+            }
+          </td>
+          <td class="d">
+            @if (totalMajoration() > 0) {
+              <span class="majo">{{ format(totalMajoration()) }}</span>
+            } @else {
+              <span class="tiret">—</span>
+            }
+          </td>
+          <td class="d">
+            @if (totalRembourse() > 0) {
+              {{ format(totalRembourse()) }}
+            } @else {
+              <span class="tiret">—</span>
+            }
+          </td>
           <td class="d">
             @if (totalDettes() > 0) {
               <span class="dette">−{{ format(totalDettes()) }}</span>

@@ -3,6 +3,9 @@
   <p class="sub">{{ 'prets.sous' | translate }}</p>
 </header>
 
+<p-confirmdialog [style]="{ maxWidth: '420px' }" />
+
+
 <div class="ajout">
   <p-select
     [options]="optMembres()"
@@ -53,6 +56,18 @@
           @if (n(p.solde) === 0) {
             <span class="badge ok"><i class="pi pi-check-circle"></i> {{ 'prets.soldeTag' | translate }}</span>
           }
+          @if (editionDe() !== p.id) {
+            <button
+              type="button"
+              class="c-modif"
+              (click)="ouvrirEdition(p)"
+              [attr.aria-label]="'prets.modifier' | translate"
+              [pTooltip]="'prets.modifier' | translate"
+              tooltipPosition="left"
+            >
+              <i class="pi pi-pencil"></i>
+            </button>
+          }
           <button
             type="button"
             class="c-suppr"
@@ -65,10 +80,53 @@
           </button>
         </header>
 
+        @if (editionDe() === p.id) {
+          <div class="c-edition">
+            <label class="c-champ">
+              <span>{{ 'prets.colMontant' | translate }}</span>
+              <p-inputnumber
+                [ngModel]="eMontant()"
+                (ngModelChange)="eMontant.set($event)"
+                [maxFractionDigits]="0"
+                [useGrouping]="true"
+                locale="fr-FR"
+                [inputStyle]="{ width: '100%', 'text-align': 'right' }"
+              />
+            </label>
+            <label class="c-champ">
+              <span>{{ 'prets.colPret' | translate }}</span>
+              <p-select
+                [options]="optMoisPret()"
+                [ngModel]="eMois()"
+                (ngModelChange)="eMois.set($event)"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"
+                [style]="{ width: '100%' }"
+              />
+            </label>
+            <div class="c-edition-actions">
+              <button type="button" class="mini-btn ok" (click)="validerEdition(p)" [attr.aria-label]="'prets.valider' | translate">
+                <i class="pi pi-check"></i>
+              </button>
+              <button type="button" class="mini-btn" (click)="annulerEdition()" [attr.aria-label]="'prets.annuler' | translate">
+                <i class="pi pi-times"></i>
+              </button>
+            </div>
+          </div>
+        } @else {
+
         <div class="c-lignes">
           <div class="c-l">
             <span class="c-lbl">{{ 'prets.colMontant' | translate }}</span>
             <span class="c-val">{{ format(p.montant) }} <small>FCFA</small></span>
+          </div>
+          <div class="c-l">
+            <span class="c-lbl">
+              {{ 'prets.colMajoration' | translate }}
+              <i class="pi pi-info-circle tip" [pTooltip]="'prets.tipMajoration' | translate" tooltipPosition="top"></i>
+            </span>
+            <span class="c-val majo">+{{ format(p.totalInterets) }} <small>FCFA</small></span>
           </div>
           <div class="c-l">
             <span class="c-lbl">{{ 'prets.colPret' | translate }}</span>
@@ -140,6 +198,7 @@
               <i class="pi pi-plus"></i> {{ 'prets.rembourser' | translate }}
             </button>
           </footer>
+        }
         }
       </article>
     }

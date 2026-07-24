@@ -65,8 +65,8 @@ export class Saisie implements OnInit {
   protected readonly optMembres = computed(() =>
     this.membres().map((m) => ({ label: m.nom, value: m.id })),
   );
-  /** Mois de dépôt possibles : septembre → juin (durée + 1 ; juin = dépôt à 0 %). */
-  protected readonly nbMoisDepot = computed(() => this.cycleStore.dureeDepot() + 1);
+  /** Mois de dépôt possibles : septembre → septembre (jusqu'au délai) ; juin→sept = 0 %. */
+  protected readonly nbMoisDepot = computed(() => this.cycleStore.moisDelai());
   protected readonly taux = computed(() =>
     Math.max(0, 5 * (this.cycleStore.dureeDepot() - this.moisIndex() + 1)),
   );

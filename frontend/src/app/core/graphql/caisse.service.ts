@@ -13,6 +13,7 @@ import {
   ParametresCycle,
   Pret,
   RecapMembre,
+  ResultatRemboursement,
   SimEpargne,
   SimPret,
 } from '../domain/caisse.models';
@@ -20,6 +21,7 @@ import {
   AJOUTER_DEPOT,
   AJOUTER_MEMBRE,
   AJOUTER_PRET,
+  MODIFIER_PRET,
   CLOTURER_CYCLE,
   CREER_CYCLE,
   RENOMMER_CAISSE,
@@ -36,6 +38,7 @@ import {
   PRETS_CYCLE,
   RECAP_CYCLE,
   AJOUTER_REMBOURSEMENT,
+  RETIRER_EPARGNE,
   SUPPRIMER_DEPOT,
   SUPPRIMER_PRET,
   SUPPRIMER_REMBOURSEMENT,
@@ -188,14 +191,43 @@ export class CaisseService {
       .pipe(map((r) => r.data!.ajouterPret as Pret));
   }
 
-  /** Enregistre un remboursement partiel d'un prêt (registre composé v2). */
-  ajouterRemboursement(pretId: string, mois: number, montant: number): Observable<Pret> {
+  /** Corrige le montant et/ou le mois d'un prêt. */
+  modifierPret(pretId: string, montant: number, moisPret: number): Observable<Pret> {
     return this.apollo
-      .mutate<{ ajouterRemboursement: Pret }>({
+      .mutate<{ modifierPret: Pret }>({
+        mutation: MODIFIER_PRET,
+        variables: { pretId, montant, moisPret },
+      })
+      .pipe(map((r) => r.data!.modifierPret as Pret));
+  }
+
+  /** Enregistre un versement ; renvoie les prêts du membre à jour + la répartition (docs/03). */
+  ajouterRemboursement(
+    pretId: string,
+    mois: number,
+    montant: number,
+  ): Observable<ResultatRemboursement> {
+    return this.apollo
+      .mutate<{ ajouterRemboursement: ResultatRemboursement }>({
         mutation: AJOUTER_REMBOURSEMENT,
         variables: { pretId, mois, montant },
       })
-      .pipe(map((r) => r.data!.ajouterRemboursement as Pret));
+      .pipe(map((r) => r.data!.ajouterRemboursement as ResultatRemboursement));
+  }
+
+  /** Retire un montant de l'épargne d'un membre (annulation d'un surplus). */
+  retirerEpargne(
+    cycleId: string,
+    memberId: string,
+    moisIndex: number,
+    montant: number,
+  ): Observable<boolean> {
+    return this.apollo
+      .mutate<{ retirerEpargne: boolean }>({
+        mutation: RETIRER_EPARGNE,
+        variables: { cycleId, memberId, moisIndex, montant },
+      })
+      .pipe(map((r) => Boolean(r.data?.retirerEpargne)));
   }
 
   /** Supprime le dépôt d'un membre pour un mois (annuler / effacer). */

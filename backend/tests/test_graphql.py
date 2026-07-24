@@ -145,12 +145,16 @@ def test_ajouter_remboursement(api_auth, donnees):
     data = _data(
         api_auth,
         "mutation($p: ID!, $mt: Decimal!){"
-        " ajouterRemboursement(pretId: $p, mois: 5, montant: $mt){ solde totalRembourse } }",
+        " ajouterRemboursement(pretId: $p, mois: 5, montant: $mt){"
+        " prets { id solde totalRembourse } repartition { type montant } } }",
         p=pid, mt="20000",
     )
-    r = data["ajouterRemboursement"]
-    assert r["solde"] == "18798.0"       # 30000@mois2, 20000 remboursés au mois 5 (composé)
-    assert r["totalRembourse"] == "20000"
+    res = data["ajouterRemboursement"]
+    pret = next(x for x in res["prets"] if x["id"] == pid)
+    assert pret["solde"] == "18798.0"        # 30000@mois2, 20000 remboursés au mois 5 (composé)
+    assert pret["totalRembourse"] == "20000"
+    # 20000 < solde → tout va sur le prêt, rien en épargne.
+    assert [p["type"] for p in res["repartition"]] == ["pret"]
 
 
 @pytest.mark.django_db

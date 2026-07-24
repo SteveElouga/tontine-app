@@ -102,6 +102,9 @@ export const RECAP_CYCLE = gql`
       interets
       epargnePlusInterets
       dettes
+      capitalEmprunte
+      majoration
+      totalRembourse
       positionNette
     }
   }
@@ -249,6 +252,7 @@ export const PRETS_CYCLE = gql`
       montant
       moisPret
       solde
+      totalInterets
       totalRembourse
       remboursements {
         id
@@ -269,6 +273,28 @@ export const AJOUTER_PRET = gql`
       montant
       moisPret
       solde
+      totalInterets
+      totalRembourse
+      remboursements {
+        id
+        mois
+        montant
+      }
+    }
+  }
+`;
+
+/** Corrige le montant et/ou le mois d'un prêt. */
+export const MODIFIER_PRET = gql`
+  mutation ModifierPret($pretId: ID!, $montant: Decimal!, $moisPret: Int!) {
+    modifierPret(pretId: $pretId, montant: $montant, moisPret: $moisPret) {
+      id
+      membreId
+      nom
+      montant
+      moisPret
+      solde
+      totalInterets
       totalRembourse
       remboursements {
         id
@@ -283,19 +309,35 @@ export const AJOUTER_PRET = gql`
 export const AJOUTER_REMBOURSEMENT = gql`
   mutation AjouterRemboursement($pretId: ID!, $mois: Int!, $montant: Decimal!) {
     ajouterRemboursement(pretId: $pretId, mois: $mois, montant: $montant) {
-      id
-      membreId
-      nom
-      montant
-      moisPret
-      solde
-      totalRembourse
-      remboursements {
+      prets {
         id
-        mois
+        membreId
+        nom
         montant
+        moisPret
+        solde
+        totalInterets
+        totalRembourse
+        remboursements {
+          id
+          mois
+          montant
+        }
+      }
+      repartition {
+        type
+        montant
+        moisCible
+        remboursementId
       }
     }
+  }
+`;
+
+/** Retire un montant de l'épargne d'un membre (annulation d'un surplus). */
+export const RETIRER_EPARGNE = gql`
+  mutation RetirerEpargne($cycleId: ID!, $memberId: ID!, $moisIndex: Int!, $montant: Decimal!) {
+    retirerEpargne(cycleId: $cycleId, memberId: $memberId, moisIndex: $moisIndex, montant: $montant)
   }
 `;
 
@@ -330,6 +372,7 @@ export const SUPPRIMER_REMBOURSEMENT = gql`
       montant
       moisPret
       solde
+      totalInterets
       totalRembourse
       remboursements {
         id
