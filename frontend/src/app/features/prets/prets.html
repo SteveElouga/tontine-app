@@ -80,6 +80,7 @@
                     (ngModelChange)="rembReunion.set($event)"
                     optionLabel="label"
                     optionValue="value"
+                    appendTo="body"
                     [style]="{ 'min-width': '130px' }"
                   />
                   <p-inputnumber
@@ -128,6 +129,6 @@
 
   <div class="astuce">
     <i class="pi pi-info-circle"></i>
-    <span>{{ 'prets.astuce' | translate }}</span>
+    <span>{{ 'prets.astuce' | translate: { delai: delaiNom() } }}</span>
   </div>
 }

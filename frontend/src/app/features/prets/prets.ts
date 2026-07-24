@@ -29,10 +29,20 @@ export class Prets implements OnInit {
   protected readonly optMoisPret = computed(() => {
     this.lang.langue();
     const debut = this.cycleStore.moisDebut();
-    return [1, 2, 3, 4, 5, 6, 7, 8, 9].map((mi) => ({
+    const duree = this.cycleStore.dureeDepot();
+    // Un prêt se contracte pendant les mois de dépôt : positions 1..duree_depot.
+    return Array.from({ length: duree }, (_, i) => i + 1).map((mi) => ({
       label: this.i18n.instant('mois.' + moisCalendaire(mi, debut)),
       value: mi,
     }));
+  });
+
+  /** Nom calendaire du dernier mois de remboursement (délai) — pour l'astuce. */
+  protected readonly delaiNom = computed(() => {
+    this.lang.langue();
+    return this.i18n.instant(
+      'mois.' + moisCalendaire(this.cycleStore.moisDelai(), this.cycleStore.moisDebut()),
+    );
   });
 
   protected readonly prets = signal<Pret[]>([]);
@@ -104,7 +114,8 @@ export class Prets implements OnInit {
   }
 
   ouvrirRemboursement(p: Pret): void {
-    this.rembReunion.set(Math.min(p.moisPret + 1, 10)); // 1re réunion après le prêt (max juin)
+    // 1re réunion après le prêt, sans dépasser le délai de remboursement (août).
+    this.rembReunion.set(Math.min(p.moisPret + 1, this.cycleStore.moisDelai()));
     this.rembMontant.set(null);
     this.remboursementDe.set(p.id);
   }
@@ -113,11 +124,15 @@ export class Prets implements OnInit {
     this.remboursementDe.set(null);
   }
 
-  /** Réunions possibles pour un remboursement : du mois suivant le prêt jusqu'à juin (10). */
+  /**
+   * Réunions possibles pour un remboursement : du mois suivant le prêt jusqu'au délai (août).
+   * L'intérêt s'arrête à la clôture (juin) ; juillet et août restent ouverts au remboursement.
+   */
   optReunions(moisPret: number): { label: string; value: number }[] {
     const debut = this.cycleStore.moisDebut();
+    const fin = this.cycleStore.moisDelai();
     const r: { label: string; value: number }[] = [];
-    for (let mi = moisPret + 1; mi <= 10; mi++) {
+    for (let mi = moisPret + 1; mi <= fin; mi++) {
       r.push({ label: this.i18n.instant('mois.' + moisCalendaire(mi, debut)), value: mi });
     }
     return r;

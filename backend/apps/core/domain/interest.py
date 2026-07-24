@@ -265,7 +265,7 @@ def cloture(cycle: Cycle) -> int:
 @dataclass(frozen=True)
 class LigneEcheance:
     """Une réunion dans la vie d'un prêt. Montants exacts, non arrondis."""
-    mois: int          # position de la réunion (mois_pret+1 … clôture)
+    mois: int          # position de la réunion (mois_pret+1 … clôture, voire délai si remb. après juin)
     interet: Decimal   # intérêt du mois = solde d'ouverture × taux
     paiement: Decimal  # part du versement imputée au prêt
     excedent: Decimal  # part du versement au-delà du solde (→ épargne)
@@ -273,23 +273,37 @@ class LigneEcheance:
 
 
 def echeancier_pret(montant, mois_pret: int, remboursements=None, cycle: Optional[Cycle] = None):
-    """Déroule un prêt réunion par réunion, du mois suivant le prêt jusqu'à la clôture (juin).
+    """Déroule un prêt réunion par réunion, du mois suivant le prêt jusqu'à la clôture (juin),
+    et au-delà UNIQUEMENT si un remboursement tombe en juillet/août (jusqu'au délai `mois_delai`).
+
+    L'intérêt composé ne court que jusqu'à la clôture (juin) : passé juin, la dette est FIGÉE
+    et les réunions restantes ne servent qu'à imputer des remboursements, sans intérêt.
 
     `remboursements` : dict {position_reunion: montant versé}. Un versement paie d'abord
     l'intérêt du mois puis le capital ; ce qui dépasse le solde devient un excédent (→ épargne).
     Aucun arrondi : tout est exact. Renvoie la liste des `LigneEcheance`.
     """
     cycle = cycle or Cycle()
-    fin = cloture(cycle)
-    if not 1 <= mois_pret < fin:
-        raise ValueError(f"mois_pret {mois_pret} hors période de prêt (1..{fin - 1})")
+    clot = cloture(cycle)                     # juin : dernier mois où l'intérêt court
+    fin_max = max(clot, cycle.mois_delai)     # août : dernière réunion de remboursement possible
+    if not 1 <= mois_pret < clot:
+        raise ValueError(f"mois_pret {mois_pret} hors période de prêt (1..{clot - 1})")
     versements = {int(m): _money(v) for m, v in (remboursements or {}).items()}
+    for m in versements:
+        if not mois_pret < m <= fin_max:
+            raise ValueError(
+                f"remboursement au mois {m} hors période ({mois_pret + 1}..{fin_max})"
+            )
+    # On ne prolonge au-delà de juin que si un remboursement tombe en juillet/août ;
+    # sinon l'échéancier s'arrête à la clôture (pas de lignes vides).
+    fin = max(clot, max(versements, default=clot))
     lignes = []
     with localcontext() as ctx:
         ctx.prec = _PREC_EXACTE
         solde = _money(montant)
         for m in range(mois_pret + 1, fin + 1):
-            interet = solde * cycle.taux_majoration
+            # Intérêt seulement jusqu'à la clôture (juin) ; gelé ensuite (juillet, août).
+            interet = solde * cycle.taux_majoration if m <= clot else Decimal(0)
             solde = solde + interet
             verse = versements.get(m, Decimal(0))
             impute = verse if verse < solde else solde

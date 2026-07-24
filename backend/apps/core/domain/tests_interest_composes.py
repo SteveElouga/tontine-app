@@ -70,6 +70,26 @@ def test_arret_en_juin():
     assert dette_finale(100000, 9, {}, CYCLE) == Decimal("105000")
 
 
+def test_remboursement_apres_cloture():
+    # Après juin, la dette est FIGÉE : un versement de juillet/août la réduit SANS intérêt.
+    # Sans remboursement tardif, l'échéancier s'arrête toujours à juin (pas de lignes vides).
+    assert len(echeancier_pret(100000, 1, {}, CYCLE)) == 9
+    # 50 000 remboursés en août (position 12) sur un prêt de septembre.
+    lignes = echeancier_pret(100000, 1, {12: 50000}, CYCLE)
+    aout = lignes[-1]
+    assert aout.mois == 12 and aout.interet == Decimal("0") and aout.paiement == Decimal("50000")
+    # Dette d'août = dette figée de juin (155 132,8) − 50 000, aucun intérêt en juillet/août.
+    assert dette_finale(100000, 1, {12: 50000}, CYCLE) == Decimal("105132.8")
+    # Les intérêts totaux restent ceux d'un prêt jamais remboursé (août ne majore pas).
+    assert total_interets_pret(100000, 1, {12: 50000}, CYCLE) == total_interets_pret(100000, 1, {}, CYCLE)
+    # Un remboursement au-delà du délai (position 13) est refusé.
+    try:
+        echeancier_pret(100000, 1, {13: 10000}, CYCLE)
+        assert False, "remboursement au mois 13 aurait dû lever ValueError"
+    except ValueError:
+        pass
+
+
 def test_taux_parametrable():
     c = Cycle(taux_majoration=Decimal("0.10"))
     assert dette_finale(100000, 9, {}, c) == Decimal("110000")  # 1 mois à 10 %

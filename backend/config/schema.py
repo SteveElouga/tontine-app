@@ -59,6 +59,8 @@ class CycleInfo:
     caisse_nom: str
     statut: str
     mois_debut: int
+    duree_depot: int
+    mois_delai: int
 
 
 @strawberry.type
@@ -331,6 +333,8 @@ class Query:
                 caisse_nom=c.caisse.nom,
                 statut=c.statut,
                 mois_debut=c.mois_debut,
+                duree_depot=c.duree_depot,
+                mois_delai=c.mois_delai,
             )
             for c in Cycle.objects.select_related("caisse").order_by("caisse__nom", "libelle")
         ]
