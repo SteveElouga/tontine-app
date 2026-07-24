@@ -78,6 +78,8 @@ gitGraph
 
 | Date | Auteur | Résumé de ce qui a été fait | Branches / PR |
 |------|--------|-----------------------------|---------------|
+| 2026-07-24 | Steve + agent | **Tests backend — pytest-django** : infra (`pytest.ini` avec `python_files` élargi pour collecter `tests_interest.py`, `requirements-dev.txt`, `conftest.py` : fixtures `api`/`tresoriere`/`token`/`api_auth`). **22 tests verts** — moteur (13, auto‑collectés), auth (login OK/KO, `/graphql/` protégé 401/200, changement de mot de passe OK/KO), modèles (`Cycle.to_params`, commande `creer_tresoriere` crée + met à jour sans dupliquer). **Bug corrigé** : le changement de mot de passe renvoyait 403 en dev (`dev.py` met `DEFAULT_AUTHENTICATION_CLASSES=()`, donc aucun authentificateur) → `@authentication_classes([JWTAuthentication])` explicite sur l'endpoint. Reste : résolveurs GraphQL avec données + job CI « Tests backend » sur `pytest`. | feat/tests-backend |
+| 2026-07-24 | Steve + agent | **Tests unitaires frontend — vague 2** : specs Vitest pour le **service GraphQL** `CaisseService` (20 méthodes, `ApolloTestingController`), la **logique des composants** (récap, tableau de bord, prêts, historique, saisie, fiche membre, aide, simulation, paramètres, membres, login, profil — smoke + logique) et le `TourService`. Polyfill `localStorage` (`src/test-setup.ts`) + providers de test (`src/testing/providers.ts`). Couverture : `core/**` à ~100 % (lignes/fonctions/instructions, branches ≥ 90 %), seuils imposés dans `angular.json` ; composants au niveau smoke+logique (approche pragmatique B). **79 tests verts en local**. | feat/tests-front-1 |
 | 2026-07-23 | Steve + agent | **Tests unitaires frontend — vague 1 (logique)** : 8 specs Vitest — `moisCalendaire`, `AuthStore` (jeton/expiration/login/logout), `authGuard`, `CycleStore` (moisDebut), `MoisNomPipe`, `ThemeStore`, `LangStore`, + réparation du `app.spec.ts` du squelette (boot avec providers de test). Compilent (`ngc -p tsconfig.spec.json` exit 0) ; **à exécuter en local via `ng test`** (le bac à sable ne lance pas Vitest/esbuild). Runner = Vitest (`@angular/build:unit-test`). Reste : service GraphQL, logique des composants, TourService ; puis pytest backend ; puis e2e. | feat/tests-front-1 |
 | 2026-07-23 | Steve + agent | **Tooltips d'aide (fixes + calculés)** : directive PrimeNG `pTooltip` — icônes ℹ avec explication sur les en-têtes du Récap (Épargne, Intérêts, Dette, À recevoir), la colonne Majoration des Prêts, les réglages (taux, mois d'ouverture, délai) et le taux de la Simulation ; **tooltips calculés** sur « À recevoir » de chaque membre (épargne + intérêts − dette) et la majoration de chaque prêt (mois de dette). Style `.tip` global, i18n FR/EN. `ngc` propre, i18n 298/298. | feat/tooltips |
 | 2026-07-23 | Steve + agent | **Visite guidée accordée au thème** : surcharge des styles Driver.js (`popoverClass: tontine-tour` + CSS dans `styles.scss`) — bulle et boutons aux couleurs de l'app (bouton Suivant en bleu primaire), coins arrondis, police héritée, adaptation automatique clair/sombre via les variables CSS ; flèche masquée (le spotlight suffit). `ngc` propre, SCSS équilibré. | feat/tour-theme |
@@ -155,8 +157,9 @@ gitGraph
 | 27 | Visite guidée à la première connexion (Driver.js) | fait | feat/visite-guidee |
 | 28 | Tooltips d'aide (fixes + calculés) sur récap, prêts, paramètres, simulation | fait | feat/tooltips |
 | 29 | Tests unitaires frontend — vague 1 : logique (helper, stores, garde, pipe) | fait | feat/tests-front-1 |
-| 30 | Tests frontend — vague 2 : service GraphQL + logique des composants + TourService | à faire | — |
-| 31 | Tests backend — pytest-django (moteur, API GraphQL, auth, modèles) | à faire | — |
+| 30 | Tests frontend — vague 2 : service GraphQL + logique des composants + TourService | fait | feat/tests-front-1 |
+| 31 | Tests backend — pytest-django (infra + moteur + auth + modèles) | fait | feat/tests-backend |
+| 33 | Tests backend — résolveurs GraphQL avec données + job CI sur pytest | à faire | — |
 | 32 | Tests end-to-end (Playwright) | à faire | — |
 
 ## 9. Stack & conventions du projet
