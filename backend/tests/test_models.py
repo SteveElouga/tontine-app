@@ -43,3 +43,26 @@ def test_creer_tresoriere_met_a_jour_sans_dupliquer():
     User = get_user_model()
     assert User.objects.filter(username="therese").count() == 1
     assert User.objects.get(username="therese").check_password("nouveau-456")
+
+
+@pytest.mark.django_db
+def test_dette_composee_et_registre_de_remboursements():
+    """Le prêt calcule sa dette composée à partir du registre de remboursements (docs/03)."""
+    from apps.cycles.models import Caisse, Cycle
+    from apps.loans.models import Loan, Remboursement
+    from apps.members.models import Member
+
+    caisse = Caisse.objects.create(nom="Caisse test")
+    cycle = Cycle.objects.create(caisse=caisse, libelle="2025-2026")
+    membre = Member.objects.create(caisse=caisse, nom="Awa")
+    pret = Loan.objects.create(cycle=cycle, member=membre, montant=100000, mois_pret=1)
+
+    # Sans remboursement → exemple A (dette finale arrondie à 1 décimale).
+    assert pret.dette == Decimal("155132.8")
+    assert pret.est_solde is False
+
+    # Un remboursement de 20 000 en octobre (mois 2) → exemple B.
+    Remboursement.objects.create(loan=pret, mois=2, montant=20000)
+    assert pret.total_rembourse == Decimal("20000")
+    assert pret.remboursements_par_mois() == {2: Decimal("20000")}
+    assert pret.dette == Decimal("125583.7")
