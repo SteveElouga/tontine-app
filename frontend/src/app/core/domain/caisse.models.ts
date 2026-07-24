@@ -113,6 +113,8 @@ export interface Pret {
   majoration: string;
   totalARembourser: string;
   rembourse: boolean;
+  solde: string; // dette composée restante (v2)
+  totalRembourse: string;
 }
 
 /** Une opération du journal (dépôt ou prêt). */
