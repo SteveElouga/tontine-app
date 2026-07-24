@@ -125,7 +125,7 @@ def test_prets_cycle(api_auth, donnees):
     data = _data(
         api_auth,
         "query($id: ID!){ pretsCycle(cycleId: $id){"
-        " nom montant moisDeDette majoration totalARembourser rembourse } }",
+        " nom montant moisDeDette majoration totalARembourser rembourse solde totalRembourse } }",
         id=str(donnees["cycle"].id),
     )
     prets = data["pretsCycle"]
@@ -133,10 +133,31 @@ def test_prets_cycle(api_auth, donnees):
     p = prets[0]
     assert p["nom"] == "Awa"
     assert p["montant"] == "30000"
+    # Anciens champs (calcul simple) — conservés en additif :
     assert p["moisDeDette"] == 10
     assert p["majoration"] == "15000"
     assert p["totalARembourser"] == "45000"
     assert p["rembourse"] is False
+    # Nouveaux champs composés v2 (30000 au mois 2, sans remboursement) :
+    assert p["solde"] == "44323.7"
+    assert p["totalRembourse"] == "0"
+
+
+@pytest.mark.django_db
+def test_ajouter_remboursement(api_auth, donnees):
+    cid = str(donnees["cycle"].id)
+    pid = _data(api_auth, "query($id: ID!){ pretsCycle(cycleId: $id){ id } }", id=cid)[
+        "pretsCycle"
+    ][0]["id"]
+    data = _data(
+        api_auth,
+        "mutation($p: ID!, $mt: Decimal!){"
+        " ajouterRemboursement(pretId: $p, mois: 5, montant: $mt){ solde totalRembourse } }",
+        p=pid, mt="20000",
+    )
+    r = data["ajouterRemboursement"]
+    assert r["solde"] == "18798.0"       # 30000@mois2, 20000 remboursés au mois 5 (composé)
+    assert r["totalRembourse"] == "20000"
 
 
 @pytest.mark.django_db
