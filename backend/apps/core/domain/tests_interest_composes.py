@@ -82,10 +82,12 @@ def test_remboursement_apres_cloture():
     assert dette_finale(100000, 1, {12: 50000}, CYCLE) == Decimal("105132.8")
     # Les intérêts totaux restent ceux d'un prêt jamais remboursé (août ne majore pas).
     assert total_interets_pret(100000, 1, {12: 50000}, CYCLE) == total_interets_pret(100000, 1, {}, CYCLE)
-    # Un remboursement au-delà du délai (position 13) est refusé.
+    # Remboursement en septembre (position 13 = le délai) : accepté, toujours sans intérêt.
+    assert dette_finale(100000, 1, {13: 50000}, CYCLE) == Decimal("105132.8")
+    # Au-delà du délai (position 14) : refusé.
     try:
-        echeancier_pret(100000, 1, {13: 10000}, CYCLE)
-        assert False, "remboursement au mois 13 aurait dû lever ValueError"
+        echeancier_pret(100000, 1, {14: 10000}, CYCLE)
+        assert False, "remboursement au mois 14 aurait dû lever ValueError"
     except ValueError:
         pass
 

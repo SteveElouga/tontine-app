@@ -28,7 +28,7 @@ export class Aide implements OnInit {
     const p = this.params();
     const debut = p ? p.moisDebut : this.cycleStore.moisDebut();
     const duree = p ? p.dureeDepot : 9;
-    const delai = p ? p.moisDelai : 12;
+    const delai = p ? p.moisDelai : 13;
     const tauxE = p ? Math.round(Number(p.tauxEpargne) * 100) : 5;
     const tauxM = p ? Math.round(Number(p.tauxMajoration) * 100) : 5;
     const nom = (pos: number): string => this.i18n.instant('mois.' + moisCalendaire(pos, debut));

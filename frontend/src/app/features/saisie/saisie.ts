@@ -8,10 +8,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { CaisseService } from '../../core/graphql/caisse.service';
 import { CycleStore } from '../../core/state/cycle-store';
 import { LangStore } from '../../core/state/lang-store';
-import { MoisNomPipe } from '../../core/i18n/mois.pipe';
-import { moisCalendaire } from '../../core/domain/caisse.models';
-
-const NB_MOIS = 9;
+import { MoisNomPipe, moisAnnee } from '../../core/i18n/mois.pipe';
 
 interface Ligne {
   label: string;
@@ -19,6 +16,7 @@ interface Ligne {
   moisIndex: number;
   montant: number | null;
   enregistre: boolean;
+  date: string | null; // ISO du jour de la saisie (null si pas encore enregistré)
 }
 
 /** Un montant en chaîne (API) → valeur d'affichage (null si 0) + état « déjà enregistré ». */
@@ -46,13 +44,24 @@ export class Saisie implements OnInit {
   protected readonly membreIndex = signal(0);
   protected readonly lignes = signal<Ligne[]>([]);
   protected readonly chargement = signal(true);
+  /** Jour de la saisie (ISO) — par défaut aujourd'hui, modifiable en vue « Par mois ». */
+  protected readonly dateSaisie = signal<string>(this.aujourdhui());
 
   protected readonly moisNom = computed(() => {
     this.lang.langue();
-    return this.i18n.instant('mois.' + moisCalendaire(this.moisIndex(), this.cycleStore.moisDebut()));
+    return moisAnnee(
+      this.i18n,
+      this.moisIndex(),
+      this.cycleStore.moisDebut(),
+      this.cycleStore.anneeDebut(),
+    );
   });
   protected readonly membreCourant = computed(() => this.membres()[this.membreIndex()]);
-  protected readonly taux = computed(() => 5 * (NB_MOIS - this.moisIndex() + 1));
+  /** Mois de dépôt possibles : septembre → juin (durée + 1 ; juin = dépôt à 0 %). */
+  protected readonly nbMoisDepot = computed(() => this.cycleStore.dureeDepot() + 1);
+  protected readonly taux = computed(() =>
+    Math.max(0, 5 * (this.cycleStore.dureeDepot() - this.moisIndex() + 1)),
+  );
   protected readonly total = computed(() =>
     this.lignes().reduce((s, l) => s + (l.montant ?? 0), 0),
   );
@@ -78,7 +87,7 @@ export class Saisie implements OnInit {
     }
   }
   moisSuivant(): void {
-    if (this.moisIndex() < NB_MOIS) {
+    if (this.moisIndex() < this.nbMoisDepot()) {
       this.moisIndex.update((m) => m + 1);
       this.chargerMois();
     }
@@ -112,14 +121,21 @@ export class Saisie implements OnInit {
       (l) => l.memberId === ligne.memberId && l.moisIndex === ligne.moisIndex,
     );
     if (!courant || courant.montant == null) return;
+    const jour = this.vue() === 'mois' ? this.dateSaisie() : (courant.date ?? this.aujourdhui());
     this.caisse
-      .ajouterDepot(this.cycleStore.cycleId(), courant.memberId, courant.moisIndex, courant.montant)
+      .ajouterDepot(
+        this.cycleStore.cycleId(),
+        courant.memberId,
+        courant.moisIndex,
+        courant.montant,
+        jour,
+      )
       .subscribe({
         next: () => {
           this.lignes.update((ls) =>
             ls.map((l) =>
               l.memberId === courant.memberId && l.moisIndex === courant.moisIndex
-                ? { ...l, enregistre: true }
+                ? { ...l, enregistre: true, date: jour }
                 : l,
             ),
           );
@@ -128,8 +144,8 @@ export class Saisie implements OnInit {
             summary: this.i18n.instant('saisie.okTitre'),
             detail:
               this.vue() === 'mois'
-                ? `${courant.label}, ${this.moisNom()}`
-                : `${this.i18n.instant('mois.' + moisCalendaire(courant.moisIndex, this.cycleStore.moisDebut()))}, ${this.membreCourant()?.nom}`,
+                ? `${courant.label} — ${this.jourCourt(jour)}`
+                : `${moisAnnee(this.i18n, courant.moisIndex, this.cycleStore.moisDebut(), this.cycleStore.anneeDebut())}, ${this.membreCourant()?.nom}`,
             life: 2500,
           });
         },
@@ -162,9 +178,11 @@ export class Saisie implements OnInit {
         this.lignes.set(
           rows.map((r) => {
             const { montant, enregistre } = versLigne(r.montant);
-            return { label: r.nom, memberId: r.id, moisIndex: mois, montant, enregistre };
+            return { label: r.nom, memberId: r.id, moisIndex: mois, montant, enregistre, date: r.date ?? null };
           }),
         );
+        // Pré-remplit le sélecteur avec la date de la réunion du mois, sinon aujourd'hui.
+        this.dateSaisie.set(rows.find((r) => r.date)?.date ?? this.aujourdhui());
         this.chargement.set(false);
       },
       error: () => this.erreurChargement(),
@@ -190,6 +208,7 @@ export class Saisie implements OnInit {
               moisIndex: r.moisIndex,
               montant,
               enregistre,
+              date: r.date ?? null,
             };
           }),
         );
@@ -209,4 +228,26 @@ export class Saisie implements OnInit {
   }
 
   protected readonly format = (n: number): string => n.toLocaleString('fr-FR');
+
+  /** Date du jour au format ISO local (YYYY-MM-DD), pour l'input date et le défaut. */
+  protected aujourdhui(): string {
+    const d = new Date();
+    const p = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  }
+
+  /** Jour ISO → « 25 octobre 2026 » (long) ou « 25 oct. 2026 » (court), selon la langue. */
+  private formatJour(iso: string, mois: 'long' | 'short'): string {
+    if (!iso) return '';
+    const loc = this.lang.langue() === 'en' ? 'en-US' : 'fr-FR';
+    return new Date(iso + 'T00:00:00').toLocaleDateString(loc, {
+      day: 'numeric',
+      month: mois,
+      year: 'numeric',
+    });
+  }
+  protected readonly jourFormate = computed(() => this.formatJour(this.dateSaisie(), 'long'));
+  protected jourCourt(iso: string | null | undefined): string {
+    return iso ? this.formatJour(iso, 'short') : '';
+  }
 }

@@ -19,13 +19,26 @@
     </button>
     <div class="step-mois">
       <span class="mois">{{ moisNom() }}</span>
-      <span class="sous">{{ 'saisie.moisSur' | translate: { i: moisIndex(), n: 9 } }}</span>
+      <span class="sous">{{ 'saisie.moisSur' | translate: { i: moisIndex(), n: nbMoisDepot() } }}</span>
     </div>
     <button class="step-btn" (click)="moisSuivant()" [attr.aria-label]="'saisie.moisSuiv' | translate">
       <i class="pi pi-chevron-right"></i>
     </button>
   </div>
   <p class="consigne">{{ 'saisie.consigneMois' | translate }}</p>
+  <div class="date-saisie">
+    <label for="dateJour" class="date-label">{{ 'saisie.dateLabel' | translate }}</label>
+    <input
+      id="dateJour"
+      type="date"
+      class="date-input"
+      [ngModel]="dateSaisie()"
+      (ngModelChange)="dateSaisie.set($event)"
+      [max]="aujourdhui()"
+    />
+    <span class="date-affiche">{{ jourFormate() }}</span>
+    <small class="date-aide">{{ 'saisie.dateAide' | translate }}</small>
+  </div>
 } @else {
   <div class="stepper">
     <button class="step-btn" (click)="membrePrecedent()" [attr.aria-label]="'saisie.membrePrec' | translate">
@@ -64,6 +77,9 @@
           <i class="pi pi-check-circle etat ok" [attr.aria-label]="'saisie.okTitre' | translate"></i>
         } @else {
           <i class="pi pi-clock etat attente" [attr.aria-label]="'saisie.attente' | translate"></i>
+        }
+        @if (vue() === 'membre' && ligne.date) {
+          <span class="ligne-date">{{ jourCourt(ligne.date) }}</span>
         }
       </div>
     }

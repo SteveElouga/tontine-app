@@ -120,12 +120,19 @@ export const INFOS_CLOTURE = gql`
 
 /** Enregistre (ou met à jour) un dépôt, et renvoie le récap à jour du membre. */
 export const AJOUTER_DEPOT = gql`
-  mutation AjouterDepot($cycleId: ID!, $memberId: ID!, $moisIndex: Int!, $montant: Decimal!) {
+  mutation AjouterDepot(
+    $cycleId: ID!
+    $memberId: ID!
+    $moisIndex: Int!
+    $montant: Decimal!
+    $date: String
+  ) {
     ajouterDepot(
       cycleId: $cycleId
       memberId: $memberId
       moisIndex: $moisIndex
       montant: $montant
+      date: $date
     ) {
       id
       nom
@@ -144,6 +151,7 @@ export const DEPOTS_MOIS = gql`
       id
       nom
       montant
+      date
     }
   }
 `;
@@ -154,6 +162,7 @@ export const DEPOTS_MEMBRE = gql`
     depotsMembre(cycleId: $cycleId, memberId: $memberId) {
       moisIndex
       montant
+      date
     }
   }
 `;

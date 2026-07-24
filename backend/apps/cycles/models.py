@@ -30,7 +30,7 @@ class Cycle(models.Model):
 
     mois_debut = models.PositiveSmallIntegerField(default=9, help_text="9 = septembre")
     duree_depot = models.PositiveSmallIntegerField(default=9, help_text="Nb de mois de dépôt")
-    mois_delai = models.PositiveSmallIntegerField(default=12, help_text="Délai de remboursement")
+    mois_delai = models.PositiveSmallIntegerField(default=13, help_text="Délai de remboursement (13 = septembre)")
     taux_epargne = models.DecimalField(max_digits=4, decimal_places=3, default=Decimal("0.05"))
     taux_majoration = models.DecimalField(max_digits=4, decimal_places=3, default=Decimal("0.05"))
 

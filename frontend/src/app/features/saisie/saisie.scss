@@ -115,6 +115,43 @@
   font-size: 14px;
 }
 
+/* Jour de la saisie — par défaut aujourd'hui, modifiable. */
+.date-saisie {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 14px;
+  max-width: 440px;
+
+  .date-label {
+    font-size: 14px;
+    color: var(--c-text-2);
+  }
+
+  .date-input {
+    font-size: 15px;
+    padding: 8px 10px;
+    border: 1px solid var(--c-border);
+    border-radius: 8px;
+    background: var(--c-surface);
+    color: inherit;
+    font-family: inherit;
+  }
+
+  .date-affiche {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--c-accent);
+  }
+
+  .date-aide {
+    flex-basis: 100%;
+    font-size: 12px;
+    color: var(--c-text-muted);
+  }
+}
+
 /* Grille des membres — occupe la largeur disponible */
 .grille-membres {
   display: grid;
@@ -138,6 +175,12 @@
   .unite {
     font-size: 12px;
     color: var(--c-text-muted);
+  }
+
+  .ligne-date {
+    font-size: 12px;
+    color: var(--c-text-muted);
+    white-space: nowrap;
   }
 }
 

@@ -74,11 +74,12 @@ export class CaisseService {
     memberId: string,
     moisIndex: number,
     montant: number,
+    date?: string,
   ): Observable<RecapMembre> {
     return this.apollo
       .mutate<{ ajouterDepot: RecapMembre }>({
         mutation: AJOUTER_DEPOT,
-        variables: { cycleId, memberId, moisIndex, montant },
+        variables: { cycleId, memberId, moisIndex, montant, date },
         refetchQueries: [{ query: RECAP_CYCLE, variables: { cycleId } }],
       })
       .pipe(map((res) => res.data!.ajouterDepot as RecapMembre));
