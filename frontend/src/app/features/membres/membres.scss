@@ -88,14 +88,21 @@
   color: var(--c-text-muted);
   padding: 8px;
   border-radius: 8px;
+  transition: transform 0.12s ease, color 0.12s ease, background 0.12s ease;
 
   i {
     font-size: 18px;
   }
 
-  &:hover {
-    color: #b23b3b;
-    background: var(--c-surface-1);
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      color: #b23b3b;
+      background: var(--c-surface-1);
+    }
+  }
+
+  &:active {
+    transform: scale(0.9);
   }
 }
 

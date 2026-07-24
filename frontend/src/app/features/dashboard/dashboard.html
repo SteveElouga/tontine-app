@@ -3,28 +3,32 @@
   <p class="sub">{{ 'tdb.sous' | translate: { n: nbMembres() } }}</p>
 </header>
 
-<div class="cartes">
-  <div class="carte">
-    <div class="lbl">{{ 'tdb.epargne' | translate }}</div>
-    <div class="val">{{ format(epargne()) }}</div>
-    <div class="unit">FCFA</div>
+@if (chargement()) {
+  <p class="muted">{{ 'commun.chargement' | translate }}</p>
+} @else {
+  <div class="cartes">
+    <div class="carte">
+      <div class="lbl">{{ 'tdb.epargne' | translate }}</div>
+      <div class="val">{{ format(epargne()) }}</div>
+      <div class="unit">FCFA</div>
+    </div>
+    <div class="carte">
+      <div class="lbl">{{ 'tdb.interets' | translate }}</div>
+      <div class="val">{{ format(interets()) }}</div>
+      <div class="unit">FCFA</div>
+    </div>
+    <div class="carte">
+      <div class="lbl">{{ 'tdb.areverser' | translate }}</div>
+      <div class="val">{{ format(aReverser()) }}</div>
+      <div class="unit">FCFA</div>
+    </div>
+    <div class="carte">
+      <div class="lbl">{{ 'tdb.pretsEnCours' | translate }}</div>
+      <div class="val">{{ pretsEnCours() }}</div>
+      <div class="unit">{{ 'tdb.aRembourser' | translate }}</div>
+    </div>
   </div>
-  <div class="carte">
-    <div class="lbl">{{ 'tdb.interets' | translate }}</div>
-    <div class="val">{{ format(interets()) }}</div>
-    <div class="unit">FCFA</div>
-  </div>
-  <div class="carte">
-    <div class="lbl">{{ 'tdb.areverser' | translate }}</div>
-    <div class="val">{{ format(aReverser()) }}</div>
-    <div class="unit">FCFA</div>
-  </div>
-  <div class="carte">
-    <div class="lbl">{{ 'tdb.pretsEnCours' | translate }}</div>
-    <div class="val">{{ pretsEnCours() }}</div>
-    <div class="unit">{{ 'tdb.aRembourser' | translate }}</div>
-  </div>
-</div>
+}
 
 <div class="raccourcis">
   <a class="raccourci primaire" routerLink="/saisie">
