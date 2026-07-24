@@ -24,7 +24,8 @@
 
 .recherche {
   position: relative;
-  display: inline-block;
+  display: block;
+  max-width: 320px;
 
   i {
     position: absolute;
@@ -38,7 +39,7 @@
 
   input {
     padding-left: 32px;
-    min-width: 280px;
+    width: 100%;
   }
 }
 
@@ -79,6 +80,7 @@
 .tableau-wrap {
   max-height: calc(100dvh - 320px);
   overflow-y: auto;
+  overflow-x: auto;
   background: var(--c-surface);
   border: 1px solid var(--c-border);
   border-radius: 12px;
@@ -86,6 +88,7 @@
 
 .recap {
   width: 100%;
+  min-width: 600px;
   border-collapse: collapse;
   font-size: 15px;
 
