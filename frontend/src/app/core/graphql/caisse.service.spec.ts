@@ -121,7 +121,7 @@ describe('CaisseService', () => {
 
   it('simulerPret renvoie l’objet', async () => {
     let out: unknown;
-    service.simulerPret('c1', 1000, 1, null).subscribe((r) => (out = r));
+    service.simulerPret('c1', 1000, 1).subscribe((r) => (out = r));
     ctrl
       .expectOne(SIMULER_PRET)
       .flush({ data: { simulerPret: { moisDeDette: 11, majoration: '550', total: '1550' } } });
