@@ -3,6 +3,23 @@
   <p class="sub">{{ 'tdb.sous' | translate: { n: nbMembres() } }}</p>
 </header>
 
+@if (etat(); as e) {
+  <section
+    class="etat"
+    [class.v-vert]="e.verdict === 'vert'"
+    [class.v-orange]="e.verdict === 'orange'"
+    [class.v-rouge]="e.verdict === 'rouge'"
+    [class.v-neutre]="e.verdict === 'neutre'"
+  >
+    <div class="etat-tete">
+      <span class="feu"></span>
+      <span class="verdict">{{ verdictLabel() }}</span>
+      <span class="etat-quoi">{{ 'tdb.etat.titre' | translate }}</span>
+    </div>
+    <p class="etat-texte">{{ e.texte }}</p>
+  </section>
+}
+
 @if (chargement()) {
   <p class="muted">{{ 'commun.chargement' | translate }}</p>
 } @else {
@@ -48,3 +65,55 @@
     <i class="pi pi-chevron-right fl"></i>
   </a>
 </div>
+
+@if (serie().length && aDesDonnees()) {
+  <section class="graphe">
+    <h2 class="graphe-titre">{{ 'tdb.courbe.titre' | translate }}</h2>
+    <div class="legende">
+      <span class="lg epargne"><span class="trait"></span>{{ 'tdb.courbe.epargne' | translate }}</span>
+      <span class="lg encours"><span class="trait"></span>{{ 'tdb.courbe.encours' | translate }}</span>
+      <span class="lg tresorerie"
+        ><span class="trait"></span>{{ 'tdb.courbe.tresorerie' | translate }}</span
+      >
+    </div>
+    <div
+      class="courbe-wrap"
+      (pointermove)="survol($event)"
+      (pointerdown)="survol($event)"
+      (pointerleave)="hoverI.set(null)"
+    >
+      <svg
+        class="courbe"
+        [attr.viewBox]="'0 0 ' + VBW + ' ' + VBH"
+        preserveAspectRatio="xMidYMid meet"
+        role="img"
+        [attr.aria-label]="'tdb.courbe.titre' | translate"
+      >
+        @for (t of yTicks(); track t.v) {
+          <line class="grille" [attr.x1]="M.left" [attr.x2]="VBW - M.right" [attr.y1]="t.y" [attr.y2]="t.y" />
+          <text class="axe" [attr.x]="M.left - 10" [attr.y]="t.y + 4" text-anchor="end">{{ t.label }}</text>
+        }
+        @for (xl of xLabels(); track xl.i) {
+          <text class="axe" [attr.x]="xl.x" [attr.y]="VBH - 9" text-anchor="middle">{{ xl.label }}</text>
+        }
+        @if (hoverX(); as hx) {
+          <line class="guide" [attr.x1]="hx" [attr.x2]="hx" [attr.y1]="M.top" [attr.y2]="VBH - M.bottom" />
+        }
+        <polyline class="serie epargne" [attr.points]="ptsEpargne()" />
+        <polyline class="serie encours" [attr.points]="ptsEncours()" />
+        <polyline class="serie tresorerie" [attr.points]="ptsTresorerie()" />
+        @for (d of hoverDots(); track d.cls) {
+          <circle [attr.class]="'pt-actif ' + d.cls" [attr.cx]="d.x" [attr.cy]="d.y" r="4" />
+        }
+      </svg>
+      @if (hoverInfo(); as h) {
+        <div class="info" [style.left.%]="h.leftPct">
+          <div class="info-mois">{{ h.label }}</div>
+          <div class="info-l"><span class="pastille epargne"></span>{{ 'tdb.courbe.epargne' | translate }} : {{ h.ep }}</div>
+          <div class="info-l"><span class="pastille encours"></span>{{ 'tdb.courbe.encours' | translate }} : {{ h.en }}</div>
+          <div class="info-l"><span class="pastille tresorerie"></span>{{ 'tdb.courbe.tresorerie' | translate }} : {{ h.tr }}</div>
+        </div>
+      }
+    </div>
+  </section>
+}

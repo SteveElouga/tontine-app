@@ -3,6 +3,7 @@ import { Apollo } from 'apollo-angular';
 import { map, Observable } from 'rxjs';
 
 import {
+  EtatCycle,
   FicheMembre,
   InfosCloture,
   Membre,
@@ -11,6 +12,7 @@ import {
   NoteSeance,
   Operation,
   ParametresCycle,
+  PointSerie,
   Pret,
   RecapMembre,
   ResultatRemboursement,
@@ -24,9 +26,12 @@ import {
   MODIFIER_PRET,
   CLOTURER_CYCLE,
   CREER_CYCLE,
+  CREER_CAISSE,
   RENOMMER_CAISSE,
   DEPOTS_MEMBRE,
   DEPOTS_MOIS,
+  ETAT_CYCLE,
+  SERIE_MENSUELLE,
   ENREGISTRER_NOTE_SEANCE,
   FICHE_MEMBRE,
   HISTORIQUE,
@@ -72,6 +77,28 @@ export class CaisseService {
         fetchPolicy: 'network-only',
       })
       .pipe(map((r) => r.data!.infosCloture as InfosCloture));
+  }
+
+  /** Évolution mensuelle : épargne cumulée, encours des prêts, trésorerie (graphe du dashboard). */
+  serieMensuelle(cycleId: string): Observable<PointSerie[]> {
+    return this.apollo
+      .query<{ serieMensuelle: PointSerie[] }>({
+        query: SERIE_MENSUELLE,
+        variables: { cycleId },
+        fetchPolicy: 'network-only',
+      })
+      .pipe(map((r) => (r.data?.serieMensuelle ?? []) as PointSerie[]));
+  }
+
+  /** Synthèse « santé » du cycle : feu + phrase de lecture immédiate. */
+  etatCycle(cycleId: string): Observable<EtatCycle> {
+    return this.apollo
+      .query<{ etatCycle: EtatCycle }>({
+        query: ETAT_CYCLE,
+        variables: { cycleId },
+        fetchPolicy: 'network-only',
+      })
+      .pipe(map((r) => r.data!.etatCycle as EtatCycle));
   }
 
   /** Saisit un dépôt et renvoie le récap à jour du membre. */
@@ -328,6 +355,16 @@ export class CaisseService {
         variables: { cycleReferenceId, libelle },
       })
       .pipe(map((r) => r.data!.creerCycle as ParametresCycle));
+  }
+
+  /** Crée une nouvelle tontine (caisse) et son premier cycle ; renvoie ce cycle. */
+  creerCaisse(nom: string, libelle: string): Observable<ParametresCycle> {
+    return this.apollo
+      .mutate<{ creerCaisse: ParametresCycle }>({
+        mutation: CREER_CAISSE,
+        variables: { nom, libelle },
+      })
+      .pipe(map((r) => r.data!.creerCaisse as ParametresCycle));
   }
 
   /** Clôture un cycle. */

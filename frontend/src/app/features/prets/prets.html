@@ -48,8 +48,24 @@
 } @else if (!prets().length) {
   <p class="vide">{{ 'prets.vide' | translate }}</p>
 } @else {
+  <div class="filtre-membre">
+    <label for="filtre-pret">{{ 'prets.filtreMembre' | translate }}</label>
+    <p-select
+      inputId="filtre-pret"
+      [options]="optFiltre()"
+      [ngModel]="filtreMembre()"
+      (ngModelChange)="filtreMembre.set($event)"
+      optionLabel="label"
+      optionValue="value"
+      [filter]="true"
+      filterBy="label"
+      [style]="{ 'min-width': '220px' }"
+    />
+    <span class="compte">{{ 'prets.compte' | translate: { n: pretsFiltres().length } }}</span>
+  </div>
+
   <div class="cartes">
-    @for (p of prets(); track p.id) {
+    @for (p of pretsFiltres(); track p.id) {
       <article class="carte" [class.soldee]="n(p.solde) === 0">
         <header class="c-tete">
           <span class="c-nom">{{ p.nom }}</span>
@@ -201,6 +217,8 @@
         }
         }
       </article>
+    } @empty {
+      <p class="vide">{{ 'prets.aucunPourMembre' | translate }}</p>
     }
   </div>
 

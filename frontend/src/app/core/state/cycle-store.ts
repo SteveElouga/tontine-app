@@ -16,34 +16,44 @@ const CYCLE_PILOTE = '8e7323b1-1277-47dd-b358-ee0354d52b3d';
 export class CycleStore {
   private readonly apollo = inject(Apollo);
 
-  /** Cycles disponibles (pour le menu). */
+  /** Cycles disponibles (toutes caisses). */
   readonly cycles = signal<CycleInfo[]>([]);
 
   /** Cycle actuellement sélectionné. */
   readonly cycleId = signal<string>(CYCLE_PILOTE);
 
-  /** Mois d'ouverture (calendaire) du cycle courant ; 9 = septembre par défaut. */
-  readonly moisDebut = computed(() => {
-    const cur = this.cycles().find((c) => c.id === this.cycleId());
-    return cur?.moisDebut ?? 9;
+  /** Cycle courant (objet complet), s'il est chargé. */
+  private readonly cycleCourant = computed(() =>
+    this.cycles().find((c) => c.id === this.cycleId()),
+  );
+
+  /** Tontines (caisses) déduites des cycles, sans doublon. */
+  readonly caisses = computed(() => {
+    const vues = new Map<string, string>();
+    for (const c of this.cycles()) if (!vues.has(c.caisseId)) vues.set(c.caisseId, c.caisseNom);
+    return [...vues].map(([id, nom]) => ({ id, nom }));
   });
+
+  /** Caisse (tontine) du cycle courant. */
+  readonly caisseId = computed(() => this.cycleCourant()?.caisseId ?? '');
+
+  /** Cycles de la caisse courante (pour le sélecteur d'année). */
+  readonly cyclesCaisse = computed(() =>
+    this.cycles().filter((c) => c.caisseId === this.caisseId()),
+  );
+
+  /** Mois d'ouverture (calendaire) du cycle courant ; 9 = septembre par défaut. */
+  readonly moisDebut = computed(() => this.cycleCourant()?.moisDebut ?? 9);
 
   /** Nombre de mois de dépôt ; 9 par défaut (dernier mois où un prêt peut être contracté). */
-  readonly dureeDepot = computed(() => {
-    const cur = this.cycles().find((c) => c.id === this.cycleId());
-    return cur?.dureeDepot ?? 9;
-  });
+  readonly dureeDepot = computed(() => this.cycleCourant()?.dureeDepot ?? 9);
 
   /** Dernière réunion de remboursement (position dans le cycle) ; 12 = août par défaut. */
-  readonly moisDelai = computed(() => {
-    const cur = this.cycles().find((c) => c.id === this.cycleId());
-    return cur?.moisDelai ?? 12;
-  });
+  readonly moisDelai = computed(() => this.cycleCourant()?.moisDelai ?? 12);
 
   /** Année d'ouverture du cycle (lue dans le libellé « 2025-2026 ») ; défaut = année courante. */
   readonly anneeDebut = computed(() => {
-    const cur = this.cycles().find((c) => c.id === this.cycleId());
-    const m = cur?.libelle?.match(/\d{4}/);
+    const m = this.cycleCourant()?.libelle?.match(/\d{4}/);
     return m ? Number(m[0]) : new Date().getFullYear();
   });
 
@@ -62,5 +72,13 @@ export class CycleStore {
 
   choisir(id: string): void {
     this.cycleId.set(id);
+  }
+
+  /** Sélectionne une tontine : bascule sur son cycle ouvert, sinon le plus récent. */
+  choisirCaisse(caisseId: string): void {
+    const dsc = this.cycles().filter((c) => c.caisseId === caisseId);
+    if (!dsc.length) return;
+    const cible = dsc.find((c) => c.statut === 'ouvert') ?? dsc[dsc.length - 1];
+    this.cycleId.set(cible.id);
   }
 }

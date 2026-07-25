@@ -23,11 +23,28 @@
     </div>
 
     <div class="cycle" data-tour="cycle">
+      <label>{{ 'nav.tontine' | translate }}</label>
+      <p-select
+        [options]="caissesOpt()"
+        [ngModel]="cycles.caisseId()"
+        (ngModelChange)="changerCaisse($event)"
+        optionLabel="label"
+        optionValue="value"
+        size="small"
+        placeholder="—"
+        [style]="{ width: '100%' }"
+      />
+      <button type="button" class="lien-nouvelle" (click)="ouvrirCreation()">
+        <i class="pi pi-plus"></i>{{ 'nav.nouvelleTontine' | translate }}
+      </button>
+    </div>
+
+    <div class="cycle">
       <label>{{ 'nav.cycle' | translate }}</label>
       <p-select
         [options]="cyclesOpt()"
         [ngModel]="cycles.cycleId()"
-        (ngModelChange)="cycles.choisir($event)"
+        (ngModelChange)="changerCycle($event)"
         optionLabel="label"
         optionValue="value"
         size="small"
@@ -105,6 +122,48 @@
     <router-outlet />
   </main>
 </div>
+
+<p-dialog
+  [header]="'tontine.creerTitre' | translate"
+  [visible]="creationOuverte()"
+  (visibleChange)="creationOuverte.set($event)"
+  [modal]="true"
+  [dismissableMask]="true"
+  [style]="{ width: '92vw', maxWidth: '420px' }"
+>
+  <div class="form-tontine">
+    <label for="t-nom">{{ 'tontine.nom' | translate }}</label>
+    <input
+      id="t-nom"
+      pInputText
+      [ngModel]="nouvNom()"
+      (ngModelChange)="nouvNom.set($event)"
+      [placeholder]="'tontine.nomEx' | translate"
+    />
+    <label for="t-cycle">{{ 'tontine.premierCycle' | translate }}</label>
+    <input
+      id="t-cycle"
+      pInputText
+      [ngModel]="nouvLibelle()"
+      (ngModelChange)="nouvLibelle.set($event)"
+      placeholder="2026-2027"
+    />
+    <small>{{ 'tontine.aide' | translate }}</small>
+    <div class="form-actions">
+      <button type="button" class="btn-annuler" (click)="creationOuverte.set(false)">
+        {{ 'tontine.annuler' | translate }}
+      </button>
+      <button
+        type="button"
+        class="btn-creer"
+        (click)="creer()"
+        [disabled]="!nouvNom().trim() || !nouvLibelle().trim() || envoi()"
+      >
+        {{ 'tontine.creer' | translate }}
+      </button>
+    </div>
+  </div>
+</p-dialog>
 
 <p-toast position="top-right" />
 <app-undo-banner />

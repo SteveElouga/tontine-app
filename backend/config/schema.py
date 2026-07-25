@@ -13,7 +13,7 @@ from typing import List, Optional
 import strawberry
 
 from apps.core.domain import interest
-from apps.cycles.models import Cycle
+from apps.cycles.models import Caisse, Cycle
 from apps.members.models import Member
 
 
@@ -61,6 +61,7 @@ def _membre(m: Member) -> "Membre":
 @strawberry.type
 class CycleInfo:
     id: strawberry.ID
+    caisse_id: strawberry.ID
     libelle: str
     caisse_nom: str
     statut: str
@@ -161,6 +162,110 @@ def _strategie_cloture(cycle: Cycle, mode: str, n_mois: int):
     return interest.InteretsComplets()
 
 
+# ── État du cycle (synthèse « santé ») ────────────────────────────────────────
+# Cache mémoire de la reformulation IA, indexé par la signature des chiffres : on ne
+# rappelle l'IA que si les données ont bougé (évite un appel réseau à chaque affichage).
+_CACHE_ETAT_IA: "dict[tuple, str]" = {}
+
+
+def _fmt_fcfa(valeur) -> str:
+    """Montant lisible en FCFA : séparateurs de milliers par espace (1 234 567)."""
+    n = Decimal(valeur).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+    return f"{int(n):,}".replace(",", " ")
+
+
+def _texte_etat_ia(verdict, epargne, promis, prets, majoration, rembourse, reste, tresorerie, taux):
+    """Reformulation naturelle par Claude, SI la clé ANTHROPIC_API_KEY est configurée.
+
+    Renvoie None en l'absence de clé, de paquet, de réseau ou en cas d'erreur : le texte
+    calculé prend alors le relais. Résultat mis en cache tant que les chiffres ne bougent pas.
+    """
+    import os
+
+    cle = os.environ.get("ANTHROPIC_API_KEY")
+    if not cle:
+        return None
+    signature = (verdict, int(promis), int(majoration), int(rembourse), int(reste))
+    if signature in _CACHE_ETAT_IA:
+        return _CACHE_ETAT_IA[signature]
+    try:
+        import anthropic
+
+        chiffres = (
+            f"- Épargne collectée : {_fmt_fcfa(epargne)} FCFA\n"
+            f"- Intérêts promis aux épargnants (complets) : {_fmt_fcfa(promis)}\n"
+            f"- Prêts accordés : {_fmt_fcfa(prets)}\n"
+            f"- Majoration gagnée sur les prêts : {_fmt_fcfa(majoration)}\n"
+            f"- Déjà remboursé : {_fmt_fcfa(rembourse)} ({taux} % du total à rembourser)\n"
+            f"- Reste dû sur les prêts : {_fmt_fcfa(reste)}\n"
+            f"- Trésorerie disponible : {_fmt_fcfa(tresorerie)}\n"
+            f"- Feu déjà décidé : {verdict}"
+        )
+        systeme = (
+            "Tu écris l'état de santé d'une tontine camerounaise (caisse mutuelle) pour une "
+            "trésorière de 45 à 60 ans, non technique. Style calme, clair et bienveillant : 2 à 3 "
+            "phrases courtes, français simple, montants en FCFA. Un manque d'intérêts n'est PAS un "
+            "échec : c'est le cas normal, réglé par une réduction à la clôture, dis-le sans "
+            "dramatiser. Tourne le propos vers la clôture (ce que ça donnera à la fin). Pas de "
+            "listes, ni tiret cadratin (—), pas de jargon, ne réexplique pas le feu. Réponds "
+            "uniquement par la synthèse."
+        )
+        client = anthropic.Anthropic(api_key=cle)
+        message = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=260,
+            system=systeme,
+            messages=[
+                {"role": "user", "content": f"Chiffres du cycle :\n{chiffres}\n\nRédige la synthèse."}
+            ],
+        )
+        texte = "".join(getattr(bloc, "text", "") for bloc in message.content).strip()
+        if texte:
+            _CACHE_ETAT_IA[signature] = texte
+        return texte or None
+    except Exception:
+        return None
+
+
+def _texte_etat(verdict, epargne, promis, prets, majoration, rembourse, reste, tresorerie, taux) -> str:
+    """Phrase de synthèse : texte calculé (toujours disponible, fiable), reformulé par
+    l'IA si une clé est configurée (repli automatique sur le calculé)."""
+    manque = promis - majoration
+    if verdict == "vert":
+        base = (
+            f"Tout roule pour ce cycle. Les prêts rapportent de quoi payer les intérêts promis aux "
+            f"épargnants ({_fmt_fcfa(majoration)} contre {_fmt_fcfa(promis)} FCFA), et les remboursements "
+            f"suivent le rythme ({taux} %). Si ça continue ainsi, chacun repartira avec sa part complète "
+            f"à la clôture."
+        )
+    elif verdict == "orange" and majoration < promis:
+        base = (
+            f"La caisse tient la route, gardons juste un œil dessus. Les prêts ont rapporté "
+            f"{_fmt_fcfa(majoration)} FCFA d'intérêts, alors que les épargnants en attendent "
+            f"{_fmt_fcfa(promis)} : il manque environ {_fmt_fcfa(manque)} pour couvrir tout le monde. "
+            f"Rien d'alarmant. À la clôture, on réduira un peu les intérêts, c'est justement prévu pour "
+            f"ce cas. Côté remboursements, on en est à {taux} %, il reste {_fmt_fcfa(reste)} à rentrer."
+        )
+    elif verdict == "orange":
+        base = (
+            f"Côté argent, tout est là : les prêts couvrent largement les intérêts promis "
+            f"({_fmt_fcfa(majoration)} contre {_fmt_fcfa(promis)} FCFA). Ce qu'il faut suivre, ce sont "
+            f"les remboursements : {taux} % seulement sont rentrés, il reste {_fmt_fcfa(reste)} FCFA à "
+            f"récupérer avant la clôture."
+        )
+    else:  # rouge
+        base = (
+            f"Ce cycle mérite qu'on s'y attarde. La trésorerie est à {_fmt_fcfa(tresorerie)} FCFA, et les "
+            f"prêts n'ont rapporté que {_fmt_fcfa(majoration)} pour {_fmt_fcfa(promis)} d'intérêts attendus. "
+            f"Il faudra réduire nettement les intérêts à la clôture et pousser sur les remboursements. Il "
+            f"reste {_fmt_fcfa(reste)} FCFA à rentrer."
+        )
+    return (
+        _texte_etat_ia(verdict, epargne, promis, prets, majoration, rembourse, reste, tresorerie, taux)
+        or base
+    )
+
+
 def _recap_membre(member: Member, cycle: Cycle, strategie=None) -> RecapMembre:
     params = cycle.to_params()
     depots = [
@@ -256,6 +361,30 @@ class ResultatRemboursement:
     """Résultat d'un versement : les prêts du membre à jour + la répartition effectuée."""
     prets: List["Pret"]
     repartition: List["PartRepartition"]
+
+
+@strawberry.type
+class PointSerie:
+    """Un mois du cycle : les 3 indicateurs cumulés (pour le graphe du tableau de bord)."""
+    mois: int
+    epargne: Decimal       # épargne cumulée collectée
+    encours: Decimal       # dette totale des prêts encore due à ce mois
+    tresorerie: Decimal    # argent disponible = épargne + remboursements − prêts accordés
+
+
+@strawberry.type
+class EtatCycle:
+    """Synthèse « santé » du cycle en cours (feu + phrase)."""
+    verdict: str               # "vert" | "orange" | "rouge"
+    texte: str                 # phrase(s) de synthèse (calculée, ou reformulée par l'IA)
+    epargne: Decimal
+    interets_promis: Decimal   # intérêts complets dus aux épargnants
+    prets: Decimal
+    majoration: Decimal        # majoration totale gagnée sur les prêts
+    rembourse: Decimal
+    reste_du: Decimal
+    tresorerie: Decimal
+    taux_remboursement: int    # % du total à rembourser déjà encaissé
 
 
 @strawberry.type
@@ -391,6 +520,7 @@ class Query:
         return [
             CycleInfo(
                 id=strawberry.ID(str(c.id)),
+                caisse_id=strawberry.ID(str(c.caisse_id)),
                 libelle=c.libelle,
                 caisse_nom=c.caisse.nom,
                 statut=c.statut,
@@ -535,6 +665,129 @@ class Query:
             .order_by("member__nom", "mois_pret")
         )
         return [_pret(loan) for loan in loans]
+
+    @strawberry.field
+    def serie_mensuelle(self, cycle_id: strawberry.ID) -> List[PointSerie]:
+        """Évolution mensuelle du cycle : épargne cumulée, encours des prêts, trésorerie.
+        Une valeur par réunion (mois 1..délai) — pour le graphe du tableau de bord."""
+        from apps.loans.models import Loan
+        from apps.savings.models import Deposit
+
+        cycle = Cycle.objects.get(id=cycle_id)
+        params = cycle.to_params()
+        depots = [
+            (d.mois_index, interest._money(d.montant))
+            for d in Deposit.objects.filter(cycle=cycle)
+        ]
+        loans = list(
+            Loan.objects.filter(cycle=cycle)
+            .select_related("cycle")
+            .prefetch_related("remboursements")
+        )
+        rmaps = {loan.id: loan.remboursements_par_mois() for loan in loans}
+
+        points: List[PointSerie] = []
+        for m in range(1, params.mois_delai + 1):
+            epargne = sum((v for mi, v in depots if mi <= m), Decimal(0))
+            prets_out = sum(
+                (interest._money(loan.montant) for loan in loans if loan.mois_pret <= m),
+                Decimal(0),
+            )
+            remb_cumule = sum(
+                (mt for loan in loans for mo, mt in rmaps[loan.id].items() if mo <= m),
+                Decimal(0),
+            )
+            encours = Decimal(0)
+            for loan in loans:
+                if loan.mois_pret > m:
+                    continue  # prêt pas encore accordé à ce mois
+                if loan.mois_pret == m:
+                    encours += interest._money(loan.montant)  # capital, pas encore d'intérêt
+                else:
+                    encours += interest.solde_a_la_reunion(
+                        loan.montant, loan.mois_pret, rmaps[loan.id], m, params
+                    )
+            points.append(
+                PointSerie(
+                    mois=m,
+                    epargne=interest.arrondi_final(epargne),
+                    encours=interest.arrondi_final(encours),
+                    tresorerie=interest.arrondi_final(epargne + remb_cumule - prets_out),
+                )
+            )
+        return points
+
+    @strawberry.field
+    def etat_cycle(self, cycle_id: strawberry.ID) -> EtatCycle:
+        """Synthèse « santé » du cycle : feu (vert/orange/rouge) + phrase de lecture immédiate.
+        Chiffres calculés par le moteur ; texte calculé (toujours dispo) reformulé par l'IA
+        si une clé est configurée."""
+        from apps.loans.models import Loan
+        from apps.savings.models import Deposit
+
+        cycle = Cycle.objects.get(id=cycle_id)
+        params = cycle.to_params()
+        depots = list(Deposit.objects.filter(cycle=cycle))
+        loans = list(
+            Loan.objects.filter(cycle=cycle)
+            .select_related("cycle")
+            .prefetch_related("remboursements")
+        )
+
+        if not depots and not loans:
+            return EtatCycle(
+                verdict="neutre",
+                texte=(
+                    "Cette tontine démarre : aucune épargne ni prêt enregistré pour l'instant. "
+                    "Saisissez les premiers dépôts et l'état se remplira tout seul."
+                ),
+                epargne=Decimal(0),
+                interets_promis=Decimal(0),
+                prets=Decimal(0),
+                majoration=Decimal(0),
+                rembourse=Decimal(0),
+                reste_du=Decimal(0),
+                tresorerie=Decimal(0),
+                taux_remboursement=0,
+            )
+
+        epargne = sum((interest._money(d.montant) for d in depots), Decimal(0))
+        promis = sum(
+            (interest.interet_depot(d.montant, d.mois_index, params) for d in depots),
+            Decimal(0),
+        )
+        prets = sum((interest._money(loan.montant) for loan in loans), Decimal(0))
+        majoration = sum((loan.total_interets_composes for loan in loans), Decimal(0))
+        rembourse = sum((loan.total_rembourse for loan in loans), Decimal(0))
+        reste = sum((loan.dette for loan in loans), Decimal(0))
+        tresorerie = epargne + rembourse - prets
+        total_du = prets + majoration
+        taux = int(rembourse * 100 / total_du) if total_du > 0 else 100
+
+        # Feu : le pivot est « les majorations couvrent-elles les intérêts promis ? »
+        couvre = majoration >= promis
+        if tresorerie < 0 or (promis > 0 and majoration < promis / 2):
+            verdict = "rouge"
+        elif not couvre or taux < 50:
+            verdict = "orange"
+        else:
+            verdict = "vert"
+
+        texte = _texte_etat(
+            verdict, epargne, promis, prets, majoration, rembourse, reste, tresorerie, taux
+        )
+        return EtatCycle(
+            verdict=verdict,
+            texte=texte,
+            epargne=interest.arrondi_final(epargne),
+            interets_promis=interest.arrondi_final(promis),
+            prets=interest.arrondi_final(prets),
+            majoration=interest.arrondi_final(majoration),
+            rembourse=interest.arrondi_final(rembourse),
+            reste_du=interest.arrondi_final(reste),
+            tresorerie=interest.arrondi_final(tresorerie),
+            taux_remboursement=taux,
+        )
 
     @strawberry.field
     def notes_seance(self, cycle_id: strawberry.ID) -> List[NoteSeance]:
@@ -823,6 +1076,19 @@ class Mutation:
         c = Cycle.objects.select_related("caisse").get(id=cycle_id)
         c.caisse.nom = nom
         c.caisse.save(update_fields=["nom"])
+        return _params_cycle(c)
+
+    @strawberry.mutation
+    def creer_caisse(self, nom: str, libelle: str) -> ParametresCycle:
+        """Crée une nouvelle tontine (caisse) et son premier cycle (règles par défaut)."""
+        nom = nom.strip()
+        libelle = libelle.strip()
+        if not nom:
+            raise ValueError("Le nom de la tontine est obligatoire.")
+        if not libelle:
+            raise ValueError("Le libellé du premier cycle est obligatoire.")
+        caisse = Caisse.objects.create(nom=nom)
+        c = Cycle.objects.create(caisse=caisse, libelle=libelle)
         return _params_cycle(c)
 
 
