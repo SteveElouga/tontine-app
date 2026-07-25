@@ -70,6 +70,30 @@
   }
 }
 
+/* Lien « + Nouvelle tontine » sous le sélecteur de caisse. */
+.lien-nouvelle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 2px 0;
+  padding: 4px 2px;
+  background: none;
+  border: none;
+  color: var(--c-accent);
+  font-size: 13px;
+  cursor: pointer;
+
+  i {
+    font-size: 12px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
 nav {
   display: flex;
   flex-direction: column;

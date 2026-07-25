@@ -5,12 +5,60 @@ export const CYCLES = gql`
   query Cycles {
     cycles {
       id
+      caisseId
       libelle
       caisseNom
       statut
       moisDebut
       dureeDepot
       moisDelai
+    }
+  }
+`;
+
+/** Crée une nouvelle tontine (caisse) + son premier cycle. */
+export const CREER_CAISSE = gql`
+  mutation CreerCaisse($nom: String!, $libelle: String!) {
+    creerCaisse(nom: $nom, libelle: $libelle) {
+      id
+      libelle
+      statut
+      caisseNom
+      moisDebut
+      dureeDepot
+      moisDelai
+      tauxEpargne
+      tauxMajoration
+    }
+  }
+`;
+
+/** Évolution mensuelle du cycle : épargne cumulée, encours des prêts, trésorerie (graphe). */
+export const SERIE_MENSUELLE = gql`
+  query SerieMensuelle($cycleId: ID!) {
+    serieMensuelle(cycleId: $cycleId) {
+      mois
+      epargne
+      encours
+      tresorerie
+    }
+  }
+`;
+
+/** Synthèse « santé » du cycle : feu (vert/orange/rouge) + phrase. */
+export const ETAT_CYCLE = gql`
+  query EtatCycle($cycleId: ID!) {
+    etatCycle(cycleId: $cycleId) {
+      verdict
+      texte
+      epargne
+      interetsPromis
+      prets
+      majoration
+      rembourse
+      resteDu
+      tresorerie
+      tauxRemboursement
     }
   }
 `;

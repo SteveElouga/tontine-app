@@ -145,3 +145,230 @@
 .muted {
   color: var(--c-text-muted);
 }
+
+/* ── État du cycle (feu + phrase) ──────────────────────────────────────── */
+.etat {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+  animation: monte-doux 0.28s var(--ease-out) both;
+
+  .etat-tete {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 8px;
+  }
+
+  .feu {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--vc, var(--c-text-muted));
+    flex: none;
+  }
+
+  .verdict {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--vc, var(--c-text));
+  }
+
+  .etat-quoi {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--c-text-muted);
+  }
+
+  .etat-texte {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--c-text);
+  }
+
+  &.v-vert {
+    --vc: #1e9e6f;
+    border-color: rgba(30, 158, 111, 0.45);
+  }
+  &.v-orange {
+    --vc: #d98a00;
+    border-color: rgba(217, 138, 0, 0.45);
+  }
+  &.v-rouge {
+    --vc: #d1453b;
+    border-color: rgba(209, 69, 59, 0.5);
+  }
+  &.v-neutre {
+    --vc: var(--c-text-muted);
+  }
+}
+
+/* ── Graphe : évolution mois par mois (SVG) ────────────────────────────── */
+.graphe {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  padding: 16px 18px 12px;
+  margin: 26px 0;
+  animation: monte-doux 0.28s var(--ease-out) both;
+
+  .graphe-titre {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 10px;
+  }
+
+  .legende {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: var(--c-text-2);
+
+    .lg {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .trait {
+      width: 20px;
+      border-top-width: 3px;
+      border-top-style: solid;
+      border-radius: 2px;
+    }
+    .epargne .trait {
+      border-top-color: #2a78d6;
+    }
+    .encours .trait {
+      border-top-color: #e0930f;
+    }
+    .tresorerie .trait {
+      border-top-color: #1baf7a;
+    }
+  }
+
+  .courbe-wrap {
+    position: relative;
+  }
+
+  .courbe {
+    width: 100%;
+    height: auto;
+    display: block;
+    overflow: visible;
+    cursor: crosshair;
+  }
+
+  .guide {
+    stroke: var(--c-border-strong);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+  }
+
+  .pt-actif {
+    stroke: var(--c-surface);
+    stroke-width: 1.5;
+  }
+  .pt-actif.epargne {
+    fill: #2a78d6;
+  }
+  .pt-actif.encours {
+    fill: #e0930f;
+  }
+  .pt-actif.tresorerie {
+    fill: #1baf7a;
+  }
+
+  .info {
+    position: absolute;
+    top: 4px;
+    transform: translateX(-50%);
+    animation: bulle-in 0.12s var(--ease-out) both;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border-strong);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 13px;
+    pointer-events: none;
+    white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    z-index: 2;
+
+    .info-mois {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .info-l {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--c-text);
+    }
+    .pastille {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex: none;
+    }
+    .pastille.epargne {
+      background: #2a78d6;
+    }
+    .pastille.encours {
+      background: #e0930f;
+    }
+    .pastille.tresorerie {
+      background: #1baf7a;
+    }
+  }
+
+  .grille {
+    stroke: var(--c-border);
+    stroke-width: 1;
+  }
+  .axe {
+    fill: var(--c-text-muted);
+    font-size: 13px;
+  }
+
+  .serie {
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+  .serie.epargne {
+    stroke: #2a78d6;
+  }
+  .serie.encours {
+    stroke: #e0930f;
+  }
+  .serie.tresorerie {
+    stroke: #1baf7a;
+  }
+
+}
+
+@keyframes bulle-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .etat,
+  .graphe {
+    animation: none;
+  }
+  .graphe .info {
+    animation: none;
+  }
+}

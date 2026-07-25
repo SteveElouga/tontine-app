@@ -189,3 +189,65 @@ h1 {
     backdrop-filter: none !important;
   }
 }
+
+/* Formulaire « nouvelle tontine » (contenu de la boîte de dialogue, rendu hors composant). */
+.form-tontine {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 6px;
+  }
+
+  input {
+    width: 100%;
+  }
+
+  small {
+    color: var(--c-text-muted);
+    font-size: 12px;
+    margin-top: 2px;
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .btn-annuler,
+  .btn-creer {
+    min-height: 44px;
+    padding: 0 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    border: 1px solid var(--c-border-strong);
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+
+  .btn-annuler {
+    background: none;
+    color: var(--c-text-2);
+  }
+
+  .btn-creer {
+    background: var(--c-accent);
+    border-color: var(--c-accent);
+    color: #fff;
+  }
+
+  .btn-creer:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-annuler:active,
+  .btn-creer:active {
+    transform: scale(0.97);
+  }
+}

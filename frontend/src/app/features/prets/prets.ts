@@ -61,6 +61,24 @@ export class Prets implements OnInit {
   );
   protected readonly chargement = signal(true);
 
+  // Filtre d'affichage par membre ('' = tous les membres)
+  protected readonly filtreMembre = signal<string>('');
+  /** Membres ayant au moins un prêt (+ « Tous »), pour le sélecteur de filtre. */
+  protected readonly optFiltre = computed(() => {
+    this.lang.langue();
+    const vus = new Map<string, string>();
+    for (const p of this.prets()) if (!vus.has(p.membreId)) vus.set(p.membreId, p.nom);
+    const membres = [...vus]
+      .map(([value, label]) => ({ label, value }))
+      .sort((a, b) => a.label.localeCompare(b.label, 'fr'));
+    return [{ label: this.i18n.instant('prets.tousMembres'), value: '' }, ...membres];
+  });
+  /** Prêts affichés selon le filtre membre. */
+  protected readonly pretsFiltres = computed(() => {
+    const id = this.filtreMembre();
+    return id ? this.prets().filter((p) => p.membreId === id) : this.prets();
+  });
+
   // Formulaire « nouveau prêt »
   protected readonly nMembre = signal('');
   protected readonly nMontant = signal<number | null>(null);
@@ -77,13 +95,13 @@ export class Prets implements OnInit {
   protected readonly eMois = signal<number | null>(null);
 
   protected readonly totalPrete = computed(() =>
-    this.prets().reduce((s, p) => s + Number(p.montant), 0),
+    this.pretsFiltres().reduce((s, p) => s + Number(p.montant), 0),
   );
   protected readonly totalRembourse = computed(() =>
-    this.prets().reduce((s, p) => s + Number(p.totalRembourse), 0),
+    this.pretsFiltres().reduce((s, p) => s + Number(p.totalRembourse), 0),
   );
   protected readonly totalSolde = computed(() =>
-    this.prets().reduce((s, p) => s + Number(p.solde), 0),
+    this.pretsFiltres().reduce((s, p) => s + Number(p.solde), 0),
   );
 
   ngOnInit(): void {

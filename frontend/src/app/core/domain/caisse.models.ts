@@ -28,6 +28,7 @@ export function anneeDe(position: number, moisDebut: number, anneeDebut: number)
 /** Un cycle de caisse (pour le sélecteur de cycle courant). */
 export interface CycleInfo {
   id: string;
+  caisseId: string;
   libelle: string;
   caisseNom: string;
   statut: string;
@@ -67,6 +68,28 @@ export interface InfosCloture {
   gains: string;
   totalPromis: string;
   reductionSuggeree: number;
+}
+
+/** Un mois du cycle : indicateurs cumulés (graphe du tableau de bord). */
+export interface PointSerie {
+  mois: number;
+  epargne: string; // épargne cumulée
+  encours: string; // encours des prêts (dette due à ce mois)
+  tresorerie: string; // épargne + remboursements − prêts accordés
+}
+
+/** Synthèse « santé » du cycle : feu + phrase de lecture immédiate. */
+export interface EtatCycle {
+  verdict: 'vert' | 'orange' | 'rouge' | 'neutre';
+  texte: string;
+  epargne: string;
+  interetsPromis: string;
+  prets: string;
+  majoration: string;
+  rembourse: string;
+  resteDu: string;
+  tresorerie: string;
+  tauxRemboursement: number;
 }
 
 export interface MembreMontant {
