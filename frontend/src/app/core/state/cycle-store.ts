@@ -5,8 +5,12 @@ import { map } from 'rxjs';
 import { CycleInfo } from '../domain/caisse.models';
 import { CYCLES } from '../graphql/caisse.queries';
 
-// Cycle pilote (dev) : valeur par défaut tant que la liste n'est pas chargée.
+// Cycle pilote (dev) : valeur par défaut tant que la liste n'est pas chargée, et tant
+// qu'aucune sélection n'a encore été mémorisée (première visite).
 const CYCLE_PILOTE = '8e7323b1-1277-47dd-b358-ee0354d52b3d';
+
+// Mémorise la tontine/année ouverte : au retour dans l'app, on rouvre là où on était.
+const CLE_CYCLE = 'tontine-cycle-id';
 
 /**
  * Source unique du « cycle courant » de l'application.
@@ -19,8 +23,8 @@ export class CycleStore {
   /** Cycles disponibles (toutes caisses). */
   readonly cycles = signal<CycleInfo[]>([]);
 
-  /** Cycle actuellement sélectionné. */
-  readonly cycleId = signal<string>(CYCLE_PILOTE);
+  /** Cycle actuellement sélectionné (retenu d'une visite à l'autre). */
+  readonly cycleId = signal<string>(localStorage.getItem(CLE_CYCLE) || CYCLE_PILOTE);
 
   /** Cycle courant (objet complet), s'il est chargé. */
   private readonly cycleCourant = computed(() =>
@@ -64,14 +68,16 @@ export class CycleStore {
       .pipe(map((r) => (r.data?.cycles ?? []) as CycleInfo[]))
       .subscribe((cs) => {
         this.cycles.set(cs);
+        // La sélection mémorisée n'existe plus (supprimée, ou premier lancement) : repli.
         if (cs.length && !cs.some((c) => c.id === this.cycleId())) {
-          this.cycleId.set(cs[0].id);
+          this.choisir(cs[0].id);
         }
       });
   }
 
   choisir(id: string): void {
     this.cycleId.set(id);
+    localStorage.setItem(CLE_CYCLE, id);
   }
 
   /** Sélectionne une tontine : bascule sur son cycle ouvert, sinon le plus récent. */
@@ -79,6 +85,6 @@ export class CycleStore {
     const dsc = this.cycles().filter((c) => c.caisseId === caisseId);
     if (!dsc.length) return;
     const cible = dsc.find((c) => c.statut === 'ouvert') ?? dsc[dsc.length - 1];
-    this.cycleId.set(cible.id);
+    this.choisir(cible.id);
   }
 }
