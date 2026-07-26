@@ -54,7 +54,7 @@ export class Parametres implements OnInit {
   protected readonly tauxEpargnePct = signal(5);
   protected readonly tauxMajoPct = signal(5);
   protected readonly dureeDepot = signal(9);
-  protected readonly moisDelai = signal(12);
+  protected readonly moisDelai = signal(13);
 
   // Nouvelle année
   protected readonly nouveauLibelle = signal('');
@@ -67,10 +67,13 @@ export class Parametres implements OnInit {
     }));
   });
 
+  /** Options du délai : de la clôture (durée + 1, ex. juin) jusqu'à 3 mois après
+   * (ex. septembre suivant, mois de la distribution) — relatif à la durée de dépôt saisie. */
   protected readonly optDelai = computed(() => {
     this.lang.langue();
     const debut = this.moisDebut();
-    return [10, 11, 12].map((mi) => ({
+    const cloture = this.dureeDepot() + 1;
+    return [cloture, cloture + 1, cloture + 2, cloture + 3].map((mi) => ({
       label: this.i18n.instant('mois.' + moisCalendaire(mi, debut)),
       value: mi,
     }));
