@@ -28,6 +28,15 @@ function versLigne(valeur: string): { montant: number | null; enregistre: boolea
   return { montant: n > 0 ? n : null, enregistre: n > 0 };
 }
 
+// Mémorise le mois affiché en vue « Par mois » : au retour dans l'app, on retrouve le
+// même mois plutôt que de repartir à Octobre.
+const CLE_MOIS = 'tontine-saisie-mois';
+
+function moisInitial(): number {
+  const brut = Number(localStorage.getItem(CLE_MOIS));
+  return brut >= 1 ? brut : 2; // Octobre par défaut, à la première visite
+}
+
 @Component({
   selector: 'app-saisie',
   imports: [FormsModule, InputNumber, Button, Select, TranslatePipe, MoisNomPipe],
@@ -43,7 +52,7 @@ export class Saisie implements OnInit {
   private readonly undo = inject(UndoStore);
 
   protected readonly vue = signal<'mois' | 'membre'>('mois');
-  protected readonly moisIndex = signal(2); // Octobre
+  protected readonly moisIndex = signal(moisInitial());
   protected readonly membres = signal<{ id: string; nom: string }[]>([]);
   protected readonly membreIndex = signal(0);
   protected readonly lignes = signal<Ligne[]>([]);
@@ -78,6 +87,10 @@ export class Saisie implements OnInit {
   );
 
   ngOnInit(): void {
+    // Le mois mémorisé peut dépasser la plage du cycle courant (ex. tontine différente) :
+    // on le borne avant le premier chargement.
+    const max = this.nbMoisDepot();
+    if (this.moisIndex() > max) this.moisIndex.set(max);
     this.chargerMois();
   }
 
@@ -91,14 +104,20 @@ export class Saisie implements OnInit {
   moisPrecedent(): void {
     if (this.moisIndex() > 1) {
       this.moisIndex.update((m) => m - 1);
+      this.memoriserMois();
       this.chargerMois();
     }
   }
   moisSuivant(): void {
     if (this.moisIndex() < this.nbMoisDepot()) {
       this.moisIndex.update((m) => m + 1);
+      this.memoriserMois();
       this.chargerMois();
     }
+  }
+
+  private memoriserMois(): void {
+    localStorage.setItem(CLE_MOIS, String(this.moisIndex()));
   }
 
   membrePrecedent(): void {
