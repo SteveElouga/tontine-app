@@ -203,10 +203,13 @@ def _texte_etat_ia(verdict, epargne, promis, prets, majoration, rembourse, reste
         )
         systeme = (
             "Tu écris l'état de santé d'une tontine camerounaise (caisse mutuelle) pour une "
-            "trésorière de 45 à 60 ans, non technique. Style calme, clair et bienveillant : 2 à 3 "
-            "phrases courtes, français simple, montants en FCFA. Un manque d'intérêts n'est PAS un "
-            "échec : c'est le cas normal, réglé par une réduction à la clôture, dis-le sans "
-            "dramatiser. Tourne le propos vers la clôture (ce que ça donnera à la fin). Pas de "
+            "trésorière de 45 à 60 ans, non technique. Style calme, clair et bienveillant : 3 à 4 "
+            "phrases courtes, français simple, montants en FCFA précis (pas d'arrondis vagues). "
+            "Cite au moins les prêts accordés et la majoration face aux intérêts promis. Un manque "
+            "d'intérêts n'est PAS un échec : c'est le cas normal quand des prêts démarrent tard dans "
+            "le cycle ou sont remboursés tôt (moins de mois, moins d'intérêts), pas un problème "
+            "d'argent non prêté ; réglé par une réduction à la clôture, dis-le sans dramatiser. "
+            "Tourne le propos vers la clôture (ce que ça donnera à la fin). Pas de "
             "listes, ni tiret cadratin (—), pas de jargon, ne réexplique pas le feu. Réponds "
             "uniquement par la synthèse."
         )
@@ -233,32 +236,36 @@ def _texte_etat(verdict, epargne, promis, prets, majoration, rembourse, reste, t
     manque = promis - majoration
     if verdict == "vert":
         base = (
-            f"Tout roule pour ce cycle. Les prêts rapportent de quoi payer les intérêts promis aux "
-            f"épargnants ({_fmt_fcfa(majoration)} contre {_fmt_fcfa(promis)} FCFA), et les remboursements "
-            f"suivent le rythme ({taux} %). Si ça continue ainsi, chacun repartira avec sa part complète "
-            f"à la clôture."
+            f"Tout roule pour ce cycle : {_fmt_fcfa(epargne)} FCFA d'épargne, {_fmt_fcfa(prets)} FCFA "
+            f"prêtés. Les prêts rapportent de quoi payer les intérêts promis aux épargnants "
+            f"({_fmt_fcfa(majoration)} contre {_fmt_fcfa(promis)} FCFA), et les remboursements suivent le "
+            f"rythme ({taux} %, il reste {_fmt_fcfa(reste)} FCFA à rentrer). Si ça continue ainsi, chacun "
+            f"repartira avec sa part complète à la clôture."
         )
     elif verdict == "orange" and majoration < promis:
         base = (
-            f"La caisse tient la route, gardons juste un œil dessus. Les prêts ont rapporté "
-            f"{_fmt_fcfa(majoration)} FCFA d'intérêts, alors que les épargnants en attendent "
-            f"{_fmt_fcfa(promis)} : il manque environ {_fmt_fcfa(manque)} pour couvrir tout le monde. "
-            f"Rien d'alarmant. À la clôture, on réduira un peu les intérêts, c'est justement prévu pour "
-            f"ce cas. Côté remboursements, on en est à {taux} %, il reste {_fmt_fcfa(reste)} à rentrer."
+            f"La caisse tient la route, gardons juste un œil dessus. Sur {_fmt_fcfa(prets)} FCFA prêtés, "
+            f"les intérêts rapportés ne couvrent pas encore tout : {_fmt_fcfa(majoration)} FCFA contre "
+            f"{_fmt_fcfa(promis)} promis aux épargnants, un manque d'environ {_fmt_fcfa(manque)}. C'est "
+            f"normal quand des prêts démarrent tard dans le cycle ou sont remboursés tôt : moins de mois, "
+            f"moins d'intérêts, pas un problème d'argent non prêté. À la clôture, on réduira un peu les "
+            f"intérêts pour chacun, c'est justement prévu pour ce cas. Côté remboursements, {taux} % sont "
+            f"rentrés, il reste {_fmt_fcfa(reste)} FCFA à récupérer."
         )
     elif verdict == "orange":
         base = (
-            f"Côté argent, tout est là : les prêts couvrent largement les intérêts promis "
-            f"({_fmt_fcfa(majoration)} contre {_fmt_fcfa(promis)} FCFA). Ce qu'il faut suivre, ce sont "
-            f"les remboursements : {taux} % seulement sont rentrés, il reste {_fmt_fcfa(reste)} FCFA à "
-            f"récupérer avant la clôture."
+            f"Côté argent, tout est là : sur {_fmt_fcfa(prets)} FCFA prêtés, les intérêts couvrent "
+            f"largement ce qui est promis aux épargnants ({_fmt_fcfa(majoration)} contre "
+            f"{_fmt_fcfa(promis)} FCFA). Ce qu'il faut suivre, ce sont les remboursements : {taux} % "
+            f"seulement sont rentrés, il reste {_fmt_fcfa(reste)} FCFA à récupérer avant la clôture."
         )
     else:  # rouge
         base = (
-            f"Ce cycle mérite qu'on s'y attarde. La trésorerie est à {_fmt_fcfa(tresorerie)} FCFA, et les "
-            f"prêts n'ont rapporté que {_fmt_fcfa(majoration)} pour {_fmt_fcfa(promis)} d'intérêts attendus. "
-            f"Il faudra réduire nettement les intérêts à la clôture et pousser sur les remboursements. Il "
-            f"reste {_fmt_fcfa(reste)} FCFA à rentrer."
+            f"Ce cycle mérite qu'on s'y attarde. La trésorerie est à {_fmt_fcfa(tresorerie)} FCFA, et sur "
+            f"{_fmt_fcfa(prets)} FCFA prêtés, les intérêts n'ont rapporté que {_fmt_fcfa(majoration)} pour "
+            f"{_fmt_fcfa(promis)} promis aux épargnants, un manque important, au-delà du simple décalage "
+            f"de calendrier. Il faudra réduire nettement les intérêts à la clôture et pousser sur les "
+            f"remboursements ({taux} % rentrés, {_fmt_fcfa(reste)} FCFA restant)."
         )
     return (
         _texte_etat_ia(verdict, epargne, promis, prets, majoration, rembourse, reste, tresorerie, taux)
@@ -677,10 +684,10 @@ class Query:
         params = cycle.to_params()
         depots = [
             (d.mois_index, interest._money(d.montant))
-            for d in Deposit.objects.filter(cycle=cycle)
+            for d in Deposit.objects.filter(cycle=cycle, member__actif=True)
         ]
         loans = list(
-            Loan.objects.filter(cycle=cycle)
+            Loan.objects.filter(cycle=cycle, member__actif=True)
             .select_related("cycle")
             .prefetch_related("remboursements")
         )
@@ -727,9 +734,9 @@ class Query:
 
         cycle = Cycle.objects.get(id=cycle_id)
         params = cycle.to_params()
-        depots = list(Deposit.objects.filter(cycle=cycle))
+        depots = list(Deposit.objects.filter(cycle=cycle, member__actif=True))
         loans = list(
-            Loan.objects.filter(cycle=cycle)
+            Loan.objects.filter(cycle=cycle, member__actif=True)
             .select_related("cycle")
             .prefetch_related("remboursements")
         )

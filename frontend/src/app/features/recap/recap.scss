@@ -76,7 +76,8 @@
   }
 }
 
-/* Zone défilante : le tableau scrolle ici (hauteur bornée), pas la page. */
+/* Zone défilante : le tableau scrolle ici (hauteur bornée), pas la page. Le défilement
+   reste actif (souris/pavé tactile/tactile) ; seule la barre visible est masquée. */
 .tableau-wrap {
   max-height: calc(100dvh - 320px);
   overflow-y: auto;
@@ -84,6 +85,12 @@
   background: var(--c-surface);
   border: 1px solid var(--c-border);
   border-radius: 12px;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* anciens Edge/IE */
+
+  &::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
 }
 
 .recap {

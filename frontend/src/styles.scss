@@ -190,6 +190,19 @@ h1 {
   }
 }
 
+/* Listes des sélecteurs (p-select) : le panneau est rendu hors composant (overlay sur
+   <body>), donc les règles doivent être globales. On garde le défilement, on masque juste
+   la barre visible (cross-navigateur). */
+.p-select-list-container,
+.p-select-overlay {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* anciens Edge/IE */
+
+  &::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
+}
+
 /* Formulaire « nouvelle tontine » (contenu de la boîte de dialogue, rendu hors composant). */
 .form-tontine {
   display: flex;
