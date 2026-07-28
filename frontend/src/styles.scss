@@ -203,6 +203,15 @@ h1 {
   }
 }
 
+/* Téléphone : le tiroir de menu ouvert fige la page derrière lui. Depuis que c'est le
+   document qui défile sur petit écran (cf. app.scss), sans ce verrou un glissement sur le
+   voile ferait défiler le contenu masqué au lieu de ne rien faire. */
+@media (max-width: 768px) {
+  body:has(.shell.menu-ouvert) {
+    overflow: hidden;
+  }
+}
+
 /* Impression : les éléments flottants de l'app (toasts, bandeau d'annulation, boîtes de
    dialogue, tooltips) n'ont pas leur place sur une page imprimée, où qu'ils soient rendus
    dans le DOM (certains sont des overlays PrimeNG attachés au <body>). */

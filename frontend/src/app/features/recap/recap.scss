@@ -218,6 +218,17 @@
   }
 }
 
+/* Téléphone : c'est le document qui défile (cf. app.scss). Un second défilement vertical
+   enfermé dans le tableau se battrait avec celui de la page — on lève donc le plafond de
+   hauteur : la zone grandit avec son contenu, l'axe vertical ne s'enclenche jamais, et
+   seul le défilement horizontal (avec la colonne Membre figée) subsiste. L'en-tête et la
+   ligne Total cessent d'être collants de fait, faute de défilement vertical à suivre. */
+@media (max-width: 768px) {
+  .tableau-wrap {
+    max-height: none;
+  }
+}
+
 .pied {
   display: flex;
   justify-content: flex-end;
