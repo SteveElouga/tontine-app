@@ -221,9 +221,21 @@ button.nav-item {
     transform: translateX(0);
   }
 
+  /* Sur téléphone, c'est le DOCUMENT qui défile, pas une zone interne. Trois raisons :
+     le navigateur peut alors rétracter sa barre d'adresse (≈55 px d'écran regagnés),
+     il affiche son indicateur de défilement furtif au lieu d'une barre permanente, et
+     la barre supérieure peut rester collée en haut (voir .topbar). Sur ordinateur, on
+     garde la zone interne : la barre latérale doit rester fixe à côté du contenu. */
+  .shell {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
   /* Moins de marge sur téléphone : on récupère de la place utile. */
   .content {
     padding: 16px 14px;
+    overflow: visible;
   }
 
   /* Le repli « rail » n'a pas cours ici : son bouton dédié disparaît. */
@@ -231,10 +243,15 @@ button.nav-item {
     display: none;
   }
 
+  /* Collée en haut : le hamburger est la SEULE entrée du menu sur téléphone, il ne
+     doit jamais partir hors de vue au défilement d'un écran long (récap, membres). */
   .topbar {
     display: flex;
     align-items: center;
     gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 30;
     margin: -16px -14px 16px;
     padding: 10px 14px;
     background: var(--c-surface);
