@@ -8,6 +8,7 @@
 @if (etat(); as e) {
   <section
     class="etat"
+    data-tour="etat"
     [class.v-vert]="e.verdict === 'vert'"
     [class.v-orange]="e.verdict === 'orange'"
     [class.v-rouge]="e.verdict === 'rouge'"
@@ -49,7 +50,7 @@
   </div>
 }
 
-<div class="raccourcis">
+<div class="raccourcis" data-tour="raccourcis">
   <a class="raccourci primaire" routerLink="/saisie">
     <i class="pi pi-pencil"></i>
     <span class="txt">

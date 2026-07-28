@@ -19,8 +19,8 @@ describe('CycleStore', () => {
 
   it('moisDebut suit le mois d’ouverture du cycle courant', () => {
     const cycles: CycleInfo[] = [
-      { id: 'a', libelle: '2025-2026', caisseNom: 'C', statut: 'ouvert', moisDebut: 10, dureeDepot: 9, moisDelai: 12 },
-      { id: 'b', libelle: '2024-2025', caisseNom: 'C', statut: 'cloture', moisDebut: 3, dureeDepot: 9, moisDelai: 12 },
+      { id: 'a', libelle: '2025-2026', caisseId: 'c1', caisseNom: 'C', statut: 'ouvert', moisDebut: 10, dureeDepot: 9, moisDelai: 12 },
+      { id: 'b', libelle: '2024-2025', caisseId: 'c1', caisseNom: 'C', statut: 'cloture', moisDebut: 3, dureeDepot: 9, moisDelai: 12 },
     ];
     store.cycles.set(cycles);
 

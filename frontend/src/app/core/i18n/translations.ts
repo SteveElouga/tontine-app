@@ -139,6 +139,14 @@ export const FR = {
     parametresTexte: "Le nom de la caisse, les taux, le mois d'ouverture, la langue et le thème.",
     profilTitre: 'Votre profil',
     profilTexte: 'Votre compte et votre mot de passe.',
+    menuTitre: 'Votre menu est ici',
+    menuTexte:
+      "Touchez ce bouton pour ouvrir le menu : la saisie, les prêts, le récapitulatif et l'aide s'y trouvent.",
+    etatTitre: 'La santé de la caisse',
+    etatTexte: "Un feu et une phrase vous disent, en un coup d'œil, si le cycle se passe bien.",
+    raccourcisTitre: 'Vos deux gestes courants',
+    raccourcisTexte:
+      'Saisir les dépôts du mois, et voir ce que chaque membre recevra à la fin.',
   },
   tontine: {
     creerTitre: 'Nouvelle tontine',
@@ -575,6 +583,14 @@ export const EN = {
     parametresTexte: 'The fund name, rates, opening month, language and theme.',
     profilTitre: 'Your profile',
     profilTexte: 'Your account and password.',
+    menuTitre: 'Your menu is here',
+    menuTexte:
+      'Tap this button to open the menu: deposits, loans, the summary and help are all in there.',
+    etatTitre: 'The health of the fund',
+    etatTexte: 'A light and a sentence tell you, at a glance, whether the cycle is going well.',
+    raccourcisTitre: 'Your two everyday actions',
+    raccourcisTexte:
+      "Enter this month's deposits, and see what each member will receive at the end.",
   },
   tontine: {
     creerTitre: 'New tontine',
