@@ -18,6 +18,12 @@
   }
 }
 
+/* Fondu d'entrée au premier passage de « chargement » à « contenu » (une
+   seule fois par visite) — réutilise le keyframe global page-fade. */
+.contenu {
+  animation: page-fade var(--dur-base) var(--ease-out) both;
+}
+
 .ajout {
   display: flex;
   flex-wrap: wrap;
@@ -66,6 +72,11 @@
   border: 1px solid var(--c-border);
   border-radius: 12px;
   padding: 16px;
+  transition: background var(--dur-fast) var(--ease-out);
+  /* Apparaît en douceur à sa création (premier chargement ou nouveau prêt
+     ajouté) — track p.id garantit qu'un simple filtrage/réordonnancement ne
+     rejoue pas cette animation. */
+  animation: monte-doux 0.28s var(--ease-out) both;
 
   &.soldee {
     background: var(--c-surface-1);

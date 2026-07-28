@@ -69,45 +69,47 @@
 @if (chargement()) {
   <p class="muted">{{ 'commun.chargement' | translate }}</p>
 } @else {
-  <div class="grille-membres">
-    @for (ligne of lignes(); track ligne.memberId + '_' + ligne.moisIndex) {
-      <div class="ligne">
-        <span class="nom">{{ vue() === 'membre' ? (ligne.moisIndex | moisNom) : ligne.label }}</span>
-        <p-inputnumber
-          [ngModel]="ligne.montant"
-          (ngModelChange)="setMontant(ligne, $event)"
-          (onBlur)="enregistrer(ligne)"
-          [maxFractionDigits]="0"
-          [useGrouping]="true"
-          locale="fr-FR"
-          placeholder="0"
-          [inputStyle]="{ width: '108px', 'text-align': 'right' }"
-        />
-        <span class="unite">FCFA</span>
-        @if (ligne.enregistre) {
-          <i class="pi pi-check-circle etat ok" [attr.aria-label]="'saisie.okTitre' | translate"></i>
-        } @else {
-          <i class="pi pi-clock etat attente" [attr.aria-label]="'saisie.attente' | translate"></i>
-        }
-        @if (vue() === 'membre' && ligne.date) {
-          <span class="ligne-date">{{ jourCourt(ligne.date) }}</span>
-        }
+  <div class="contenu">
+    <div class="grille-membres" [class.grille-membres--entree]="entreeInitiale()">
+      @for (ligne of lignes(); track ligne.memberId + '_' + ligne.moisIndex; let i = $index) {
+        <div class="ligne" [style.animation-delay.ms]="entreeInitiale() ? retardEntree(i) : null">
+          <span class="nom">{{ vue() === 'membre' ? (ligne.moisIndex | moisNom) : ligne.label }}</span>
+          <p-inputnumber
+            [ngModel]="ligne.montant"
+            (ngModelChange)="setMontant(ligne, $event)"
+            (onBlur)="enregistrer(ligne)"
+            [maxFractionDigits]="0"
+            [useGrouping]="true"
+            locale="fr-FR"
+            placeholder="0"
+            [inputStyle]="{ width: '108px', 'text-align': 'right' }"
+          />
+          <span class="unite">FCFA</span>
+          @if (ligne.enregistre) {
+            <i class="pi pi-check-circle etat ok" [attr.aria-label]="'saisie.okTitre' | translate"></i>
+          } @else {
+            <i class="pi pi-clock etat attente" [attr.aria-label]="'saisie.attente' | translate"></i>
+          }
+          @if (vue() === 'membre' && ligne.date) {
+            <span class="ligne-date">{{ jourCourt(ligne.date) }}</span>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="pied">
+      <span class="total">
+        {{ 'saisie.totalLabel' | translate }} <strong>{{ format(total()) }} FCFA</strong>.
+        {{ 'saisie.totalCompte' | translate: { k: nbEnregistres(), n: lignes().length } }}
+      </span>
+      <p-button [label]="'saisie.terminer' | translate" (onClick)="terminer()" />
+    </div>
+
+    @if (vue() === 'mois') {
+      <div class="astuce">
+        <i class="pi pi-info-circle"></i>
+        <span>{{ 'saisie.astuce' | translate: { mois: moisNom(), taux: taux() } }}</span>
       </div>
     }
   </div>
-
-  <div class="pied">
-    <span class="total">
-      {{ 'saisie.totalLabel' | translate }} <strong>{{ format(total()) }} FCFA</strong>.
-      {{ 'saisie.totalCompte' | translate: { k: nbEnregistres(), n: lignes().length } }}
-    </span>
-    <p-button [label]="'saisie.terminer' | translate" (onClick)="terminer()" />
-  </div>
-
-  @if (vue() === 'mois') {
-    <div class="astuce">
-      <i class="pi pi-info-circle"></i>
-      <span>{{ 'saisie.astuce' | translate: { mois: moisNom(), taux: taux() } }}</span>
-    </div>
-  }
 }

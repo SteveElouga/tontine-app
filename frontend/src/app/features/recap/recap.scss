@@ -18,6 +18,12 @@
   }
 }
 
+/* En-tête dédié à l'impression : invisible à l'écran, affiché uniquement sur papier
+   (voir @media print plus bas) pour remplacer les contrôles interactifs masqués. */
+.entete-impression {
+  display: none;
+}
+
 .barre {
   margin-bottom: 12px;
 }
@@ -82,6 +88,7 @@
   max-height: calc(100dvh - 320px);
   overflow-y: auto;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* défilement inertiel fluide sur iOS */
   background: var(--c-surface);
   border: 1px solid var(--c-border);
   border-radius: 12px;
@@ -131,10 +138,29 @@
     &:hover .chev i {
       color: var(--c-accent);
     }
+
+    /* La cellule figée (membre) ne suit pas le fond de la ligne par héritage
+       (le sticky la peint à part) : on reproduit le survol explicitement. */
+    &:hover .g {
+      background: var(--c-surface-1);
+    }
   }
 
+  /* Colonne membre figée horizontalement : sur mobile, on garde toujours de vue
+     à qui appartient la ligne pendant qu'on fait défiler les montants vers la droite. */
   .g {
     text-align: left;
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--c-surface);
+    border-right: 1px solid var(--c-border);
+  }
+
+  /* Coin figé sur les deux axes : en-tête (haut + gauche) et ligne Total (bas + gauche). */
+  thead th.g,
+  tfoot td.g {
+    z-index: 3;
   }
 
   .d {
@@ -200,4 +226,72 @@
 
 .muted {
   color: var(--c-text-muted);
+}
+
+/* Impression : un document sur papier, pas une capture de l'écran. On masque les
+   contrôles interactifs (recherche, sélecteur de répartition, bouton imprimer) et on
+   les remplace par l'en-tête ci-dessus ; le tableau perd ses artifices d'écran
+   (colonnes/en-tête figés, défilement borné) pour s'étaler naturellement sur la page. */
+@media print {
+  .entete-impression {
+    display: block;
+    margin-bottom: 16px;
+
+    .imp-titre {
+      margin: 0 0 4px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #000;
+    }
+
+    .imp-ligne {
+      margin: 2px 0;
+      font-size: 12px;
+      color: #000;
+    }
+
+    .imp-date {
+      color: #444;
+    }
+  }
+
+  /* L'en-tête d'écran ferait doublon avec l'en-tête d'impression (même titre), et son
+     sous-titre parle de cliquer sur un nom : sans objet sur papier. */
+  .entete,
+  .barre,
+  .cloture,
+  .pied {
+    display: none !important;
+  }
+
+  .tableau-wrap {
+    max-height: none;
+    overflow: visible;
+    border: none;
+    background: none;
+  }
+
+  .recap {
+    font-size: 12px;
+
+    th,
+    td {
+      background: none !important;
+      box-shadow: none !important;
+    }
+
+    thead th,
+    tfoot td,
+    .g {
+      position: static;
+    }
+
+    .chev {
+      display: none;
+    }
+
+    tbody tr {
+      break-inside: avoid;
+    }
+  }
 }

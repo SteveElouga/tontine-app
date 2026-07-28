@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
@@ -162,6 +162,18 @@ export class Dashboard implements OnInit {
     };
   });
 
+  constructor() {
+    // La phrase d'état est dans la langue de l'app : on la recharge si la langue
+    // change pendant que le tableau de bord est ouvert (pas besoin de re-naviguer).
+    effect(() => {
+      const langue = this.lang.langue();
+      this.caisse.etatCycle(this.cycleStore.cycleId(), langue).subscribe({
+        next: (e) => this.etat.set(e),
+        error: () => {},
+      });
+    });
+  }
+
   ngOnInit(): void {
     const id = this.cycleStore.cycleId();
     this.caisse.recapCycle(id).subscribe({
@@ -172,7 +184,6 @@ export class Dashboard implements OnInit {
       error: () => this.chargement.set(false),
     });
     this.caisse.serieMensuelle(id).subscribe({ next: (s) => this.serie.set(s), error: () => {} });
-    this.caisse.etatCycle(id).subscribe({ next: (e) => this.etat.set(e), error: () => {} });
     // Visite guidée à la toute première connexion (délai : laisser le menu s'afficher).
     setTimeout(() => this.tour.demarrerSiPremiereFois(), 600);
   }

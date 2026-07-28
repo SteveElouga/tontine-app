@@ -41,6 +41,12 @@ export class CycleStore {
   /** Caisse (tontine) du cycle courant. */
   readonly caisseId = computed(() => this.cycleCourant()?.caisseId ?? '');
 
+  /** Nom de la tontine (caisse) du cycle courant — pour affichage (ex. en-tête d'impression). */
+  readonly caisseNom = computed(() => this.cycleCourant()?.caisseNom ?? '');
+
+  /** Libellé du cycle courant (ex. « 2025-2026 »). */
+  readonly libelle = computed(() => this.cycleCourant()?.libelle ?? '');
+
   /** Cycles de la caisse courante (pour le sélecteur d'année). */
   readonly cyclesCaisse = computed(() =>
     this.cycles().filter((c) => c.caisseId === this.caisseId()),

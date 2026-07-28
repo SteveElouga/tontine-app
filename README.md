@@ -15,18 +15,25 @@ plus compliqué que WhatsApp, c'est raté. Première brique d'un projet plus lar
 
 Tous les écrans sont réalisés :
 
-- **Tableau de bord** : les totaux du cycle et des raccourcis.
+- **Tableau de bord** : les totaux du cycle, une carte « état du cycle » (feu vert/orange/rouge + phrase de synthèse, bilingue), un graphe des 3 courbes (épargne/encours/trésorerie) et des raccourcis.
 - **Saisie des dépôts** : par mois ou par membre, avec pré-remplissage des montants déjà saisis.
 - **Prêts** : ajout d'un prêt, remboursement, calcul de la majoration.
 - **Récapitulatif** : ce que chaque membre reçoit à la clôture, avec le choix du mode de
-  répartition des intérêts, la recherche et l'impression.
+  répartition des intérêts, la recherche et une **impression pensée pour le papier**
+  (en-tête avec la tontine, le cycle, le mode de répartition et la date ; menu et
+  commandes de l'écran masqués).
 - **Membres** : ajouter, renommer, retirer.
 - **Simulation** : projeter un dépôt ou un prêt sans rien enregistrer.
 - **Historique** : le journal de toutes les opérations.
 - **Fiche membre** : le détail, d'où vient le montant de chacun (transparence).
 - **Aide** : le guide du fonctionnement de la caisse et des écrans.
 
-Un sélecteur de cycle (barre latérale) permet de changer le cycle courant.
+Une trésorière peut gérer **plusieurs tontines** (caisses) : sélecteur de tontine puis de cycle (barre latérale), création d'une nouvelle tontine à la volée.
+
+L'interface respecte le réglage système « moins d'animations » : le mouvement y est discret
+et se limite à des fondus d'entrée et à quelques retours tactiles. Les valeurs (courbes et
+durées) sont centralisées dans `frontend/src/styles.scss` ; les décisions de motion sont
+documentées dans `plans/`.
 
 ## Documentation
 
@@ -70,5 +77,5 @@ ou partage en parts égales. Les quatre sont implémentés et testés (`Repartit
 ## Ce qui reste
 
 - Valider avec le vrai cycle 2025-2026 (saisie réelle avec la trésorière, comparaison au calcul manuel).
-- Authentification (login trésorière) et protection des enregistrements.
+- Tenancy par trésorière (aujourd'hui, un compte connecté voit toutes les tontines existantes).
 - Déploiement en ligne (backend, frontend, PostgreSQL).

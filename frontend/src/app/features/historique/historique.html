@@ -6,72 +6,77 @@
 @if (chargement()) {
   <p class="muted">{{ 'commun.chargement' | translate }}</p>
 } @else {
-  @if (operations().length) {
-    <div class="barre">
-      <span class="recherche">
-        <i class="pi pi-search"></i>
-        <input
-          pInputText
-          type="search"
-          [ngModel]="recherche()"
-          (ngModelChange)="recherche.set($event)"
-          placeholder="{{ 'historique.recherche' | translate }}"
+  <div class="contenu">
+    @if (operations().length) {
+      <div class="barre">
+        <span class="recherche">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="search"
+            [ngModel]="recherche()"
+            (ngModelChange)="recherche.set($event)"
+            placeholder="{{ 'historique.recherche' | translate }}"
+          />
+        </span>
+        <p-selectbutton
+          [options]="optType()"
+          [ngModel]="typeFiltre()"
+          (ngModelChange)="typeFiltre.set($event)"
+          optionLabel="label"
+          optionValue="value"
+          [allowEmpty]="false"
         />
-      </span>
-      <p-selectbutton
-        [options]="optType()"
-        [ngModel]="typeFiltre()"
-        (ngModelChange)="typeFiltre.set($event)"
-        optionLabel="label"
-        optionValue="value"
-        [allowEmpty]="false"
-      />
-    </div>
-  }
-
-  <ul class="journal">
-    @for (op of operationsFiltrees(); track $index) {
-      <li class="op">
-        <span
-          class="ic"
-          [class.depot]="op.type === 'depot'"
-          [class.pret]="op.type === 'pret'"
-          [class.remb]="op.type === 'remboursement'"
-        >
-          <i
-            class="pi"
-            [class.pi-arrow-down-left]="op.type === 'depot'"
-            [class.pi-arrow-up-right]="op.type === 'pret'"
-            [class.pi-replay]="op.type === 'remboursement'"
-          ></i>
-        </span>
-
-        <span class="txt">
-          <span class="l1">
-            <strong>{{ op.membreNom }}</strong>
-            {{
-              (op.type === 'depot'
-                ? 'historique.aDepose'
-                : op.type === 'pret'
-                  ? 'historique.aEmprunte'
-                  : 'historique.aRembourse'
-              ) | translate
-            }}
-          </span>
-          <span class="l2">
-            {{ op.mois | moisNom }},
-            {{ 'historique.saisiLe' | translate: { date: date(op.date) } }}
-          </span>
-        </span>
-
-        <span class="montant" [class.vert]="op.type !== 'pret'" [class.rouge]="op.type === 'pret'">
-          {{ op.type === 'pret' ? '' : '+' }}{{ fmt(op.montant) }}
-        </span>
-      </li>
-    } @empty {
-      <li class="vide muted">
-        {{ (operations().length ? 'historique.aucunResultat' : 'historique.vide') | translate }}
-      </li>
+      </div>
     }
-  </ul>
+
+    <ul class="journal" [class.journal--entree]="entreeInitiale()">
+      @for (op of operationsFiltrees(); track $index; let i = $index) {
+        <li
+          class="op"
+          [style.animation-delay.ms]="entreeInitiale() ? retardEntree(i) : null"
+        >
+          <span
+            class="ic"
+            [class.depot]="op.type === 'depot'"
+            [class.pret]="op.type === 'pret'"
+            [class.remb]="op.type === 'remboursement'"
+          >
+            <i
+              class="pi"
+              [class.pi-arrow-down-left]="op.type === 'depot'"
+              [class.pi-arrow-up-right]="op.type === 'pret'"
+              [class.pi-replay]="op.type === 'remboursement'"
+            ></i>
+          </span>
+
+          <span class="txt">
+            <span class="l1">
+              <strong>{{ op.membreNom }}</strong>
+              {{
+                (op.type === 'depot'
+                  ? 'historique.aDepose'
+                  : op.type === 'pret'
+                    ? 'historique.aEmprunte'
+                    : 'historique.aRembourse'
+                ) | translate
+              }}
+            </span>
+            <span class="l2">
+              {{ op.mois | moisNom }},
+              {{ 'historique.saisiLe' | translate: { date: date(op.date) } }}
+            </span>
+          </span>
+
+          <span class="montant" [class.vert]="op.type !== 'pret'" [class.rouge]="op.type === 'pret'">
+            {{ op.type === 'pret' ? '' : '+' }}{{ fmt(op.montant) }}
+          </span>
+        </li>
+      } @empty {
+        <li class="vide muted">
+          {{ (operations().length ? 'historique.aucunResultat' : 'historique.vide') | translate }}
+        </li>
+      }
+    </ul>
+  </div>
 }

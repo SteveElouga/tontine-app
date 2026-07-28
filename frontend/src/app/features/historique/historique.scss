@@ -18,6 +18,12 @@
   }
 }
 
+/* Fondu d'entrée au premier passage de « chargement » à « contenu » (une
+   seule fois par visite) — réutilise le keyframe global page-fade. */
+.contenu {
+  animation: page-fade var(--dur-base) var(--ease-out) both;
+}
+
 .barre {
   display: flex;
   align-items: center;
@@ -58,6 +64,12 @@
   gap: 14px;
   padding: 13px 4px;
   border-bottom: 1px solid var(--c-border);
+}
+
+/* Entrée en cascade au premier chargement seulement (classe retirée après la
+   fenêtre initiale par le composant) — ne rejoue jamais au filtrage. */
+.journal--entree .op {
+  animation: monte-doux 0.28s var(--ease-out) both;
 }
 
 .ic {
