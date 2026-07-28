@@ -18,6 +18,12 @@
   }
 }
 
+/* Fondu d'entrée au premier passage de « chargement » à « contenu » (une
+   seule fois par visite) — réutilise le keyframe global page-fade. */
+.contenu {
+  animation: page-fade var(--dur-base) var(--ease-out) both;
+}
+
 /* Sélecteur de séance — même esprit que l'écran Saisie. */
 .stepper {
   display: flex;

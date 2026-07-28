@@ -19,21 +19,23 @@
 @if (chargement()) {
   <p class="muted">{{ 'commun.chargement' | translate }}</p>
 } @else {
-  <textarea
-    class="zone"
-    rows="12"
-    [ngModel]="texte()"
-    (ngModelChange)="texte.set($event)"
-    (blur)="enregistrer()"
-    [placeholder]="'notes.placeholder' | translate"
-  ></textarea>
-  <p class="etat">
-    @if (enregistreLe()) {
-      <i class="pi pi-check-circle ok"></i>
-      <span>{{ 'notes.enregistreLe' | translate: { date: dateFr(enregistreLe()) } }}</span>
-    } @else {
-      <i class="pi pi-info-circle"></i>
-      <span>{{ 'notes.videAstuce' | translate }}</span>
-    }
-  </p>
+  <div class="contenu">
+    <textarea
+      class="zone"
+      rows="12"
+      [ngModel]="texte()"
+      (ngModelChange)="texte.set($event)"
+      (blur)="enregistrer()"
+      [placeholder]="'notes.placeholder' | translate"
+    ></textarea>
+    <p class="etat">
+      @if (enregistreLe()) {
+        <i class="pi pi-check-circle ok"></i>
+        <span>{{ 'notes.enregistreLe' | translate: { date: dateFr(enregistreLe()) } }}</span>
+      } @else {
+        <i class="pi pi-info-circle"></i>
+        <span>{{ 'notes.videAstuce' | translate }}</span>
+      }
+    </p>
+  </div>
 }
