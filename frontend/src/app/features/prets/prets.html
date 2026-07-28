@@ -48,188 +48,190 @@
 } @else if (!prets().length) {
   <p class="vide">{{ 'prets.vide' | translate }}</p>
 } @else {
-  <div class="filtre-membre">
-    <label for="filtre-pret">{{ 'prets.filtreMembre' | translate }}</label>
-    <p-select
-      inputId="filtre-pret"
-      [options]="optFiltre()"
-      [ngModel]="filtreMembre()"
-      (ngModelChange)="filtreMembre.set($event)"
-      optionLabel="label"
-      optionValue="value"
-      [filter]="true"
-      filterBy="label"
-      [style]="{ 'min-width': '220px' }"
-    />
-    <span class="compte">{{ 'prets.compte' | translate: { n: pretsFiltres().length } }}</span>
-  </div>
+  <div class="contenu">
+    <div class="filtre-membre">
+      <label for="filtre-pret">{{ 'prets.filtreMembre' | translate }}</label>
+      <p-select
+        inputId="filtre-pret"
+        [options]="optFiltre()"
+        [ngModel]="filtreMembre()"
+        (ngModelChange)="filtreMembre.set($event)"
+        optionLabel="label"
+        optionValue="value"
+        [filter]="true"
+        filterBy="label"
+        [style]="{ 'min-width': '220px' }"
+      />
+      <span class="compte">{{ 'prets.compte' | translate: { n: pretsFiltres().length } }}</span>
+    </div>
 
-  <div class="cartes">
-    @for (p of pretsFiltres(); track p.id) {
-      <article class="carte" [class.soldee]="n(p.solde) === 0">
-        <header class="c-tete">
-          <span class="c-nom">{{ p.nom }}</span>
-          @if (n(p.solde) === 0) {
-            <span class="badge ok"><i class="pi pi-check-circle"></i> {{ 'prets.soldeTag' | translate }}</span>
-          }
-          @if (editionDe() !== p.id) {
+    <div class="cartes">
+      @for (p of pretsFiltres(); track p.id) {
+        <article class="carte" [class.soldee]="n(p.solde) === 0">
+          <header class="c-tete">
+            <span class="c-nom">{{ p.nom }}</span>
+            @if (n(p.solde) === 0) {
+              <span class="badge ok"><i class="pi pi-check-circle"></i> {{ 'prets.soldeTag' | translate }}</span>
+            }
+            @if (editionDe() !== p.id) {
+              <button
+                type="button"
+                class="c-modif"
+                (click)="ouvrirEdition(p)"
+                [attr.aria-label]="'prets.modifier' | translate"
+                [pTooltip]="'prets.modifier' | translate"
+                tooltipPosition="left"
+              >
+                <i class="pi pi-pencil"></i>
+              </button>
+            }
             <button
               type="button"
-              class="c-modif"
-              (click)="ouvrirEdition(p)"
-              [attr.aria-label]="'prets.modifier' | translate"
-              [pTooltip]="'prets.modifier' | translate"
+              class="c-suppr"
+              (click)="supprimer(p)"
+              [attr.aria-label]="'prets.supprimer' | translate"
+              [pTooltip]="'prets.supprimer' | translate"
               tooltipPosition="left"
             >
-              <i class="pi pi-pencil"></i>
+              <i class="pi pi-trash"></i>
             </button>
-          }
-          <button
-            type="button"
-            class="c-suppr"
-            (click)="supprimer(p)"
-            [attr.aria-label]="'prets.supprimer' | translate"
-            [pTooltip]="'prets.supprimer' | translate"
-            tooltipPosition="left"
-          >
-            <i class="pi pi-trash"></i>
-          </button>
-        </header>
+          </header>
 
-        @if (editionDe() === p.id) {
-          <div class="c-edition">
-            <label class="c-champ">
-              <span>{{ 'prets.colMontant' | translate }}</span>
-              <p-inputnumber
-                [ngModel]="eMontant()"
-                (ngModelChange)="eMontant.set($event)"
-                [maxFractionDigits]="0"
-                [useGrouping]="true"
-                locale="fr-FR"
-                [inputStyle]="{ width: '100%', 'text-align': 'right' }"
-              />
-            </label>
-            <label class="c-champ">
-              <span>{{ 'prets.colPret' | translate }}</span>
-              <p-select
-                [options]="optMoisPret()"
-                [ngModel]="eMois()"
-                (ngModelChange)="eMois.set($event)"
-                optionLabel="label"
-                optionValue="value"
-                appendTo="body"
-                [style]="{ width: '100%' }"
-              />
-            </label>
-            <div class="c-edition-actions">
-              <button type="button" class="mini-btn ok" (click)="validerEdition(p)" [attr.aria-label]="'prets.valider' | translate">
-                <i class="pi pi-check"></i>
-              </button>
-              <button type="button" class="mini-btn" (click)="annulerEdition()" [attr.aria-label]="'prets.annuler' | translate">
-                <i class="pi pi-times"></i>
-              </button>
-            </div>
-          </div>
-        } @else {
-
-        <div class="c-lignes">
-          <div class="c-l">
-            <span class="c-lbl">{{ 'prets.colMontant' | translate }}</span>
-            <span class="c-val">{{ format(p.montant) }} <small>FCFA</small></span>
-          </div>
-          <div class="c-l">
-            <span class="c-lbl">
-              {{ 'prets.colMajoration' | translate }}
-              <i class="pi pi-info-circle tip" [pTooltip]="'prets.tipMajoration' | translate" tooltipPosition="top"></i>
-            </span>
-            <span class="c-val majo">+{{ format(p.totalInterets) }} <small>FCFA</small></span>
-          </div>
-          <div class="c-l">
-            <span class="c-lbl">{{ 'prets.colPret' | translate }}</span>
-            <span class="c-val">{{ p.moisPret | moisNom }}</span>
-          </div>
-          <div class="c-l">
-            <span class="c-lbl">
-              {{ 'prets.colSolde' | translate }}
-              <i class="pi pi-info-circle tip" [pTooltip]="'prets.tipSolde' | translate" tooltipPosition="top"></i>
-            </span>
-            <span class="c-val fort" [class.rouge]="n(p.solde) > 0">{{ format(p.solde) }} <small>FCFA</small></span>
-          </div>
-        </div>
-
-        @if (p.remboursements.length) {
-          <div class="c-rembs">
-            <span class="c-rembs-titre">
-              {{ 'prets.colRembourse' | translate }} · {{ format(p.totalRembourse) }} FCFA
-            </span>
-            @for (r of p.remboursements; track r.id) {
-              <div class="c-remb">
-                <span class="mois">{{ r.mois | moisNom }}</span>
-                <span class="mnt">{{ format(r.montant) }} FCFA</span>
-                <button
-                  type="button"
-                  class="c-remb-x"
-                  (click)="supprimerUnRemboursement(r)"
-                  [attr.aria-label]="'prets.supprimerRemb' | translate"
-                >
+          @if (editionDe() === p.id) {
+            <div class="c-edition">
+              <label class="c-champ">
+                <span>{{ 'prets.colMontant' | translate }}</span>
+                <p-inputnumber
+                  [ngModel]="eMontant()"
+                  (ngModelChange)="eMontant.set($event)"
+                  [maxFractionDigits]="0"
+                  [useGrouping]="true"
+                  locale="fr-FR"
+                  [inputStyle]="{ width: '100%', 'text-align': 'right' }"
+                />
+              </label>
+              <label class="c-champ">
+                <span>{{ 'prets.colPret' | translate }}</span>
+                <p-select
+                  [options]="optMoisPret()"
+                  [ngModel]="eMois()"
+                  (ngModelChange)="eMois.set($event)"
+                  optionLabel="label"
+                  optionValue="value"
+                  appendTo="body"
+                  [style]="{ width: '100%' }"
+                />
+              </label>
+              <div class="c-edition-actions">
+                <button type="button" class="mini-btn ok" (click)="validerEdition(p)" [attr.aria-label]="'prets.valider' | translate">
+                  <i class="pi pi-check"></i>
+                </button>
+                <button type="button" class="mini-btn" (click)="annulerEdition()" [attr.aria-label]="'prets.annuler' | translate">
                   <i class="pi pi-times"></i>
                 </button>
               </div>
-            }
-          </div>
-        }
-
-        @if (remboursementDe() === p.id) {
-          <footer class="c-pied">
-            <div class="c-remb-form">
-              <p-select
-                [options]="optReunions(p.moisPret)"
-                [ngModel]="rembReunion()"
-                (ngModelChange)="rembReunion.set($event)"
-                optionLabel="label"
-                optionValue="value"
-                appendTo="body"
-                [style]="{ 'min-width': '150px' }"
-              />
-              <p-inputnumber
-                [ngModel]="rembMontant()"
-                (ngModelChange)="rembMontant.set($event)"
-                [maxFractionDigits]="0"
-                [useGrouping]="true"
-                locale="fr-FR"
-                [placeholder]="'prets.montantRemb' | translate"
-                [inputStyle]="{ width: '120px', 'text-align': 'right' }"
-              />
-              <button type="button" class="mini-btn ok" (click)="valider(p)" [attr.aria-label]="'prets.valider' | translate">
-                <i class="pi pi-check"></i>
-              </button>
-              <button type="button" class="mini-btn" (click)="annuler()" [attr.aria-label]="'prets.annuler' | translate">
-                <i class="pi pi-times"></i>
-              </button>
             </div>
-          </footer>
-        } @else if (n(p.solde) > 0) {
-          <footer class="c-pied">
-            <button type="button" class="lien plein" (click)="ouvrirRemboursement(p)">
-              <i class="pi pi-plus"></i> {{ 'prets.rembourser' | translate }}
-            </button>
-          </footer>
-        }
-        }
-      </article>
-    } @empty {
-      <p class="vide">{{ 'prets.aucunPourMembre' | translate }}</p>
-    }
-  </div>
+          } @else {
 
-  <div class="totaux">
-    <div><span>{{ 'prets.total' | translate }}</span><strong>{{ format(totalPrete()) }} FCFA</strong></div>
-    <div><span>{{ 'prets.colRembourse' | translate }}</span><strong>{{ format(totalRembourse()) }} FCFA</strong></div>
-    <div><span>{{ 'prets.colSolde' | translate }}</span><strong>{{ format(totalSolde()) }} FCFA</strong></div>
-  </div>
+          <div class="c-lignes">
+            <div class="c-l">
+              <span class="c-lbl">{{ 'prets.colMontant' | translate }}</span>
+              <span class="c-val">{{ format(p.montant) }} <small>FCFA</small></span>
+            </div>
+            <div class="c-l">
+              <span class="c-lbl">
+                {{ 'prets.colMajoration' | translate }}
+                <i class="pi pi-info-circle tip" [pTooltip]="'prets.tipMajoration' | translate" tooltipPosition="top"></i>
+              </span>
+              <span class="c-val majo">+{{ format(p.totalInterets) }} <small>FCFA</small></span>
+            </div>
+            <div class="c-l">
+              <span class="c-lbl">{{ 'prets.colPret' | translate }}</span>
+              <span class="c-val">{{ p.moisPret | moisNom }}</span>
+            </div>
+            <div class="c-l">
+              <span class="c-lbl">
+                {{ 'prets.colSolde' | translate }}
+                <i class="pi pi-info-circle tip" [pTooltip]="'prets.tipSolde' | translate" tooltipPosition="top"></i>
+              </span>
+              <span class="c-val fort" [class.rouge]="n(p.solde) > 0">{{ format(p.solde) }} <small>FCFA</small></span>
+            </div>
+          </div>
 
-  <div class="astuce">
-    <i class="pi pi-info-circle"></i>
-    <span>{{ 'prets.astuce' | translate: { delai: delaiNom() } }}</span>
+          @if (p.remboursements.length) {
+            <div class="c-rembs">
+              <span class="c-rembs-titre">
+                {{ 'prets.colRembourse' | translate }} · {{ format(p.totalRembourse) }} FCFA
+              </span>
+              @for (r of p.remboursements; track r.id) {
+                <div class="c-remb">
+                  <span class="mois">{{ r.mois | moisNom }}</span>
+                  <span class="mnt">{{ format(r.montant) }} FCFA</span>
+                  <button
+                    type="button"
+                    class="c-remb-x"
+                    (click)="supprimerUnRemboursement(r)"
+                    [attr.aria-label]="'prets.supprimerRemb' | translate"
+                  >
+                    <i class="pi pi-times"></i>
+                  </button>
+                </div>
+              }
+            </div>
+          }
+
+          @if (remboursementDe() === p.id) {
+            <footer class="c-pied">
+              <div class="c-remb-form">
+                <p-select
+                  [options]="optReunions(p.moisPret)"
+                  [ngModel]="rembReunion()"
+                  (ngModelChange)="rembReunion.set($event)"
+                  optionLabel="label"
+                  optionValue="value"
+                  appendTo="body"
+                  [style]="{ 'min-width': '150px' }"
+                />
+                <p-inputnumber
+                  [ngModel]="rembMontant()"
+                  (ngModelChange)="rembMontant.set($event)"
+                  [maxFractionDigits]="0"
+                  [useGrouping]="true"
+                  locale="fr-FR"
+                  [placeholder]="'prets.montantRemb' | translate"
+                  [inputStyle]="{ width: '120px', 'text-align': 'right' }"
+                />
+                <button type="button" class="mini-btn ok" (click)="valider(p)" [attr.aria-label]="'prets.valider' | translate">
+                  <i class="pi pi-check"></i>
+                </button>
+                <button type="button" class="mini-btn" (click)="annuler()" [attr.aria-label]="'prets.annuler' | translate">
+                  <i class="pi pi-times"></i>
+                </button>
+              </div>
+            </footer>
+          } @else if (n(p.solde) > 0) {
+            <footer class="c-pied">
+              <button type="button" class="lien plein" (click)="ouvrirRemboursement(p)">
+                <i class="pi pi-plus"></i> {{ 'prets.rembourser' | translate }}
+              </button>
+            </footer>
+          }
+          }
+        </article>
+      } @empty {
+        <p class="vide">{{ 'prets.aucunPourMembre' | translate }}</p>
+      }
+    </div>
+
+    <div class="totaux">
+      <div><span>{{ 'prets.total' | translate }}</span><strong>{{ format(totalPrete()) }} FCFA</strong></div>
+      <div><span>{{ 'prets.colRembourse' | translate }}</span><strong>{{ format(totalRembourse()) }} FCFA</strong></div>
+      <div><span>{{ 'prets.colSolde' | translate }}</span><strong>{{ format(totalSolde()) }} FCFA</strong></div>
+    </div>
+
+    <div class="astuce">
+      <i class="pi pi-info-circle"></i>
+      <span>{{ 'prets.astuce' | translate: { delai: delaiNom() } }}</span>
+    </div>
   </div>
 }
