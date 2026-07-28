@@ -12,6 +12,8 @@
   --c-accent: #1d5fa5;
   --c-accent-bg: #e8f1fb;
   --c-success: #1d7a52;
+  /* Ombre marquant qu'une zone défilante cache du contenu au-delà de son bord. */
+  --c-ombre-defilement: rgba(0, 0, 0, 0.14);
 
   /* Mouvement — courbes & durées (réf. Emil/Apple), réutilisables partout. */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -33,6 +35,8 @@
   --c-accent: #5c9cd8;
   --c-accent-bg: #17293c;
   --c-success: #3fae7c;
+  /* Plus dense qu'en clair : une ombre noire sur une surface foncée passerait inaperçue. */
+  --c-ombre-defilement: rgba(0, 0, 0, 0.45);
 }
 
 * {

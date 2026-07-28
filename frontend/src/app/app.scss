@@ -4,6 +4,13 @@
   overflow: hidden;
 }
 
+/* Panneau à trois zones : haut figé (identité + sélecteurs), menu défilant, bas figé
+   (Aide/Paramètres/Profil/Déconnexion). Avant, tout le panneau défilait et le bloc du bas
+   ne tenait sa position que par `margin-top: auto`, donc uniquement s'il restait de la
+   place : sur un écran court (portable 13", téléphone) il repassait dans le flux et il
+   fallait faire défiler pour atteindre Déconnexion. Le contenu mesure ~790 px : plus haut
+   que la plupart des téléphones. Une entrée ne doit pas changer de domicile selon la
+   hauteur de l'écran — c'est le seul défilement du <nav> qui absorbe le manque de place. */
 .sidebar {
   width: 202px;
   flex-shrink: 0;
@@ -12,8 +19,8 @@
   padding: 14px 10px;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
+  min-height: 0;
+  overflow: hidden;
   transition: width 0.18s ease;
 }
 
@@ -21,6 +28,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
   padding: 4px 10px 16px;
   font-weight: 600;
   font-size: 15px;
@@ -58,6 +66,7 @@
 }
 
 .cycle {
+  flex-shrink: 0;
   padding: 2px 4px 12px;
 
   label {
@@ -94,10 +103,32 @@
   }
 }
 
+/* Seule zone qui défile : c'est ici qu'on absorbe le manque de hauteur, pas sur les
+   sélecteurs ni sur le bloc du bas. `min-height: 0` est indispensable — sans lui, un
+   enfant flex refuse de rétrécir sous la taille de son contenu et le défilement
+   n'apparaît jamais. */
 nav {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  /* Ombres de défilement, visibles UNIQUEMENT si du contenu est réellement masqué au-delà
+     du bord. Deux « couvre-ombres » opaques sont ancrés au contenu (background-attachment:
+     local) et deux ombres au cadre (scroll) : en haut de course, le couvre-ombre recouvre
+     exactement son ombre ; dès qu'on défile, il s'en va et l'ombre apparaît. Aucun script,
+     aucune classe à piloter. */
+  background:
+    linear-gradient(var(--c-surface) 30%, transparent) top / 100% 24px no-repeat,
+    linear-gradient(transparent, var(--c-surface) 70%) bottom / 100% 24px no-repeat,
+    radial-gradient(farthest-side at 50% 0, var(--c-ombre-defilement), transparent) top /
+      100% 8px no-repeat,
+    radial-gradient(farthest-side at 50% 100%, var(--c-ombre-defilement), transparent)
+      bottom / 100% 8px no-repeat;
+  background-attachment: local, local, scroll, scroll;
 }
 
 .nav-item {
@@ -150,8 +181,12 @@ button.nav-item {
   font-size: 11px;
 }
 
+/* Bloc du bas figé : Aide/Paramètres/Profil/Déconnexion gardent le même domicile quelle
+   que soit la hauteur de l'écran. Plus de `margin-top: auto` — le `flex: 1` du <nav>
+   suffit à le pousser en bas, et surtout il ne peut plus repasser dans le flux quand le
+   contenu déborde, ce qui était le défaut d'origine. */
 .sidebar-bottom {
-  margin-top: auto;
+  flex-shrink: 0;
   padding-top: 10px;
   border-top: 1px solid var(--c-border);
 }
