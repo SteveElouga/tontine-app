@@ -74,6 +74,21 @@ export class Recap implements OnInit {
     ];
   });
 
+  /** Libellé lisible du mode de répartition choisi — utilisé dans l'en-tête d'impression. */
+  protected readonly modeLabel = computed(
+    () => this.optModes().find((o) => o.value === this.mode())?.label ?? '',
+  );
+
+  /** Date du jour, formatée selon la langue — utilisée dans l'en-tête d'impression. */
+  protected readonly dateImpression = computed(() => {
+    const loc = this.lang.langue() === 'en' ? 'en-US' : 'fr-FR';
+    return new Date().toLocaleDateString(loc, { day: 'numeric', month: 'long', year: 'numeric' });
+  });
+
+  /** Nom de la tontine et libellé du cycle courant — utilisés dans l'en-tête d'impression. */
+  protected readonly caisseNom = computed(() => this.cycleStore.caisseNom());
+  protected readonly cycleLibelle = computed(() => this.cycleStore.libelle());
+
   ngOnInit(): void {
     this.caisse.infosCloture(this.cycleStore.cycleId()).subscribe({
       next: (i) => this.infos.set(i),

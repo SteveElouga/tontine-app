@@ -282,3 +282,24 @@ button.nav-item {
     background: rgba(0, 0, 0, 0.4);
   }
 }
+
+/* Impression : la coquille de l'app (menu, barre mobile) n'a pas sa place sur papier ;
+   seul le contenu de l'écran routé doit sortir. On enlève aussi les contraintes de
+   hauteur/défilement d'écran, sinon seule la première « page » visible s'imprimerait. */
+@media print {
+  .sidebar,
+  .backdrop,
+  .topbar {
+    display: none !important;
+  }
+
+  .shell {
+    height: auto;
+    overflow: visible;
+  }
+
+  .content {
+    padding: 0;
+    overflow: visible;
+  }
+}

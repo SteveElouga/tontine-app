@@ -203,6 +203,19 @@ h1 {
   }
 }
 
+/* Impression : les éléments flottants de l'app (toasts, bandeau d'annulation, boîtes de
+   dialogue, tooltips) n'ont pas leur place sur une page imprimée, où qu'ils soient rendus
+   dans le DOM (certains sont des overlays PrimeNG attachés au <body>). */
+@media print {
+  p-toast,
+  app-undo-banner,
+  .p-dialog-mask,
+  .p-confirmdialog,
+  .p-tooltip {
+    display: none !important;
+  }
+}
+
 /* Formulaire « nouvelle tontine » (contenu de la boîte de dialogue, rendu hors composant). */
 .form-tontine {
   display: flex;

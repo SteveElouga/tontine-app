@@ -6,6 +6,20 @@
 @if (chargement()) {
   <p class="muted">{{ 'commun.chargement' | translate }}</p>
 } @else {
+  <div class="entete-impression">
+    <p class="imp-titre">
+      {{ caisseNom() }}@if (cycleLibelle()) { — {{ cycleLibelle() }} }
+    </p>
+    <p class="imp-ligne">{{ 'recap.titre' | translate }}</p>
+    <p class="imp-ligne">
+      {{ 'recap.repartition' | translate }} : {{ modeLabel() }}
+      @if (infos(); as inf) {
+        · {{ 'recap.majorations' | translate }} {{ format(inf.gains) }} FCFA
+      }
+    </p>
+    <p class="imp-ligne imp-date">{{ 'recap.impDate' | translate: { date: dateImpression() } }}</p>
+  </div>
+
   <div class="barre">
     <span class="recherche">
       <i class="pi pi-search"></i>
