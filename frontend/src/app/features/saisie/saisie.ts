@@ -73,6 +73,10 @@ export class Saisie implements OnInit {
       this.cycleStore.anneeDebut(),
     );
   });
+  /** Tontine et cycle réellement ouverts — le sous-titre les nommait en dur. */
+  protected readonly caisseNom = computed(() => this.cycleStore.caisseNom());
+  protected readonly cycleLibelle = computed(() => this.cycleStore.libelle());
+
   protected readonly membreCourant = computed(() => this.membres()[this.membreIndex()]);
   /** Options du sélecteur de membre (vue « Par membre »), pour la recherche directe. */
   protected readonly optMembres = computed(() =>

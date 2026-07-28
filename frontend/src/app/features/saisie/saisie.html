@@ -1,6 +1,6 @@
 <header class="entete">
   <h1>{{ 'saisie.titre' | translate }}</h1>
-  <p class="sub">{{ 'saisie.sous' | translate }}</p>
+  <p class="sub">{{ 'saisie.sous' | translate: { caisse: caisseNom(), cycle: cycleLibelle() } }}</p>
 </header>
 
 <div class="bascule">

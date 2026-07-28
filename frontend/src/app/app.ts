@@ -5,6 +5,7 @@ import { Toast } from 'primeng/toast';
 import { Select } from 'primeng/select';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
+import { Tooltip } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
@@ -33,6 +34,7 @@ interface NavItem {
     Select,
     Dialog,
     InputText,
+    Tooltip,
     TranslatePipe,
     UndoBanner,
   ],

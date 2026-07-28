@@ -54,6 +54,10 @@ export class Prets implements OnInit {
     );
   });
 
+  /** Tontine et cycle réellement ouverts — le sous-titre les nommait en dur. */
+  protected readonly caisseNom = computed(() => this.cycleStore.caisseNom());
+  protected readonly cycleLibelle = computed(() => this.cycleStore.libelle());
+
   protected readonly prets = signal<Pret[]>([]);
   protected readonly membres = signal<Membre[]>([]);
   protected readonly optMembres = computed(() =>

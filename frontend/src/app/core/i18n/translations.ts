@@ -153,7 +153,7 @@ export const FR = {
   },
   tdb: {
     titre: 'Tableau de bord',
-    sous: 'Caisse mutuelle, cycle 2025-2026, {{n}} membres.',
+    sous: '{{caisse}}, cycle {{cycle}}, {{n}} membres.',
     epargne: 'Épargne déposée',
     interets: 'Intérêts à ce jour',
     areverser: 'À reverser à la clôture',
@@ -229,7 +229,7 @@ export const FR = {
   },
   saisie: {
     titre: 'Saisie des dépôts',
-    sous: 'Caisse mutuelle, cycle 2025-2026.',
+    sous: '{{caisse}}, cycle {{cycle}}.',
     parMois: 'Par mois',
     parMembre: 'Par membre',
     moisPrec: 'Mois précédent',
@@ -279,7 +279,7 @@ export const FR = {
   },
   prets: {
     titre: 'Prêts',
-    sous: 'Caisse mutuelle, cycle 2025-2026.',
+    sous: '{{caisse}}, cycle {{cycle}}.',
     choisirMembre: 'Choisir un membre…',
     filtreMembre: 'Filtrer par membre',
     tousMembres: 'Tous les membres',
@@ -389,7 +389,7 @@ export const FR = {
   },
   fiche: {
     retour: 'Récapitulatif',
-    cycle: 'Cycle 2025–2026',
+    cycle: 'Cycle {{cycle}}',
     aRecevoir: 'À recevoir à la clôture',
     epargneInterets: 'Épargne et intérêts',
     colMoisDepot: 'Mois du dépôt',
@@ -589,7 +589,7 @@ export const EN = {
   },
   tdb: {
     titre: 'Dashboard',
-    sous: 'Mutual fund, 2025-2026 cycle, {{n}} members.',
+    sous: '{{caisse}}, {{cycle}} cycle, {{n}} members.',
     epargne: 'Savings deposited',
     interets: 'Interest so far',
     areverser: 'To pay out at closing',
@@ -665,7 +665,7 @@ export const EN = {
   },
   saisie: {
     titre: 'Enter deposits',
-    sous: 'Mutual fund, 2025-2026 cycle.',
+    sous: '{{caisse}}, {{cycle}} cycle.',
     parMois: 'By month',
     parMembre: 'By member',
     moisPrec: 'Previous month',
@@ -715,7 +715,7 @@ export const EN = {
   },
   prets: {
     titre: 'Loans',
-    sous: 'Mutual fund, 2025-2026 cycle.',
+    sous: '{{caisse}}, {{cycle}} cycle.',
     choisirMembre: 'Choose a member…',
     filtreMembre: 'Filter by member',
     tousMembres: 'All members',
@@ -825,7 +825,7 @@ export const EN = {
   },
   fiche: {
     retour: 'Summary',
-    cycle: '2025–2026 cycle',
+    cycle: '{{cycle}} cycle',
     aRecevoir: 'To receive at closing',
     epargneInterets: 'Savings and interest',
     colMoisDepot: 'Deposit month',

@@ -9,7 +9,7 @@
     <span class="avatar">{{ initiales() }}</span>
     <span class="ident">
       <span class="nom">{{ f.nom }}</span>
-      <span class="cycle">{{ 'fiche.cycle' | translate }}</span>
+      <span class="cycle">{{ 'fiche.cycle' | translate: { cycle: cycleLibelle() } }}</span>
     </span>
   </header>
 

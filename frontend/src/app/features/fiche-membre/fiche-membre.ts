@@ -21,6 +21,9 @@ export class FicheMembrePage implements OnInit {
   protected readonly fiche = signal<FicheMembre | null>(null);
   protected readonly chargement = signal(true);
 
+  /** Cycle réellement ouvert — le sous-titre le nommait en dur (« 2025-2026 »). */
+  protected readonly cycleLibelle = computed(() => this.cycleStore.libelle());
+
   /** Initiales pour l'avatar (« Membre 03 » → « M0 »). */
   protected readonly initiales = computed(() => {
     const parts = (this.fiche()?.nom ?? '').trim().split(/\s+/);

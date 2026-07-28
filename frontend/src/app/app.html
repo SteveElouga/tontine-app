@@ -12,7 +12,9 @@
         (click)="layout.basculerReplie()"
         [attr.aria-expanded]="!layout.replie()"
         [attr.aria-label]="(layout.replie() ? 'nav.deplier' : 'nav.replier') | translate"
-        [attr.title]="(layout.replie() ? 'nav.deplier' : 'nav.replier') | translate"
+        [pTooltip]="(layout.replie() ? 'nav.deplier' : 'nav.replier') | translate"
+        [showDelay]="250"
+        tooltipPosition="right"
       >
         <i
           class="pi"
@@ -61,7 +63,11 @@
             [routerLink]="item.route"
             routerLinkActive="active"
             [attr.data-tour]="item.tour"
-            [attr.title]="layout.replie() ? (item.label | translate) : null"
+            [attr.aria-label]="item.label | translate"
+            [pTooltip]="item.label | translate"
+            [tooltipDisabled]="!layout.replie()"
+            [showDelay]="250"
+            tooltipPosition="right"
             (click)="layout.fermerMobile()"
           >
             <i [class]="item.icon"></i><span class="libelle">{{ item.label | translate }}</span>
@@ -81,7 +87,11 @@
             [routerLink]="item.route"
             routerLinkActive="active"
             [attr.data-tour]="item.tour"
-            [attr.title]="layout.replie() ? (item.label | translate) : null"
+            [attr.aria-label]="item.label | translate"
+            [pTooltip]="item.label | translate"
+            [tooltipDisabled]="!layout.replie()"
+            [showDelay]="250"
+            tooltipPosition="right"
             (click)="layout.fermerMobile()"
           >
             <i [class]="item.icon"></i><span class="libelle">{{ item.label | translate }}</span>
@@ -97,7 +107,11 @@
         type="button"
         class="nav-item deconnexion"
         (click)="deconnecter()"
-        [attr.title]="layout.replie() ? ('nav.deconnexion' | translate) : null"
+        [attr.aria-label]="'nav.deconnexion' | translate"
+        [pTooltip]="'nav.deconnexion' | translate"
+        [tooltipDisabled]="!layout.replie()"
+        [showDelay]="250"
+        tooltipPosition="right"
       >
         <i class="pi pi-sign-out"></i><span class="libelle">{{ 'nav.deconnexion' | translate }}</span>
       </button>

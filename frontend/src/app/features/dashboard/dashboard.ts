@@ -162,6 +162,11 @@ export class Dashboard implements OnInit {
     };
   });
 
+  /** Tontine et cycle réellement ouverts — le sous-titre les nommait en dur
+   *  (« Caisse mutuelle, cycle 2025-2026 »), donc faux dès la deuxième tontine. */
+  protected readonly caisseNom = computed(() => this.cycleStore.caisseNom());
+  protected readonly cycleLibelle = computed(() => this.cycleStore.libelle());
+
   constructor() {
     // La phrase d'état est dans la langue de l'app : on la recharge si la langue
     // change pendant que le tableau de bord est ouvert (pas besoin de re-naviguer).

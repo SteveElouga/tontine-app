@@ -1,6 +1,6 @@
 <header class="entete">
   <h1>{{ 'prets.titre' | translate }}</h1>
-  <p class="sub">{{ 'prets.sous' | translate }}</p>
+  <p class="sub">{{ 'prets.sous' | translate: { caisse: caisseNom(), cycle: cycleLibelle() } }}</p>
 </header>
 
 <p-confirmdialog [style]="{ maxWidth: '420px' }" />

@@ -1,6 +1,8 @@
 <header class="entete">
   <h1>{{ 'tdb.titre' | translate }}</h1>
-  <p class="sub">{{ 'tdb.sous' | translate: { n: nbMembres() } }}</p>
+  <p class="sub">
+    {{ 'tdb.sous' | translate: { caisse: caisseNom(), cycle: cycleLibelle(), n: nbMembres() } }}
+  </p>
 </header>
 
 @if (etat(); as e) {
