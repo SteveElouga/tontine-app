@@ -26,6 +26,9 @@ export class Historique implements OnInit {
 
   protected readonly operations = signal<Operation[]>([]);
   protected readonly chargement = signal(true);
+  /** Vrai seulement pendant la fenêtre d'entrée en cascade du premier chargement
+   * (voir ngOnInit) — évite de rejouer l'animation à chaque frappe de recherche. */
+  protected readonly entreeInitiale = signal(true);
 
   protected readonly recherche = signal('');
   protected readonly typeFiltre = signal<FiltreType>('tout');
@@ -60,9 +63,18 @@ export class Historique implements OnInit {
       next: (ops) => {
         this.operations.set(ops);
         this.chargement.set(false);
+        // La cascade ne doit jouer qu'une fois : on referme la fenêtre après la
+        // durée du plus long délai + la durée de monte-doux (240ms + 280ms ≈
+        // 520ms, arrondi à 600ms par marge de sécurité).
+        setTimeout(() => this.entreeInitiale.set(false), 600);
       },
       error: () => this.chargement.set(false),
     });
+  }
+
+  /** Décalage d'entrée en cascade, plafonné pour ne pas étirer une longue liste. */
+  protected retardEntree(i: number): number {
+    return Math.min(i * 30, 240);
   }
 
   protected fmt(v: string | number): string {
