@@ -174,18 +174,21 @@ def _fmt_fcfa(valeur) -> str:
     return f"{int(n):,}".replace(",", " ")
 
 
-def _texte_etat_ia(verdict, epargne, promis, prets, majoration, rembourse, reste, tresorerie, taux):
+def _texte_etat_ia(
+    verdict, epargne, promis, prets, majoration, rembourse, reste, tresorerie, taux, langue="fr"
+):
     """Reformulation naturelle par Claude, SI la clé ANTHROPIC_API_KEY est configurée.
 
     Renvoie None en l'absence de clé, de paquet, de réseau ou en cas d'erreur : le texte
-    calculé prend alors le relais. Résultat mis en cache tant que les chiffres ne bougent pas.
+    calculé prend alors le relais. Résultat mis en cache tant que les chiffres ne bougent pas
+    (la langue fait partie de la signature : FR et EN sont mis en cache séparément).
     """
     import os
 
     cle = os.environ.get("ANTHROPIC_API_KEY")
     if not cle:
         return None
-    signature = (verdict, int(promis), int(majoration), int(rembourse), int(reste))
+    signature = (verdict, int(promis), int(majoration), int(rembourse), int(reste), langue)
     if signature in _CACHE_ETAT_IA:
         return _CACHE_ETAT_IA[signature]
     try:
@@ -201,10 +204,12 @@ def _texte_etat_ia(verdict, epargne, promis, prets, majoration, rembourse, reste
             f"- Trésorerie disponible : {_fmt_fcfa(tresorerie)}\n"
             f"- Feu déjà décidé : {verdict}"
         )
+        langue_txt = "en anglais" if langue == "en" else "en français"
         systeme = (
             "Tu écris l'état de santé d'une tontine camerounaise (caisse mutuelle) pour une "
-            "trésorière de 45 à 60 ans, non technique. Style calme, clair et bienveillant : 3 à 4 "
-            "phrases courtes, français simple, montants en FCFA précis (pas d'arrondis vagues). "
+            f"trésorière de 45 à 60 ans, non technique. Réponds {langue_txt}, quelle que soit la "
+            "langue des chiffres ci-dessous. Style calme, clair et bienveillant : 3 à 4 "
+            "phrases courtes, montants en FCFA précis (pas d'arrondis vagues). "
             "Cite au moins les prêts accordés et la majoration face aux intérêts promis. Un manque "
             "d'intérêts n'est PAS un échec : c'est le cas normal quand des prêts démarrent tard dans "
             "le cycle ou sont remboursés tôt (moins de mois, moins d'intérêts), pas un problème "
@@ -230,11 +235,48 @@ def _texte_etat_ia(verdict, epargne, promis, prets, majoration, rembourse, reste
         return None
 
 
-def _texte_etat(verdict, epargne, promis, prets, majoration, rembourse, reste, tresorerie, taux) -> str:
-    """Phrase de synthèse : texte calculé (toujours disponible, fiable), reformulé par
-    l'IA si une clé est configurée (repli automatique sur le calculé)."""
+def _texte_etat(
+    verdict, epargne, promis, prets, majoration, rembourse, reste, tresorerie, taux, langue="fr"
+) -> str:
+    """Phrase de synthèse : texte calculé (toujours disponible, fiable, FR ou EN selon `langue`),
+    reformulé par l'IA si une clé est configurée (repli automatique sur le calculé)."""
     manque = promis - majoration
-    if verdict == "vert":
+    if langue == "en":
+        if verdict == "vert":
+            base = (
+                f"This cycle is running smoothly: {_fmt_fcfa(epargne)} FCFA saved, {_fmt_fcfa(prets)} "
+                f"FCFA lent out. Loan interest covers what's owed to savers ({_fmt_fcfa(majoration)} vs "
+                f"{_fmt_fcfa(promis)} FCFA), and repayments are keeping pace ({taux} %, {_fmt_fcfa(reste)} "
+                f"FCFA still to come in). If it stays this way, everyone will get their full share at "
+                f"closing."
+            )
+        elif verdict == "orange" and majoration < promis:
+            base = (
+                f"The fund is holding steady, just worth watching. Out of {_fmt_fcfa(prets)} FCFA lent, "
+                f"the interest collected doesn't cover it all yet: {_fmt_fcfa(majoration)} FCFA against "
+                f"{_fmt_fcfa(promis)} owed to savers, a shortfall of about {_fmt_fcfa(manque)}. That's "
+                f"normal when loans start late in the cycle or get repaid early: fewer months, less "
+                f"interest, not a case of money sitting unused. At closing, everyone's interest will be "
+                f"trimmed slightly, that's exactly what this is for. As for repayments, {taux} % is in, "
+                f"with {_fmt_fcfa(reste)} FCFA still to collect."
+            )
+        elif verdict == "orange":
+            base = (
+                f"Money-wise, it's all there: out of {_fmt_fcfa(prets)} FCFA lent, the interest easily "
+                f"covers what's owed to savers ({_fmt_fcfa(majoration)} vs {_fmt_fcfa(promis)} FCFA). "
+                f"What needs watching is repayments: only {taux} % is in so far, with "
+                f"{_fmt_fcfa(reste)} FCFA still to collect before closing."
+            )
+        else:  # rouge
+            base = (
+                f"This cycle needs closer attention. Cash on hand stands at {_fmt_fcfa(tresorerie)} FCFA, "
+                f"and out of {_fmt_fcfa(prets)} FCFA lent, interest collected is only "
+                f"{_fmt_fcfa(majoration)} against {_fmt_fcfa(promis)} owed to savers, a significant "
+                f"shortfall that goes beyond simple timing. Interest will need to be cut noticeably at "
+                f"closing, and repayments need a push ({taux} % collected, {_fmt_fcfa(reste)} FCFA "
+                f"remaining)."
+            )
+    elif verdict == "vert":
         base = (
             f"Tout roule pour ce cycle : {_fmt_fcfa(epargne)} FCFA d'épargne, {_fmt_fcfa(prets)} FCFA "
             f"prêtés. Les prêts rapportent de quoi payer les intérêts promis aux épargnants "
@@ -268,7 +310,9 @@ def _texte_etat(verdict, epargne, promis, prets, majoration, rembourse, reste, t
             f"remboursements ({taux} % rentrés, {_fmt_fcfa(reste)} FCFA restant)."
         )
     return (
-        _texte_etat_ia(verdict, epargne, promis, prets, majoration, rembourse, reste, tresorerie, taux)
+        _texte_etat_ia(
+            verdict, epargne, promis, prets, majoration, rembourse, reste, tresorerie, taux, langue
+        )
         or base
     )
 
@@ -725,10 +769,10 @@ class Query:
         return points
 
     @strawberry.field
-    def etat_cycle(self, cycle_id: strawberry.ID) -> EtatCycle:
+    def etat_cycle(self, cycle_id: strawberry.ID, langue: str = "fr") -> EtatCycle:
         """Synthèse « santé » du cycle : feu (vert/orange/rouge) + phrase de lecture immédiate.
-        Chiffres calculés par le moteur ; texte calculé (toujours dispo) reformulé par l'IA
-        si une clé est configurée."""
+        Chiffres calculés par le moteur ; texte calculé (toujours dispo, FR ou EN selon `langue`)
+        reformulé par l'IA si une clé est configurée."""
         from apps.loans.models import Loan
         from apps.savings.models import Deposit
 
@@ -742,12 +786,16 @@ class Query:
         )
 
         if not depots and not loans:
+            texte_neutre = (
+                "This tontine is just getting started: no savings or loans recorded yet. "
+                "Enter the first deposits and the status will fill in on its own."
+                if langue == "en"
+                else "Cette tontine démarre : aucune épargne ni prêt enregistré pour l'instant. "
+                "Saisissez les premiers dépôts et l'état se remplira tout seul."
+            )
             return EtatCycle(
                 verdict="neutre",
-                texte=(
-                    "Cette tontine démarre : aucune épargne ni prêt enregistré pour l'instant. "
-                    "Saisissez les premiers dépôts et l'état se remplira tout seul."
-                ),
+                texte=texte_neutre,
                 epargne=Decimal(0),
                 interets_promis=Decimal(0),
                 prets=Decimal(0),
@@ -781,7 +829,7 @@ class Query:
             verdict = "vert"
 
         texte = _texte_etat(
-            verdict, epargne, promis, prets, majoration, rembourse, reste, tresorerie, taux
+            verdict, epargne, promis, prets, majoration, rembourse, reste, tresorerie, taux, langue
         )
         return EtatCycle(
             verdict=verdict,

@@ -47,8 +47,8 @@ export const SERIE_MENSUELLE = gql`
 
 /** Synthèse « santé » du cycle : feu (vert/orange/rouge) + phrase. */
 export const ETAT_CYCLE = gql`
-  query EtatCycle($cycleId: ID!) {
-    etatCycle(cycleId: $cycleId) {
+  query EtatCycle($cycleId: ID!, $langue: String!) {
+    etatCycle(cycleId: $cycleId, langue: $langue) {
       verdict
       texte
       epargne

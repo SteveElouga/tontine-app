@@ -90,12 +90,12 @@ export class CaisseService {
       .pipe(map((r) => (r.data?.serieMensuelle ?? []) as PointSerie[]));
   }
 
-  /** Synthèse « santé » du cycle : feu + phrase de lecture immédiate. */
-  etatCycle(cycleId: string): Observable<EtatCycle> {
+  /** Synthèse « santé » du cycle : feu + phrase de lecture immédiate (dans la langue donnée). */
+  etatCycle(cycleId: string, langue: string): Observable<EtatCycle> {
     return this.apollo
       .query<{ etatCycle: EtatCycle }>({
         query: ETAT_CYCLE,
-        variables: { cycleId },
+        variables: { cycleId, langue },
         fetchPolicy: 'network-only',
       })
       .pipe(map((r) => r.data!.etatCycle as EtatCycle));
