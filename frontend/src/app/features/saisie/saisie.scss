@@ -18,6 +18,12 @@
   }
 }
 
+/* Fondu d'entrée au premier passage de « chargement » à « contenu » (une
+   seule fois par visite) — réutilise le keyframe global page-fade. */
+.contenu {
+  animation: page-fade var(--dur-base) var(--ease-out) both;
+}
+
 /* Bascule — pilule de la maquette */
 .bascule {
   display: inline-flex;
@@ -240,6 +246,10 @@
     color: var(--c-text-muted);
     white-space: nowrap;
   }
+}
+
+.grille-membres--entree .ligne {
+  animation: monte-doux 0.28s var(--ease-out) both;
 }
 
 .etat {

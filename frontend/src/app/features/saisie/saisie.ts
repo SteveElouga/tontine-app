@@ -57,6 +57,10 @@ export class Saisie implements OnInit {
   protected readonly membreIndex = signal(0);
   protected readonly lignes = signal<Ligne[]>([]);
   protected readonly chargement = signal(true);
+  /** Ferme après le tout premier chargement réussi (mois ou membre) : la cascade
+   *  d'entrée des lignes (voir grille-membres--entree) ne doit jouer qu'une fois
+   *  par visite d'écran, jamais aux changements de mois/membre. */
+  protected readonly entreeInitiale = signal(true);
   /** Jour de la saisie (ISO) — par défaut aujourd'hui, modifiable en vue « Par mois ». */
   protected readonly dateSaisie = signal<string>(this.aujourdhui());
 
@@ -264,6 +268,9 @@ export class Saisie implements OnInit {
         // Pré-remplit le sélecteur avec la date de la réunion du mois, sinon aujourd'hui.
         this.dateSaisie.set(rows.find((r) => r.date)?.date ?? this.aujourdhui());
         this.chargement.set(false);
+        if (this.entreeInitiale()) {
+          setTimeout(() => this.entreeInitiale.set(false), 600);
+        }
       },
       error: () => this.erreurChargement(),
     });
@@ -294,6 +301,9 @@ export class Saisie implements OnInit {
           }),
         );
         this.chargement.set(false);
+        if (this.entreeInitiale()) {
+          setTimeout(() => this.entreeInitiale.set(false), 600);
+        }
       },
       error: () => this.erreurChargement(),
     });
@@ -330,5 +340,10 @@ export class Saisie implements OnInit {
   protected readonly jourFormate = computed(() => this.formatJour(this.dateSaisie(), 'long'));
   protected jourCourt(iso: string | null | undefined): string {
     return iso ? this.formatJour(iso, 'short') : '';
+  }
+
+  /** Décalage d'entrée en cascade, plafonné pour ne pas s'étirer sur une longue liste. */
+  protected retardEntree(i: number): number {
+    return Math.min(i * 30, 240);
   }
 }
